@@ -1,16 +1,17 @@
 import "./globals.css";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import { createMetadata } from "@/lib/metadata";
+import { baseUrl, createMetadata } from "@/lib/metadata";
 import { Providers } from "@/components/providers";
+
 
 export const metadata = createMetadata({
   title: {
-    template: "%s | Base by BuildAppolis",
-    default: "Base",
+    template: "%s | Ohriv",
+    default: "Ohriv",
   },
-  description: "Base is a powerful boilerplate for building modern web applications.",
-  metadataBase: new URL("https://ohriv.com"),
+  description: "Preview of Ohriv and its features.",
+  metadataBase: new URL(`${baseUrl}`),
 });
 
 export default function RootLayout({
