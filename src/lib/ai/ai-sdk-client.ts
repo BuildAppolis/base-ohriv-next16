@@ -8,15 +8,10 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, streamText } from "ai";
 import {
   AIRequestSchema,
-  AIStreamingRequestSchema,
   AIResponseSchema,
   AIStreamEventSchema,
-  AI_MODELS,
-  type AIRequest,
-  type AIStreamingRequest,
   type AIResponse,
-  type AIStreamEvent,
-  type AIModel
+  type AIStreamEvent
 } from "@/schemas/ai";
 import OpenAI from "openai";
 
@@ -30,9 +25,22 @@ const openaiClient = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Type-safe options interface extending our Zod schema
-export interface AISDKGenerateOptions extends Partial<AIRequest> {
+// Type-safe options interface with required fields matching our AI operations
+export interface AISDKGenerateOptions {
+  // Required fields from AIRequest
+  prompt: string;
   model?: string;
+
+  // Optional fields with proper types
+  type?: "general" | "analysis" | "recommendations" | "custom" | "json";
+  responseFormat?: "text" | "json";
+  temperature?: number;
+  maxTokens?: number;
+  systemPrompt?: string;
+  instructions?: string;
+  context?: Record<string, unknown> | string;
+
+  // Extended options
   reasoning?: "none" | "low" | "medium" | "high";
   verbosity?: "low" | "medium" | "high";
   instructionSet?: "ksa-framework" | "ksa-framework-short" | string;
@@ -49,12 +57,18 @@ export interface AISDKStreamingOptions extends AISDKGenerateOptions {
 
 // GPT-5 models that may have compatibility issues with AI SDK
 const GPT5_MODELS = new Set([
-  AI_MODELS.GPT_5_1,
-  AI_MODELS.GPT_5,
-  AI_MODELS.GPT_5_MINI,
-  AI_MODELS.GPT_5_NANO,
-  AI_MODELS.GPT_5_PRO,
+  'gpt-5.1',
+  'gpt-5',
+  'gpt-5-mini',
+  'gpt-5-nano',
+  'gpt-5-pro',
 ]);
+
+// Default models
+const DEFAULT_MODELS = {
+  GPT_4O: 'gpt-4o',
+  GPT_35_TURBO: 'gpt-3.5-turbo'
+} as const;
 
 function isGPT5Model(model?: string): boolean {
   return model ? GPT5_MODELS.has(model as any) : false;
@@ -102,7 +116,7 @@ export async function generateSimple(
 
   const startTime = Date.now();
   const {
-    model = AI_MODELS.GPT_4O,
+    model = DEFAULT_MODELS.GPT_4O,
     prompt,
     context,
     instructions,
@@ -234,6 +248,14 @@ export async function generateSimple(
       type,
       responseFormat,
       timestamp: new Date().toISOString(),
+      usage: result.usage ? {
+        promptTokens: (result.usage as any).promptTokens || 0,
+        completionTokens: (result.usage as any).completionTokens || 0,
+        totalTokens: (result.usage as any).totalTokens || 0
+      } : undefined,
+      metadata: {
+        processingTime: Date.now() - startTime
+      }
     };
   } catch (error) {
     console.error("AI SDK generation failed:", error);
@@ -253,7 +275,7 @@ export async function generateStreamSimple(
   onEvent: (event: any) => void
 ) {
   const {
-    model = AI_MODELS.GPT_4O,
+    model = DEFAULT_MODELS.GPT_4O,
     prompt,
     context,
     instructions,
@@ -426,7 +448,7 @@ async function generateStreamGPT5(
   onEvent: (event: any) => void
 ) {
   const {
-    model = AI_MODELS.GPT_4O,
+    model = DEFAULT_MODELS.GPT_4O,
     prompt,
     context,
     instructions,
