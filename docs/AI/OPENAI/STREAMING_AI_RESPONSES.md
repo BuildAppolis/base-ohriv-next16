@@ -52,7 +52,7 @@ for event in stream:
 ```csharp
 using OpenAI.Responses;
 
-string key = Environment.GetEnvironmentVariable("OPEN_AI_API_KEY")!;
+string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
 OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
 
 var responses = client.CreateResponseStreamingAsync([

@@ -15,7 +15,7 @@ macOS / Linux
 Export an environment variable on macOS or Linux systems
 
 ```bash
-export OPEN_AI_API_KEY="your_api_key_here"
+export OPENAI_API_KEY="your_api_key_here"
 ```
 
 Windows
@@ -23,7 +23,7 @@ Windows
 Export an environment variable in PowerShell
 
 ```bash
-setx OPEN_AI_API_KEY "your_api_key_here"
+setx OPENAI_API_KEY "your_api_key_here"
 ```
 
 OpenAI SDKs are configured to automatically read your API key from the system environment.
@@ -123,7 +123,7 @@ class Program
     static async Task Main()
     {
         var client = new OpenAIClient(
-            Environment.GetEnvironmentVariable("OPEN_AI_API_KEY")
+            Environment.GetEnvironmentVariable("OPENAI_API_KEY")
         );
 
         var response = await client.Responses.CreateAsync(new ResponseCreateRequest
@@ -218,7 +218,7 @@ import (
 
 func main() {
 	client := openai.NewClient(
-		option.WithAPIKey("My API Key"), // or set OPEN_AI_API_KEY in your env
+		option.WithAPIKey("My API Key"), // or set OPENAI_API_KEY in your env
 	)
 
 	resp, err := client.Responses.New(context.TODO(), openai.ResponseNewParams{

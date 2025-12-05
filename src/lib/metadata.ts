@@ -4,16 +4,19 @@ export function createMetadata(override: Metadata): Metadata {
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "https://base-ohriv-next16.vercel.app";
+      : process.env.NEXT_PUBLIC_APP_URL
+        ? process.env.NEXT_PUBLIC_APP_URL.startsWith('http')
+          ? process.env.NEXT_PUBLIC_APP_URL
+          : `https://${process.env.NEXT_PUBLIC_APP_URL}`
+        : process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : undefined;
 
-  return {
+  const metadata: Metadata = {
     ...override,
     openGraph: {
       title: override.title ?? "OHRIV Platform",
       description: override.description ?? "Advanced HR and business intelligence platform",
-      url: baseUrl,
       images: [
         {
           url: "/OG_IMAGE.png",
@@ -34,13 +37,26 @@ export function createMetadata(override: Metadata): Metadata {
       images: ["/OG_IMAGE.png"],
       ...override.twitter,
     },
-    metadataBase: new URL(baseUrl),
   };
+
+  // Only add URL-dependent metadata if baseUrl is available
+  if (baseUrl) {
+    if (!metadata.openGraph) metadata.openGraph = {};
+    metadata.openGraph.url = baseUrl;
+
+    metadata.metadataBase = new URL(baseUrl);
+  }
+
+  return metadata;
 }
 
-export const baseUrl =
+export const baseUrl: URL | undefined =
   process.env.NODE_ENV === "development"
     ? new URL("http://localhost:3000")
-    : process.env.VERCEL_URL
-      ? new URL(`https://${process.env.VERCEL_URL}`)
-      : new URL("https://base-ohriv-next16.vercel.app");
+    : process.env.NEXT_PUBLIC_APP_URL
+      ? new URL(process.env.NEXT_PUBLIC_APP_URL.startsWith('http')
+          ? process.env.NEXT_PUBLIC_APP_URL
+          : `https://${process.env.NEXT_PUBLIC_APP_URL}`)
+      : process.env.VERCEL_URL
+        ? new URL(`https://${process.env.VERCEL_URL}`)
+        : undefined;

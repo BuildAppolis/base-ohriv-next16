@@ -1,7 +1,7 @@
 import "./globals.css";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import { baseUrl, createMetadata } from "@/lib/metadata";
+import { createMetadata } from "@/lib/metadata";
 import { Providers } from "@/components/providers";
 
 
@@ -11,7 +11,6 @@ export const metadata = createMetadata({
     default: "Ohriv",
   },
   description: "Preview of Ohriv and its features.",
-  metadataBase: new URL(`${baseUrl}`),
 });
 
 export default function RootLayout({

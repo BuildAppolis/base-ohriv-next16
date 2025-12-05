@@ -8,7 +8,7 @@ import OpenAI from "openai";
 
 // Export server-side OpenAI client with secure API key
 export const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Server-side AI model constants for API route usage

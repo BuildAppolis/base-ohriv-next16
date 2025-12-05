@@ -11,12 +11,12 @@ import OpenAI from "openai";
 
 // Initialize OpenAI provider with the correct environment variable
 const openai = createOpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Fallback OpenAI client for GPT-5 models
 const openaiClient = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export interface AISDKGenerateOptions {
