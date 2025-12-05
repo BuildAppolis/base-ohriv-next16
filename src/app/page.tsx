@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loginDemo } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import Splitter from '@/components/ui/splitter'
 
-export default function PasswordPage() {
+function PasswordPageContent() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -63,18 +63,14 @@ export default function PasswordPage() {
 
       const result = await loginDemo(password, redirectTo, request)
 
-      console.log('Login result:', result) // Debug log
-
       if (result.success) {
         router.push(redirectTo)
         router.refresh()
       } else {
-        console.log('Setting error:', result.error) // Debug log
         setError(result.error || 'Login failed')
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Caught error in handleSubmit:', error) // Debug log
       setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
@@ -153,5 +149,13 @@ export default function PasswordPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function PasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4"><Card className="w-full max-w-md"><CardContent className="pt-6"><div className="flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div></CardContent></Card></div>}>
+      <PasswordPageContent />
+    </Suspense>
   )
 }

@@ -84,7 +84,8 @@ const isRateLimited = async (identifier: string): Promise<{ isLimited: boolean; 
     pipeline.expire(key, 24 * 60 * 60); // Auto-expire after 24 hours
 
     const results = await pipeline.exec();
-    const data = results?.[0]?.[1] as any;
+    const firstResult = results?.[0];
+    const data = firstResult && Array.isArray(firstResult) ? firstResult[1] as Record<string, any> : null;
 
     if (!data || Object.keys(data).length === 0) {
       // First time seeing this client
@@ -197,9 +198,6 @@ const getGlobalRateLimit = async (action: string): Promise<boolean> => {
 
 export async function loginDemo(password: string, redirectTo?: string, request?: Request): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('Environment check - Redis URL:', process.env.UPSTASH_REDIS_REST_URL ? 'SET' : 'NOT SET');
-    console.log('Environment check - Redis Token:', process.env.UPSTASH_REDIS_REST_TOKEN ? 'SET' : 'NOT SET');
-    console.log('Login attempt with password:', password.substring(0, 3) + '***'); // Debug log
     // Global rate limiting check
     const globalAllowed = await getGlobalRateLimit('login-attempt');
     if (!globalAllowed) {
@@ -276,7 +274,6 @@ export async function loginDemo(password: string, redirectTo?: string, request?:
 
     return { success: true }
   } catch (error) {
-    console.error('Error in loginDemo:', error); // Debug log
     logger.auth.error('Error during demo login', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
