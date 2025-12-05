@@ -1,0 +1,100 @@
+Generate KSA interview questions using this exact JSON structure:
+
+{
+  "KSAs": {
+    "Knowledge": {
+      "definition": "Information and understanding needed for the role",
+      "weighting": 40,
+      "behavioral_indicators": ["Industry knowledge", "Technical understanding", "Business awareness"],
+      "assessment_methods": ["Technical questions", "Scenario analysis"],
+      "red_flag_indicators": ["Lacks basic knowledge", "Cannot apply knowledge"]
+    },
+    "Skills": {
+      "definition": "Practical capabilities and proficiencies",
+      "weighting": 35,
+      "behavioral_indicators": ["Technical skills", "Tool proficiency", "Problem-solving"],
+      "assessment_methods": ["Practical tests", "Tool demonstration"],
+      "red_flag_indicators": ["Poor technical skills", "Ineffective tool usage"]
+    },
+    "Abilities": {
+      "definition": "Capacity to perform and deliver results",
+      "weighting": 25,
+      "behavioral_indicators": ["Leadership", "Initiative", "Accountability"],
+      "assessment_methods": ["Behavioral interviews", "Past performance review"],
+      "red_flag_indicators": ["No leadership", "Poor accountability"]
+    }
+  },
+  "KSA_JobFit": {
+    "Knowledge": {
+      "questions": [
+        {
+          "id": 1,
+          "category": "Knowledge",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "[Company-specific knowledge question]",
+          "evaluation_criteria": "Demonstrates understanding and application",
+          "expected_answers": "Shows depth of knowledge",
+          "follow_up_probes": ["How did you learn this?", "How have you applied it?"],
+          "red_flag_indicators": ["No specific knowledge", "Cannot apply concepts"]
+        }
+      ]
+    },
+    "Skills": {
+      "questions": [
+        {
+          "id": 2,
+          "category": "Skills",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "[Technical skills question using company technologies]",
+          "evaluation_criteria": "Demonstrates practical application",
+          "expected_answers": "Shows hands-on experience",
+          "follow_up_probes": ["What tools did you use?", "What challenges did you face?"],
+          "red_flag_indicators": ["No practical skills", "Poor problem-solving"]
+        }
+      ]
+    },
+    "Abilities": {
+      "questions": [
+        {
+          "id": 3,
+          "category": "Abilities",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "[Leadership/ownership question]",
+          "evaluation_criteria": "Shows responsibility and impact",
+          "expected_answers": "Demonstrates ownership",
+          "follow_up_probes": ["What was your role?", "What was the outcome?"],
+          "red_flag_indicators": ["No ownership", "Poor leadership"]
+        }
+      ]
+    }
+  },
+  "CoreValues_CompanyFit": {
+    "[VALUE_1]": {
+      "questions": [
+        {
+          "id": 4,
+          "category": "[VALUE_1]",
+          "type": "behavioral",
+          "question_text": "[Value-specific question using company values]",
+          "sample_indicators": {
+            "strong_response": "Demonstrates alignment with [VALUE_1]",
+            "weak_response": "Shows no understanding of [VALUE_1]"
+          },
+          "follow_up_probes": ["How did you apply this?", "What was the impact?"]
+        }
+      ]
+    }
+  }
+}
+
+IMPORTANT:
+- Replace [Company-specific] with actual company name
+- Replace [VALUE_1] with exact core values from input
+- Use provided technologies in questions
+- All questions must be behavioral ("Tell me about...", "Describe a time...")
+- Include 3 follow-up probes per question
+- Include red_flag_indicators for job questions
+- Include sample_indicators for value questions

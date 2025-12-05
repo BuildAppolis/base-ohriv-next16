@@ -1,0 +1,18 @@
+{
+  "enabledMcpjsonServers": [
+    "console-ninja",
+    "ohriv-better-auth",
+    "shadcn-ui",
+    "upstash-context-7-mcp"
+  ],
+  "permissions": {
+    "allow": ["Bash(pnpm :*)", "Bash(npm run :*)"]
+  },
+  "env": {
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
+    "ANTHROPIC_AUTH_TOKEN": "7ab50e2f518f42e9ab20e07fb8930c0e.y7chVJDrz3TJzH5J",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic"
+  }
+}

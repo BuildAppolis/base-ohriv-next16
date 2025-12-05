@@ -1,0 +1,181 @@
+{
+  "KSA_JobFit": {
+    "Knowledge": {
+      "attribute": {
+        "definition": "Understanding of enterprise software development principles and industry trends.",
+        "evaluation_scale": {
+          "1": "Cannot perform job duty",
+          "2": "Cannot perform job duty",
+          "3": "Requires significant training/guidance to perform job duty",
+          "4": "Requires significant training/guidance to perform job duty",
+          "5": "Able to perform job duties with minimal guidance",
+          "6": "Able to perform job duties with minimal guidance",
+          "7": "Able to perform job duties and positively impact performance of peers",
+          "8": "Able to perform job duties and positively impact performance of peers",
+          "9": "Transforms the way the team delivers",
+          "10": "Transforms the way the team delivers"
+        },
+        "weighting": 40,
+        "red_flags": [
+          "Low understanding of software development lifecycle",
+          "Not aware of industry trends",
+          "Struggles to connect business needs with software solutions"
+        ]
+      },
+      "questions": [
+        {
+          "id": 1,
+          "category": "Knowledge",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "Can you describe a recent major trend in enterprise software development and how it impacts business operations?",
+          "evaluation_criteria": "Depth of understanding of current trends and their relevance to business.",
+          "expected_answers": "Insight into the trend, its implications, and examples of applications.",
+          "follow_up_probes": [
+            "How have you implemented a similar trend in your previous work?",
+            "Can you provide a specific example of how this trend improved software delivery?"
+          ],
+          "red_flag_indicators": [
+            "Vague or unconvincing explanation of trends",
+            "Lack of practical application in previous experiences"
+          ]
+        },
+        {
+          "id": 2,
+          "category": "Knowledge",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "Describe how you ensure that you stay updated with evolving technologies in software development.",
+          "evaluation_criteria": "Engagement in continuous learning and knowledge application.",
+          "expected_answers": "Mentorship, courses attended, resources used (e.g., industry blogs, webinars).",
+          "follow_up_probes": [
+            "How often do you engage with these resources?",
+            "Give an example of how learning improved your work performance."
+          ],
+          "red_flag_indicators": [
+            "No specific examples of learning or engagement",
+            "Lack of motivation for professional development"
+          ]
+        }
+      ]
+    },
+    "Skills": {
+      "attribute": {
+        "definition": "Proficient use of collaboration tools and coding languages relevant to the role.",
+        "evaluation_scale": {
+          "1": "Cannot perform job duty",
+          "2": "Cannot perform job duty",
+          "3": "Requires significant training/guidance to perform job duty",
+          "4": "Requires significant training/guidance to perform job duty",
+          "5": "Able to perform job duties with minimal guidance",
+          "6": "Able to perform job duties with minimal guidance",
+          "7": "Able to perform job duties and positively impact performance of peers",
+          "8": "Able to perform job duties and positively impact performance of peers",
+          "9": "Transforms the way the team delivers",
+          "10": "Transforms the way the team delivers"
+        },
+        "weighting": 35,
+        "red_flags": [
+          "Struggles with basic programming tasks",
+          "Has difficulty using essential collaboration tools",
+          "Fails to demonstrate proficiency in relevant technologies"
+        ]
+      },
+      "questions": [
+        {
+          "id": 3,
+          "category": "Skills",
+          "type": "behavioral",
+          "difficulty": "advanced",
+          "question_text": "Provide an example of a complex problem you solved using programming skills. What was your approach?",
+          "evaluation_criteria": "Ability to articulate technical problem-solving processes.",
+          "expected_answers": "Clear steps taken, technologies used, and the outcome achieved.",
+          "follow_up_probes": [
+            "What challenges did you face during implementation?",
+            "How did you ensure the solution met user needs?"
+          ],
+          "red_flag_indicators": [
+            "Inability to explain problem-solving processes clearly",
+            "Lack of technical depth or specificity"
+          ]
+        },
+        {
+          "id": 4,
+          "category": "Skills",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "Discuss how you have utilized collaboration tools (like Jira or Slack) in managing a project.",
+          "evaluation_criteria": "Experience and proficiency with tools for project management and team collaboration.",
+          "expected_answers": "Examples of managing tasks or communication via tools.",
+          "follow_up_probes": [
+            "How did those tools improve project outcomes?",
+            "What features did you find most beneficial, and why?"
+          ],
+          "red_flag_indicators": [
+            "Negative or vague responses about tool effectiveness",
+            "Limited exposure to collaboration tools"
+          ]
+        }
+      ]
+    },
+    "Ability": {
+      "attribute": {
+        "definition": "Capacity to lead projects and produce results effectively.",
+        "evaluation_scale": {
+          "1": "Cannot perform job duty",
+          "2": "Cannot perform job duty",
+          "3": "Requires significant training/guidance to perform job duty",
+          "4": "Requires significant training/guidance to perform job duty",
+          "5": "Able to perform job duties with minimal guidance",
+          "6": "Able to perform job duties with minimal guidance",
+          "7": "Able to perform job duties and positively impact performance of peers",
+          "8": "Able to perform job duties and positively impact performance of peers",
+          "9": "Transforms the way the team delivers",
+          "10": "Transforms the way the team delivers"
+        },
+        "weighting": 25,
+        "red_flags": [
+          "Inconsistent performance in team or leadership roles",
+          "Failure to demonstrate initiative or accountability",
+          "Limited results in previous projects or roles"
+        ]
+      },
+      "questions": [
+        {
+          "id": 5,
+          "category": "Ability",
+          "type": "behavioral",
+          "difficulty": "advanced",
+          "question_text": "Can you describe a time when you were responsible for a project? What was the outcome, and what did you learn?",
+          "evaluation_criteria": "Demonstration of leadership skills and accountability for project outcomes.",
+          "expected_answers": "Clear descriptions of roles, challenges faced, and personal growth.",
+          "follow_up_probes": [
+            "How did you measure success for the project?",
+            "What would you do differently if you could lead that project again?"
+          ],
+          "red_flag_indicators": [
+            "Vague explanations of projects",
+            "Inability to accept responsibility for project outcomes"
+          ]
+        },
+        {
+          "id": 6,
+          "category": "Ability",
+          "type": "behavioral",
+          "difficulty": "intermediate",
+          "question_text": "Describe a situation where you identified a significant opportunity to improve a process. How did you approach it?",
+          "evaluation_criteria": "Ability to identify and implement process improvements.",
+          "expected_answers": "Specific improvements made and the impact on efficiency or outcomes.",
+          "follow_up_probes": [
+            "What factors did you consider while proposing the change?",
+            "How did you communicate this change to your team?"
+          ],
+          "red_flag_indicators": [
+            "Inability to identify opportunities for improvement",
+            "No clear examples of changes made or their results"
+          ]
+        }
+      ]
+    }
+  }
+}

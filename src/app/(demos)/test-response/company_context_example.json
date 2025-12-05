@@ -1,0 +1,457 @@
+{
+  "company_profile": {
+    "name": "TechCorp Solutions",
+    "industry": "technology",
+    "sub_industry": "Enterprise Software",
+    "size": "201-500",
+    "location": "San Francisco, CA",
+    "stage": {
+      "name": "Series B",
+      "phase": "growth"
+    }
+  },
+  "mission_and_culture": {
+    "mission_statement": "We're dedicated to transforming businesses through innovative enterprise software that combines cutting-edge technology with practical business solutions. Our mission is to accelerate digital transformation and empower organizations to reach their full potential.",
+    "core_values": [
+      {
+        "name": "Innovation",
+        "description": "Pushing boundaries and exploring new possibilities"
+      },
+      {
+        "name": "Excellence",
+        "description": "Delivering high-quality solutions and exceeding expectations"
+      },
+      {
+        "name": "Collaboration",
+        "description": "Working together to achieve common goals"
+      },
+      {
+        "name": "Growth",
+        "description": "Continuous learning and personal development"
+      }
+    ]
+  },
+  "interview_steps": {
+    "total_steps": 6,
+    "steps": [
+      {
+        "name": "Screening",
+        "order": 1,
+        "type": "screening",
+        "generates_questions": true,
+        "description": "Initial resume and application review"
+      },
+      {
+        "name": "Technical Assessment",
+        "order": 2,
+        "type": "technical",
+        "generates_questions": true,
+        "description": "Skills and technical evaluation"
+      },
+      {
+        "name": "Behavioral Interview",
+        "order": 3,
+        "type": "cultural",
+        "generates_questions": true,
+        "description": "Cultural fit and behavioral assessment"
+      },
+      {
+        "name": "Final Interview",
+        "order": 4,
+        "type": "final",
+        "generates_questions": true,
+        "description": "Final decision-making interview"
+      },
+      {
+        "name": "System Design Interview",
+        "order": 5,
+        "type": "final",
+        "generates_questions": true,
+        "description": "Architecture and system design evaluation for senior roles"
+      },
+      {
+        "name": "Culture Fit Assessment",
+        "order": 6,
+        "type": "final",
+        "generates_questions": false,
+        "description": "Team culture and collaboration evaluation"
+      }
+    ]
+  },
+  "technologies": {
+    "languages": [
+      {
+        "name": "TypeScript",
+        "company_specific": false
+      },
+      {
+        "name": "Python",
+        "company_specific": false
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "React",
+        "type": "fullstack",
+        "description": "Component-based UI library for building user interfaces",
+        "company_specific": false
+      },
+      {
+        "name": "FastAPI",
+        "type": "fullstack",
+        "description": "Modern, fast web framework for building APIs with Python",
+        "company_specific": false
+      },
+      {
+        "name": "Django",
+        "type": "fullstack",
+        "description": "High-level Python web framework for rapid development",
+        "company_specific": false
+      }
+    ],
+    "databases": [
+      {
+        "name": "PostgreSQL",
+        "type": "sql",
+        "usage_pattern": "Advanced open-source relational database with rich features",
+        "scale": "small",
+        "company_specific": false
+      },
+      {
+        "name": "Redis",
+        "type": "cache",
+        "usage_pattern": "In-memory data structure store for caching and real-time data",
+        "scale": "small",
+        "company_specific": false
+      }
+    ],
+    "infrastructure": [
+      {
+        "name": "Amazon Web Services",
+        "category": "cloud",
+        "purpose": "Enterprise cloud infrastructure with managed services and multi-account setup",
+        "company_specific": false
+      },
+      {
+        "name": "Kubernetes",
+        "category": "cloud",
+        "purpose": "Container orchestration platform for automating deployment",
+        "company_specific": false
+      },
+      {
+        "name": "Docker",
+        "category": "cloud",
+        "purpose": "Platform for developing, shipping, and running applications",
+        "company_specific": false
+      }
+    ],
+    "tools": [
+      {
+        "name": "GitHub",
+        "category": "collaboration",
+        "purpose": "general purpose tool",
+        "company_specific": false
+      },
+      {
+        "name": "Jira",
+        "category": "collaboration",
+        "purpose": "general purpose tool",
+        "company_specific": false
+      }
+    ]
+  },
+  "positions": [
+    {
+      "title": "Software Engineer",
+      "category": "engineering",
+      "seniority_level": 5,
+      "total_levels": 3,
+      "role_requirements": {
+        "core_responsibilities": [
+          "Design and develop robust software architecture",
+          "Write clean, maintainable, and testable code",
+          "Collaborate with product managers and designers",
+          "Participate in code reviews and architectural discussions",
+          "Optimize application performance and scalability",
+          "Develop and test features in React and Node.js",
+          "Participate in daily standups and sprint planning",
+          "Learn and apply company coding standards",
+          "Collaborate with QA team to ensure quality deliverables",
+          "Debug and resolve technical issues with guidance",
+          "Design and implement complex system features",
+          "Mentor junior engineers in best practices",
+          "Lead technical discussions and architecture reviews",
+          "Collaborate with cross-functional teams on integrations",
+          "Optimize application performance and security",
+          "Lead system architecture and design decisions",
+          "Mentor and develop engineering talent",
+          "Drive engineering best practices and innovation",
+          "Collaborate with CTO and product leadership on roadmap",
+          "Evaluate and introduce new technologies"
+        ],
+        "key_objectives": [
+          "Transform business requirements into scalable software solutions that drive digital transformation"
+        ],
+        "impact_areas": [
+          "End-to-end software development from concept to deployment in agile teams"
+        ],
+        "scope": "company",
+        "reach": "internal",
+        "complexity": "strategic"
+      },
+      "extended_descriptions": [
+        "This role is ideal for recent graduates or developers with 0-2 years of experience looking to grow their skills in a fast-paced environment. You'll work closely with senior engineers, participate in code reviews, and have opportunities to contribute to production features while learning modern development practices. The team follows agile methodologies with 2-week sprints and emphasizes mentorship and skill development. You'll have access to learning resources, conference opportunities, and a clear growth path within the engineering organization."
+      ],
+      "position_tools": [
+        {
+          "name": "Docker",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Containerize applications and manage deployments"
+        },
+        {
+          "name": "Kubernetes",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Deploy applications and manage container workloads"
+        },
+        {
+          "name": "Terraform",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use terraform for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Datadog",
+          "category": "monitoring_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use datadog for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Prometheus",
+          "category": "monitoring_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use prometheus for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Architecture discussions and team leadership",
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Team communication and code reviews",
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Linear",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use linear for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Docker",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Containerize applications and manage deployments"
+        },
+        {
+          "name": "Kubernetes",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Deploy applications and manage container workloads"
+        },
+        {
+          "name": "Jira",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Code review participation and sprint planning",
+          "job_specific_usage": "Track tasks, update progress, and participate in sprint ceremonies"
+        },
+        {
+          "name": "Datadog",
+          "category": "monitoring_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use datadog for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "DevOps coordination and deployment discussions",
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Docker",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Containerize applications and manage deployments"
+        },
+        {
+          "name": "Kubernetes",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Deploy applications and manage container workloads"
+        },
+        {
+          "name": "Terraform",
+          "category": "cloud_infrastructure",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use terraform for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Datadog",
+          "category": "monitoring_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use datadog for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Prometheus",
+          "category": "monitoring_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use prometheus for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Architecture discussions and team leadership",
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        }
+      ]
+    },
+    {
+      "title": "Product Manager",
+      "category": "leadership",
+      "seniority_level": 5,
+      "total_levels": 1,
+      "role_requirements": {
+        "core_responsibilities": [
+          "Define product strategy and roadmap",
+          "Conduct market research and customer interviews",
+          "Work with engineering teams on feature development",
+          "Analyze product metrics and user feedback",
+          "Collaborate with sales and marketing teams",
+          "Define and prioritize product features",
+          "Write detailed user stories and acceptance criteria",
+          "Work closely with engineering teams on development",
+          "Analyze user feedback and product analytics",
+          "Present product roadmap to stakeholders"
+        ],
+        "key_objectives": [
+          "Shape product vision and roadmap to solve customer problems and drive business growth"
+        ],
+        "impact_areas": [
+          "End-to-end product management from market research to product launch"
+        ],
+        "scope": "company",
+        "reach": "customer_facing",
+        "complexity": "strategic"
+      },
+      "extended_descriptions": [
+        "This is a high-impact product management role requiring strong technical understanding and business acumen. You'll be the voice of the customer, working closely with engineering, design, and business stakeholders to deliver enterprise-grade solutions. The role involves significant stakeholder management, including C-level executives, and requires excellent communication and presentation skills. You'll have autonomy over product decisions while working within a collaborative environment. Success in this role typically leads to Senior Product Manager or Product Lead positions within 2-3 years, with opportunities to mentor junior PMs and lead larger product initiatives."
+      ],
+      "position_tools": [
+        {
+          "name": "Jira",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Product backlog management and sprint planning",
+          "job_specific_usage": "Oversee project management processes and resource allocation"
+        },
+        {
+          "name": "Confluence",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Documentation and team knowledge base",
+          "job_specific_usage": "Use confluence for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Notion",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Product planning and team organization",
+          "job_specific_usage": "Use notion for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Linear",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use linear for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Jira",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Product backlog management and sprint planning",
+          "job_specific_usage": "Oversee project management processes and resource allocation"
+        },
+        {
+          "name": "Confluence",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Documentation and team knowledge base",
+          "job_specific_usage": "Use confluence for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Notion",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 8,
+          "company_specific_context": "Product planning and team organization",
+          "job_specific_usage": "Use notion for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Linear",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use linear for daily development tasks and collaborate with team members"
+        },
+        {
+          "name": "Slack",
+          "category": "collaboration_tools",
+          "usage_frequency": "daily",
+          "proficiency_required": 6,
+          "job_specific_usage": "Use slack for daily development tasks and collaborate with team members"
+        }
+      ]
+    }
+  ]
+}
