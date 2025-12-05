@@ -11,7 +11,7 @@ import type {
   GeneratedQuestion,
   GeneratedJobTemplate,
   LevelExpectations,
-} from "@/types/company";
+} from "@/types/company_old";
 
 export interface MockDatabaseOperation {
   model: string;

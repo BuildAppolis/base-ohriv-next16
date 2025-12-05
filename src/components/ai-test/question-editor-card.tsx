@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GeneratedAttribute } from './attribute-editor';
-import type { CompanyStage } from '@/types/company/generation-types';
+import type { CompanyStage } from '@/types/company_old/generation-types';
 
 export interface GeneratedQuestion {
   id: string;
@@ -38,8 +38,8 @@ export interface GeneratedQuestion {
   assessmentType: "company-fit" | "role-fit" | "both"; // Whether evaluating company values or job-specific skills
   assignedLevels?: string[]; // Job levels this question applies to (e.g., ["Senior", "Lead"])
   expectations: {
-    scoringAnchors: import('@/types/company/generation-types').ScoringAnchors; // 5x2 bucket scoring system
-    followUpQuestions: import('@/types/company/generation-types').FollowUpQuestion[];
+    scoringAnchors: import('@/types/company_old/generation-types').ScoringAnchors; // 5x2 bucket scoring system
+    followUpQuestions: import('@/types/company_old/generation-types').FollowUpQuestion[];
   };
   internalNotes?: string;
 }

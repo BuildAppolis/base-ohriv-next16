@@ -29,7 +29,7 @@ import {
   // type KSAJobFit,
   // type KSACoreValuesCompanyFit,
   // type KSAFramework
-} from '@/types/company/ksa'
+} from '@/types/company_old/ksa'
 import { CompanyContextInput } from '@/types/ai/company'
 import { GPT5_FAMILY_OPTIONS, type AIModelOption } from '@/lib/ai/ai-models'
 

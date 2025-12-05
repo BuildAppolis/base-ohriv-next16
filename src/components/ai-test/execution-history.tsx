@@ -8,7 +8,7 @@ import { Loader2, CheckCircle2, XCircle, Brain, Code, Briefcase, ChevronDown, Ch
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-import { CompanyStage, GeneratedAttribute, GeneratedQuestion } from '@/types/company';
+import { CompanyStage, GeneratedAttribute, GeneratedQuestion } from '@/types/company_old';
 import { AttributeEditor } from './attribute-editor';
 import { QuestionEditor } from './question-editor';
 

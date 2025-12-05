@@ -4,7 +4,7 @@
  */
 
 import { openai, AI_MODELS } from "@/lib/open_ai/client";
-import { GenerationResult } from "@/types/company";
+import { GenerationResult } from "@/types/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 
 export async function generateCompanyDescription(): Promise<

@@ -4,14 +4,14 @@
  */
 
 import { openai, AI_MODELS } from "@/lib/open_ai/client";
-import { CompanyContext, GenerationResult } from "@/types/company";
+import { CompanyContext, GenerationResult } from "@/types/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 import {
   BUSINESS_MODELS,
   COMPANY_STAGES,
   INDUSTRIES,
   COMPANY_SIZES,
-} from "@/types/company/company-enums";
+} from "@/types/company_old/company-enums";
 
 export async function analyzeContext(
   description: string,

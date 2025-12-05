@@ -10,7 +10,7 @@ import {
   RoleDetails,
   GeneratedAttribute,
   GeneratedQuestion,
-} from "@/types/company";
+} from "@/types/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 import {
   getJobLevelsForDifficulty,
@@ -18,7 +18,7 @@ import {
   getDifficultyFocusDescription,
   type QuestionDifficulty,
   type JobSeniorityLevel,
-} from "@/types/company/job_levels";
+} from "@/types/company_old/job_levels";
 export interface LevelAssignment {
   id: string;
   level: string;

@@ -8,7 +8,7 @@ import { streamAttributes } from "@/lib/ai/_instructions/streaming-attribute-gen
 import type {
   CompanyContext,
   RoleDetails,
-} from "@/types/company/generation-types";
+} from "@/types/company_old/generation-types";
 import { serverLogger as logger } from "@/lib/logger";
 
 export const runtime = "nodejs";

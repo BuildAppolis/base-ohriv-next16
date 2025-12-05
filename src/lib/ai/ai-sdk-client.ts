@@ -1,12 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * AI SDK Client - Simple and reliable AI generation
+ * AI SDK Client - Simple and reliable AI generation with type safety
  * Uses the AI SDK which handles all the complexity automatically
+ * Enhanced with comprehensive Zod schema validation
  */
 
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, streamText } from "ai";
-import { AI_MODELS } from "@/lib/open_ai/client";
+import {
+  AIRequestSchema,
+  AIStreamingRequestSchema,
+  AIResponseSchema,
+  AIStreamEventSchema,
+  AI_MODELS,
+  type AIRequest,
+  type AIStreamingRequest,
+  type AIResponse,
+  type AIStreamEvent,
+  type AIModel
+} from "@/schemas/ai";
 import OpenAI from "openai";
 
 // Initialize OpenAI provider with the correct environment variable
@@ -19,19 +30,21 @@ const openaiClient = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export interface AISDKGenerateOptions {
+// Type-safe options interface extending our Zod schema
+export interface AISDKGenerateOptions extends Partial<AIRequest> {
   model?: string;
-  prompt: string;
-  context?: any;
-  instructions?: string;
-  instructionSet?: string;
-  temperature?: number;
-  maxTokens?: number;
-  type?: "general" | "analysis" | "recommendations" | "custom" | "json";
-  systemPrompt?: string;
-  responseFormat?: "text" | "json";
   reasoning?: "none" | "low" | "medium" | "high";
   verbosity?: "low" | "medium" | "high";
+  instructionSet?: "ksa-framework" | "ksa-framework-short" | string;
+}
+
+// Type-safe streaming options interface
+export interface AISDKStreamingOptions extends AISDKGenerateOptions {
+  onEvent?: (event: AIStreamEvent) => void;
+  onStart?: () => void;
+  onProgress?: (content: string, progress: number) => void;
+  onComplete?: (result: AIResponse) => void;
+  onError?: (error: Error) => void;
 }
 
 // GPT-5 models that may have compatibility issues with AI SDK
@@ -47,6 +60,7 @@ function isGPT5Model(model?: string): boolean {
   return model ? GPT5_MODELS.has(model as any) : false;
 }
 
+// Type-safe result interface matching our Zod schema
 export interface AISDKGenerateResult {
   content: string;
   contentLength: number;
@@ -55,14 +69,38 @@ export interface AISDKGenerateResult {
   type: string;
   responseFormat: string;
   timestamp: string;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  metadata?: {
+    processingTime: number;
+    requestId?: string;
+  };
 }
 
 /**
- * Simple AI generation using AI SDK
+ * Simple AI generation using AI SDK with schema validation
  */
 export async function generateSimple(
   options: AISDKGenerateOptions
 ): Promise<AISDKGenerateResult> {
+  // Validate input using our Zod schema
+  const validatedOptions = AIRequestSchema.parse({
+    prompt: options.prompt,
+    type: options.type || 'general',
+    responseFormat: options.responseFormat || 'text',
+    temperature: options.temperature || 0.7,
+    maxTokens: options.maxTokens || 2000,
+    systemPrompt: options.systemPrompt,
+    instructions: options.instructions,
+    context: options.context,
+    requestId: crypto.randomUUID(),
+    timestamp: new Date().toISOString()
+  });
+
+  const startTime = Date.now();
   const {
     model = AI_MODELS.GPT_4O,
     prompt,

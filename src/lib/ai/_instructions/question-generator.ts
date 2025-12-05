@@ -11,7 +11,7 @@ import {
   GeneratedAttribute,
   GeneratedQuestion,
   GenerationResult,
-} from "@/types/company";
+} from "@/types/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 import {
   getDifficultyDistribution,
@@ -19,7 +19,7 @@ import {
   getDifficultyLevelsForJobLevel,
   isDifficultyAppropriateForJobLevel,
   QuestionDifficulty,
-} from "@/types/company/job_levels";
+} from "@/types/company_old/job_levels";
 
 const MAX_QUESTIONS_PER_STAGE = 4; // Maximum 4 questions per stage total
 const QUESTIONS_PER_BATCH = 8; // Questions per API call (to stay within token limits)

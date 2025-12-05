@@ -28,7 +28,7 @@ import {
 import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { QuestionEditorCard, GeneratedQuestion } from './question-editor-card';
 import type { GeneratedAttribute } from './attribute-editor';
-import type { CompanyStage } from '@/types/company/generation-types';
+import type { CompanyStage } from '@/types/company_old/generation-types';
 
 interface QuestionEditorProps {
   questions: GeneratedQuestion[];

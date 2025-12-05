@@ -31,9 +31,9 @@ export type {
   LevelAssignment,
   CellResult,
   ExecutionTracking,
-} from "@/types/company";
+} from "@/types/company_old";
 
-export type { GenerationStep, DescriptionAnalysis } from "@/types/company";
+export type { GenerationStep, DescriptionAnalysis } from "@/types/company_old";
 export * from "@/lib/open_ai/client";
 export * from "./context-analyzer";
 export * from "./attribute-generator";

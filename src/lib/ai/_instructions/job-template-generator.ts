@@ -10,7 +10,7 @@ import {
   GeneratedAttribute,
   GeneratedJobTemplate,
   GenerationResult,
-} from "@/types/company";
+} from "@/types/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 
 export interface LevelAssignment {
