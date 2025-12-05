@@ -50,16 +50,31 @@ export default function PasswordPage() {
     setError(null)
 
     try {
-      const result = await loginDemo(password, redirectTo)
+      // Create a minimal request object for client identification
+      const request = new Request(window.location.href, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': navigator.userAgent,
+          // Add client IP if available (will be populated by server in production)
+          'X-Forwarded-For': window.location.hostname,
+        },
+      })
+
+      const result = await loginDemo(password, redirectTo, request)
+
+      console.log('Login result:', result) // Debug log
 
       if (result.success) {
         router.push(redirectTo)
         router.refresh()
       } else {
+        console.log('Setting error:', result.error) // Debug log
         setError(result.error || 'Login failed')
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error('Caught error in handleSubmit:', error) // Debug log
       setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
