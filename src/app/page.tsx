@@ -73,7 +73,7 @@ export default function PasswordPage() {
           <div className='w-fit flex gap-2 items-center'>
             <Logo withText={true} />
             <Splitter orientation="vertical" className="h-6" />
-            <CardTitle className="text-sm">Demo Access</CardTitle>
+            <CardTitle className="text-sm">Preview Center</CardTitle>
 
           </div>
           <CardDescription>
