@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Redis } from "@upstash/redis";
 import fs from "fs";
 import path from "path";
@@ -52,6 +53,7 @@ export async function setRunRecord(id: string, record: RunRecord) {
     const all = await readAllFromFile();
     all[id] = record;
     await writeFile(FILE_PATH, JSON.stringify(all), "utf8");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     // swallow file write errors in serverless
     // console.error("Failed to persist run record to file", err);
@@ -72,6 +74,7 @@ export async function getRunRecord(id: string): Promise<RunRecord | null> {
   try {
     const all = await readAllFromFile();
     if (all[id]) return all[id];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     // ignore
   }

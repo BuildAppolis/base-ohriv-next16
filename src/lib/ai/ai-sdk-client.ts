@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * AI SDK Client - Simple and reliable AI generation
  * Uses the AI SDK which handles all the complexity automatically
  */
 
-import { createOpenAI } from '@ai-sdk/openai';
-import { generateText, streamText } from 'ai';
-import { AI_MODELS } from '@/lib/open_ai/client';
-import OpenAI from 'openai';
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText, streamText } from "ai";
+import { AI_MODELS } from "@/lib/open_ai/client";
+import OpenAI from "openai";
 
 // Initialize OpenAI provider with the correct environment variable
 const openai = createOpenAI({
@@ -29,8 +30,8 @@ export interface AISDKGenerateOptions {
   type?: "general" | "analysis" | "recommendations" | "custom" | "json";
   systemPrompt?: string;
   responseFormat?: "text" | "json";
-  reasoning?: 'none' | 'low' | 'medium' | 'high';
-  verbosity?: 'low' | 'medium' | 'high';
+  reasoning?: "none" | "low" | "medium" | "high";
+  verbosity?: "low" | "medium" | "high";
 }
 
 // GPT-5 models that may have compatibility issues with AI SDK
@@ -59,7 +60,9 @@ export interface AISDKGenerateResult {
 /**
  * Simple AI generation using AI SDK
  */
-export async function generateSimple(options: AISDKGenerateOptions): Promise<AISDKGenerateResult> {
+export async function generateSimple(
+  options: AISDKGenerateOptions
+): Promise<AISDKGenerateResult> {
   const {
     model = AI_MODELS.GPT_4O,
     prompt,
@@ -71,8 +74,8 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
     type = "general",
     systemPrompt,
     responseFormat = "text",
-    reasoning,
-    verbosity,
+    // reasoning,
+    // verbosity,
   } = options;
 
   // Build the full prompt
@@ -84,8 +87,8 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
     let instructionSetContent = "";
     if (instructionSet === "ksa-framework") {
       // Load KSA framework instructions
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -96,8 +99,8 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
         console.error("Failed to load KSA framework instructions", error);
       }
     } else if (instructionSet === "ksa-framework-short") {
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -140,20 +143,33 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
 
   switch (type) {
     case "analysis":
-      finalSystemPrompt = systemPrompt || "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
       break;
     case "recommendations":
-      finalSystemPrompt = systemPrompt || "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
       break;
     case "json":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
       break;
     case "custom":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant with expertise in the provided domain.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant with expertise in the provided domain.";
       break;
   }
 
-  console.log('AI SDK: Generating with model:', model, 'Response format:', responseFormat);
+  console.log(
+    "AI SDK: Generating with model:",
+    model,
+    "Response format:",
+    responseFormat
+  );
 
   // Configure generation parameters
   const generateOptions: any = {
@@ -166,7 +182,7 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
 
   // Add JSON format if requested
   if (responseFormat === "json") {
-    generateOptions.format = 'json';
+    generateOptions.format = "json";
   }
 
   try {
@@ -182,8 +198,12 @@ export async function generateSimple(options: AISDKGenerateOptions): Promise<AIS
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
-    console.error('AI SDK generation failed:', error);
-    throw new Error(`AI generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error("AI SDK generation failed:", error);
+    throw new Error(
+      `AI generation failed: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
 }
 
@@ -205,13 +225,16 @@ export async function generateStreamSimple(
     type = "general",
     systemPrompt,
     responseFormat = "text",
-    reasoning,
-    verbosity,
+    // reasoning,
+    // verbosity,
   } = options;
 
   // For GPT-5 models, use the original OpenAI implementation
   if (isGPT5Model(model)) {
-    console.log('AI SDK: Using fallback OpenAI implementation for GPT-5 model:', model);
+    console.log(
+      "AI SDK: Using fallback OpenAI implementation for GPT-5 model:",
+      model
+    );
     return generateStreamGPT5(options, onEvent);
   }
 
@@ -223,8 +246,8 @@ export async function generateStreamSimple(
   if (instructionSet) {
     let instructionSetContent = "";
     if (instructionSet === "ksa-framework") {
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -235,8 +258,8 @@ export async function generateStreamSimple(
         console.error("Failed to load KSA framework instructions", error);
       }
     } else if (instructionSet === "ksa-framework-short") {
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -279,20 +302,28 @@ export async function generateStreamSimple(
 
   switch (type) {
     case "analysis":
-      finalSystemPrompt = systemPrompt || "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
       break;
     case "recommendations":
-      finalSystemPrompt = systemPrompt || "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
       break;
     case "json":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
       break;
     case "custom":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant with expertise in the provided domain.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant with expertise in the provided domain.";
       break;
   }
 
-  console.log('AI SDK: Starting stream with model:', model);
+  console.log("AI SDK: Starting stream with model:", model);
 
   // Configure generation parameters
   const generateOptions: any = {
@@ -305,7 +336,7 @@ export async function generateStreamSimple(
 
   // Add JSON format if requested
   if (responseFormat === "json") {
-    generateOptions.format = 'json';
+    generateOptions.format = "json";
   }
 
   try {
@@ -319,7 +350,10 @@ export async function generateStreamSimple(
       onEvent({
         type: "progress",
         content: fullContent,
-        progress: Math.min((fullContent.length / (maxTokens || 2000)) * 100, 95),
+        progress: Math.min(
+          (fullContent.length / (maxTokens || 2000)) * 100,
+          95
+        ),
       });
     }
 
@@ -336,9 +370,8 @@ export async function generateStreamSimple(
         timestamp: new Date().toISOString(),
       },
     });
-
   } catch (error) {
-    console.error('AI SDK streaming failed:', error);
+    console.error("AI SDK streaming failed:", error);
     onEvent({
       type: "error",
       message: "AI generation failed",
@@ -365,8 +398,8 @@ async function generateStreamGPT5(
     type = "general",
     systemPrompt,
     responseFormat = "text",
-    reasoning = 'none', // Default for GPT-5
-    verbosity = 'medium', // Default for GPT-5
+    reasoning = "none", // Default for GPT-5
+    verbosity = "medium", // Default for GPT-5
   } = options;
 
   // Build the full prompt (same logic as above)
@@ -377,8 +410,8 @@ async function generateStreamGPT5(
   if (instructionSet) {
     let instructionSetContent = "";
     if (instructionSet === "ksa-framework") {
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -389,8 +422,8 @@ async function generateStreamGPT5(
         console.error("Failed to load KSA framework instructions", error);
       }
     } else if (instructionSet === "ksa-framework-short") {
-      const fs = await import('fs');
-      const path = await import('path');
+      const fs = await import("fs");
+      const path = await import("path");
       try {
         const instructionsPath = path.join(
           process.cwd(),
@@ -433,26 +466,34 @@ async function generateStreamGPT5(
 
   switch (type) {
     case "analysis":
-      finalSystemPrompt = systemPrompt || "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert analyst. Break down complex information into clear insights and actionable recommendations.";
       break;
     case "recommendations":
-      finalSystemPrompt = systemPrompt || "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are an expert advisor. Provide specific, actionable recommendations based on the provided context.";
       break;
     case "json":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant. Respond with valid JSON only. Do not include any explanations or text outside of the JSON structure.";
       break;
     case "custom":
-      finalSystemPrompt = systemPrompt || "You are a helpful AI assistant with expertise in the provided domain.";
+      finalSystemPrompt =
+        systemPrompt ||
+        "You are a helpful AI assistant with expertise in the provided domain.";
       break;
   }
 
-  console.log('GPT-5: Starting OpenAI streaming with model:', model);
+  console.log("GPT-5: Starting OpenAI streaming with model:", model);
 
   try {
     // Determine if we use responses or chat completions endpoint
     const useResponsesEndpoint = GPT5_MODELS.has(model as any);
 
-    let openaiRequest: any = {
+    const openaiRequest: any = {
       model,
       stream: true,
     };
@@ -493,7 +534,7 @@ async function generateStreamGPT5(
       chunkCount++;
 
       if (chunkCount > MAX_CHUNKS) {
-        console.warn('GPT-5: Maximum chunks reached, ending stream');
+        console.warn("GPT-5: Maximum chunks reached, ending stream");
         break;
       }
 
@@ -510,11 +551,15 @@ async function generateStreamGPT5(
           chunk.text,
           chunk.response,
           chunk.data,
-          chunk.choices?.[0]?.delta?.content // Fallback for mixed endpoints
+          chunk.choices?.[0]?.delta?.content, // Fallback for mixed endpoints
         ];
 
         for (const source of deltaSources) {
-          if (source && typeof source === 'string' && source.trim().length > 0) {
+          if (
+            source &&
+            typeof source === "string" &&
+            source.trim().length > 0
+          ) {
             delta = source;
             break;
           }
@@ -529,17 +574,23 @@ async function generateStreamGPT5(
         onEvent({
           type: "progress",
           content: fullContent,
-          progress: Math.min((fullContent.length / (maxTokens || 2000)) * 100, 95),
+          progress: Math.min(
+            (fullContent.length / (maxTokens || 2000)) * 100,
+            95
+          ),
         });
       }
 
       // Check for completion
       const isComplete = useResponsesEndpoint
-        ? (chunk.status === 'completed' || chunk.status === 'succeeded' || chunk.status === 'finished' || chunk.done)
-        : (chunk.choices?.[0]?.finish_reason);
+        ? chunk.status === "completed" ||
+          chunk.status === "succeeded" ||
+          chunk.status === "finished" ||
+          chunk.done
+        : chunk.choices?.[0]?.finish_reason;
 
       if (isComplete) {
-        console.log('GPT-5: Stream completed naturally');
+        console.log("GPT-5: Stream completed naturally");
         break;
       }
 
@@ -552,25 +603,28 @@ async function generateStreamGPT5(
         // Check if this looks like a complete response
         let isComplete = false;
 
-        if (['.', '!', '?', ')', ']', '}', '"', "'"].includes(lastChar)) {
+        if ([".", "!", "?", ")", "]", "}", '"', "'"].includes(lastChar)) {
           isComplete = true;
-        } else if (responseFormat === 'json') {
+        } else if (responseFormat === "json") {
           // For JSON, check if it looks complete but has trailing comma
           try {
             // Try to parse and see if it's valid JSON after cleaning trailing commas
-            const cleaned = trimmed.replace(/,\s*$/, '').replace(/,\s*([}\]])/g, '$1');
+            const cleaned = trimmed
+              .replace(/,\s*$/, "")
+              .replace(/,\s*([}\]])/g, "$1");
             JSON.parse(cleaned);
             isComplete = true;
             // Use the cleaned version for the final content
             fullContent = cleaned;
-            console.log('GPT-5: Fixed JSON trailing comma, ending naturally');
+            console.log("GPT-5: Fixed JSON trailing comma, ending naturally");
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (e) {
             // Not valid JSON yet, continue streaming
           }
         }
 
-        if (isComplete && responseFormat !== 'json') {
-          console.log('GPT-5: Stream appears complete, ending naturally');
+        if (isComplete && responseFormat !== "json") {
+          console.log("GPT-5: Stream appears complete, ending naturally");
           break;
         }
       }
@@ -589,9 +643,8 @@ async function generateStreamGPT5(
         timestamp: new Date().toISOString(),
       },
     });
-
   } catch (error) {
-    console.error('GPT-5 streaming failed:', error);
+    console.error("GPT-5 streaming failed:", error);
     onEvent({
       type: "error",
       message: "GPT-5 generation failed",
