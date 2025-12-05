@@ -1193,26 +1193,7 @@ function HeaderSectionCallout({ children }: { children: React.ReactNode }) {
 }
 
 function HeaderSectionCalloutTooltip({ fileKey }: { fileKey: TooltipKey }) {
-  const [content, setContent] = useState(initialTooltipContent[fileKey]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/docs?file=${encodeURIComponent(fileKey)}`);
-        const data = await res.json();
-        if (!cancelled && data?.content) {
-          setContent(["```", data.content.trim(), "```"].join("\n"));
-        }
-      } catch {
-        // keep fallback
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [fileKey]);
+  const content = initialTooltipContent[fileKey];
 
   return (
     <TooltipProvider delayDuration={50}>

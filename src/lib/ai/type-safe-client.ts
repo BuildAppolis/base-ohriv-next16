@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Type-Safe AI Client with Zod Schema Validation
  * This is a new implementation that provides comprehensive type safety for AI operations
@@ -9,23 +10,13 @@ import {
   AIRequestSchema,
   AIStreamingRequestSchema,
   AIResponseSchema,
-  AIStreamEventSchema,
-  type AIRequest,
-  type AIStreamingRequest,
-  type AIResponse,
   type AIStreamEvent,
   type AIGenerationType,
-  type AIResponseFormat
+  type AIResponseFormat,
 } from "@/schemas/ai";
-import OpenAI from "openai";
 
 // Initialize OpenAI provider
 const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Fallback OpenAI client for GPT-5 models
-const openaiClient = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -96,28 +87,33 @@ export async function generateTypeSafe(
     // Validate input using our Zod schema
     const validatedRequest = AIRequestSchema.parse({
       prompt: options.prompt,
-      type: options.type || 'general',
-      responseFormat: options.responseFormat || 'text',
+      type: options.type || "general",
+      responseFormat: options.responseFormat || "text",
       temperature: options.temperature || 0.7,
       maxTokens: options.maxTokens || 2000,
       systemPrompt: options.systemPrompt,
       instructions: options.instructions,
       context: options.context,
       requestId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
-    const model = options.model || 'gpt-4o';
+    const model = options.model || "gpt-4o";
 
     // Build the full prompt
     let fullPrompt = validatedRequest.prompt;
-    let finalSystemPrompt = validatedRequest.systemPrompt || "You are a helpful AI assistant.";
+    let finalSystemPrompt =
+      validatedRequest.systemPrompt || "You are a helpful AI assistant.";
 
     // Add context if provided
     if (validatedRequest.context) {
       let contextString = "";
       if (typeof validatedRequest.context === "object") {
-        contextString = `CONTEXT:\n${JSON.stringify(validatedRequest.context, null, 2)}\n\n`;
+        contextString = `CONTEXT:\n${JSON.stringify(
+          validatedRequest.context,
+          null,
+          2
+        )}\n\n`;
       } else {
         contextString = `CONTEXT:\n${validatedRequest.context}\n\n`;
       }
@@ -165,7 +161,12 @@ export async function generateTypeSafe(
       generateOptions.format = "json";
     }
 
-    console.log("TypeSafe AI: Generating with model:", model, "Type:", validatedRequest.type);
+    console.log(
+      "TypeSafe AI: Generating with model:",
+      model,
+      "Type:",
+      validatedRequest.type
+    );
 
     const result = await generateText(generateOptions);
     const processingTime = Date.now() - startTime;
@@ -179,19 +180,22 @@ export async function generateTypeSafe(
         requestId,
         timestamp: new Date().toISOString(),
         processingTime,
-        usage: result.usage ? {
-          promptTokens: result.usage.promptTokens,
-          completionTokens: result.usage.completionTokens,
-          totalTokens: result.usage.totalTokens
-        } : undefined
-      }
+        usage: result.usage
+          ? {
+              promptTokens: result.usage.inputTokens || 0,
+              completionTokens: result.usage.outputTokens || 0,
+              totalTokens:
+                (result.usage.inputTokens || 0) +
+                (result.usage.outputTokens || 0),
+            }
+          : undefined,
+      },
     };
 
     // Validate response using our schema
     const validatedResponse = AIResponseSchema.parse(response);
 
     return validatedResponse;
-
   } catch (error) {
     const processingTime = Date.now() - startTime;
     console.error("TypeSafe AI generation failed:", error);
@@ -201,16 +205,16 @@ export async function generateTypeSafe(
       success: false,
       content: "",
       metadata: {
-        model: options.model || 'unknown',
+        model: options.model || "unknown",
         requestId,
         timestamp: new Date().toISOString(),
-        processingTime
+        processingTime,
       },
       error: {
-        code: 'GENERATION_ERROR',
+        code: "GENERATION_ERROR",
         message: error instanceof Error ? error.message : "Unknown error",
-        details: error
-      }
+        details: error,
+      },
     };
 
     return errorResponse;
@@ -232,19 +236,24 @@ export async function generateTypeSafeStream(
       ...options,
       stream: true,
       requestId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
-    const model = options.model || 'gpt-4o';
+    const model = options.model || "gpt-4o";
 
     // Build the full prompt (same logic as above)
     let fullPrompt = validatedRequest.prompt;
-    let finalSystemPrompt = validatedRequest.systemPrompt || "You are a helpful AI assistant.";
+    let finalSystemPrompt =
+      validatedRequest.systemPrompt || "You are a helpful AI assistant.";
 
     if (validatedRequest.context) {
       let contextString = "";
       if (typeof validatedRequest.context === "object") {
-        contextString = `CONTEXT:\n${JSON.stringify(validatedRequest.context, null, 2)}\n\n`;
+        contextString = `CONTEXT:\n${JSON.stringify(
+          validatedRequest.context,
+          null,
+          2
+        )}\n\n`;
       } else {
         contextString = `CONTEXT:\n${validatedRequest.context}\n\n`;
       }
@@ -280,10 +289,10 @@ export async function generateTypeSafeStream(
 
     // Send start event
     const startEvent: AIStreamEvent = {
-      type: 'start',
+      type: "start",
       id: crypto.randomUUID(),
       requestId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (options.onStart) options.onStart();
@@ -312,23 +321,31 @@ export async function generateTypeSafeStream(
 
       // Create progress event
       const progressEvent: AIStreamEvent = {
-        type: 'progress',
+        type: "progress",
         id: crypto.randomUUID(),
         requestId,
         timestamp: new Date().toISOString(),
         content: fullContent,
         progress: {
           current: fullContent.length,
-          percentage: Math.min((fullContent.length / (validatedRequest.maxTokens || 2000)) * 100, 95)
-        }
+          percentage: Math.min(
+            (fullContent.length / (validatedRequest.maxTokens || 2000)) * 100,
+            95
+          ),
+        },
       };
 
       if (options.onEvent) options.onEvent(progressEvent);
-      if (options.onProgress) options.onProgress(fullContent, progressEvent.progress?.percentage || 0);
+      if (options.onProgress)
+        options.onProgress(
+          fullContent,
+          progressEvent.progress?.percentage || 0
+        );
     }
 
     // Create completion result
     const processingTime = Date.now() - startTime;
+    const usage = await result.usage;
     const completionResult: TypeSafeAIGenerateResult = {
       success: true,
       content: fullContent,
@@ -337,46 +354,47 @@ export async function generateTypeSafeStream(
         requestId,
         timestamp: new Date().toISOString(),
         processingTime,
-        usage: result.usage ? {
-          promptTokens: result.usage.promptTokens,
-          completionTokens: result.usage.completionTokens,
-          totalTokens: result.usage.totalTokens
-        } : undefined
-      }
+        usage: usage
+          ? {
+              promptTokens: usage.inputTokens || 0,
+              completionTokens: usage.outputTokens || 0,
+              totalTokens: (usage.inputTokens || 0) + (usage.outputTokens || 0),
+            }
+          : undefined,
+      },
     };
 
-    // Send completion event
+    // Create complete event
     const completeEvent: AIStreamEvent = {
-      type: 'complete',
+      type: "complete",
       id: crypto.randomUUID(),
       requestId,
       timestamp: new Date().toISOString(),
       result: completionResult,
-      usage: completionResult.metadata.usage
+      usage: completionResult.metadata.usage,
     };
 
     if (options.onEvent) options.onEvent(completeEvent);
     if (options.onComplete) options.onComplete(completionResult);
-
   } catch (error) {
-    const processingTime = Date.now() - startTime;
     console.error("TypeSafe AI streaming failed:", error);
 
     const errorEvent: AIStreamEvent = {
-      type: 'error',
+      type: "error",
       id: crypto.randomUUID(),
       requestId,
       timestamp: new Date().toISOString(),
       error: {
-        code: 'STREAM_ERROR',
+        code: "STREAM_ERROR",
         message: error instanceof Error ? error.message : "Unknown error",
-        details: error
-      }
+        details: error,
+      },
     };
 
     if (options.onEvent) options.onEvent(errorEvent);
     if (options.onError) {
-      const errorObj = error instanceof Error ? error : new Error('Unknown streaming error');
+      const errorObj =
+        error instanceof Error ? error : new Error("Unknown streaming error");
       options.onError(errorObj);
     }
   }

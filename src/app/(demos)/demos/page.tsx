@@ -25,19 +25,20 @@ export default function DemoCatalogPage() {
           const Icon = demo.icon;
 
           return (
-            <Card key={demo.href} className="border bg-card/80 shadow-sm">
-              <CardHeader className="flex flex-row items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Icon className="size-4 text-primary" />
-                    {demo.title}
-                  </CardTitle>
-                  <p className="text-muted-foreground text-sm">
-                    {demo.description}
-                  </p>
-                </div>
-              </CardHeader>
+            <Card key={demo.href} className="">
+
               <CardContent className="flex items-center justify-end">
+                <CardHeader className="flex flex-row items-start justify-between border-none">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center gap-2 text-lg ">
+                      <Icon className="size-4 text-primary" />
+                      {demo.title}
+                    </CardTitle>
+                    <p className="text-muted-foreground text-sm">
+                      {demo.description}
+                    </p>
+                  </div>
+                </CardHeader>
                 <Button asChild size="sm" variant="primary">
                   <Link href={demo.href} className="flex items-center gap-1">
                     Open <ArrowRightIcon className="size-3.5" />

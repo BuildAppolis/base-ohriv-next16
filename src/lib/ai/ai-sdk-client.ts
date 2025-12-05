@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * AI SDK Client - Simple and reliable AI generation with type safety
  * Uses the AI SDK which handles all the complexity automatically
@@ -6,13 +7,7 @@
 
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, streamText } from "ai";
-import {
-  AIRequestSchema,
-  AIResponseSchema,
-  AIStreamEventSchema,
-  type AIResponse,
-  type AIStreamEvent
-} from "@/schemas/ai";
+import { type AIResponse, type AIStreamEvent } from "@/schemas/ai";
 import OpenAI from "openai";
 
 // Initialize OpenAI provider with the correct environment variable
@@ -57,21 +52,21 @@ export interface AISDKStreamingOptions extends AISDKGenerateOptions {
 
 // GPT-5 models that may have compatibility issues with AI SDK
 const GPT5_MODELS = new Set([
-  'gpt-5.1',
-  'gpt-5',
-  'gpt-5-mini',
-  'gpt-5-nano',
-  'gpt-5-pro',
+  "gpt-5.1",
+  "gpt-5",
+  "gpt-5-mini",
+  "gpt-5-nano",
+  "gpt-5-pro",
 ]);
 
 // Default models
 const DEFAULT_MODELS = {
-  GPT_4O: 'gpt-4o',
-  GPT_35_TURBO: 'gpt-3.5-turbo'
+  GPT_4O: "gpt-4o",
+  GPT_35_TURBO: "gpt-3.5-turbo",
 } as const;
 
 function isGPT5Model(model?: string): boolean {
-  return model ? GPT5_MODELS.has(model as any) : false;
+  return model ? GPT5_MODELS.has(model) : false;
 }
 
 // Type-safe result interface matching our Zod schema
@@ -100,19 +95,19 @@ export interface AISDKGenerateResult {
 export async function generateSimple(
   options: AISDKGenerateOptions
 ): Promise<AISDKGenerateResult> {
-  // Validate input using our Zod schema
-  const validatedOptions = AIRequestSchema.parse({
-    prompt: options.prompt,
-    type: options.type || 'general',
-    responseFormat: options.responseFormat || 'text',
-    temperature: options.temperature || 0.7,
-    maxTokens: options.maxTokens || 2000,
-    systemPrompt: options.systemPrompt,
-    instructions: options.instructions,
-    context: options.context,
-    requestId: crypto.randomUUID(),
-    timestamp: new Date().toISOString()
-  });
+  // // Validate input using our Zod schema
+  // const validatedOptions = AIRequestSchema.parse({
+  //   prompt: options.prompt,
+  //   type: options.type || 'general',
+  //   responseFormat: options.responseFormat || 'text',
+  //   temperature: options.temperature || 0.7,
+  //   maxTokens: options.maxTokens || 2000,
+  //   systemPrompt: options.systemPrompt,
+  //   instructions: options.instructions,
+  //   context: options.context,
+  //   requestId: crypto.randomUUID(),
+  //   timestamp: new Date().toISOString()
+  // });
 
   const startTime = Date.now();
   const {
@@ -248,14 +243,16 @@ export async function generateSimple(
       type,
       responseFormat,
       timestamp: new Date().toISOString(),
-      usage: result.usage ? {
-        promptTokens: (result.usage as any).promptTokens || 0,
-        completionTokens: (result.usage as any).completionTokens || 0,
-        totalTokens: (result.usage as any).totalTokens || 0
-      } : undefined,
+      usage: result.usage
+        ? {
+            promptTokens: (result.usage as any).promptTokens || 0,
+            completionTokens: (result.usage as any).completionTokens || 0,
+            totalTokens: (result.usage as any).totalTokens || 0,
+          }
+        : undefined,
       metadata: {
-        processingTime: Date.now() - startTime
-      }
+        processingTime: Date.now() - startTime,
+      },
     };
   } catch (error) {
     console.error("AI SDK generation failed:", error);

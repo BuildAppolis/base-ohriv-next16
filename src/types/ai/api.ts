@@ -16,6 +16,7 @@ export interface AIGenerationRequestBody {
   prompt: string;
 
   /** Context data object (company data, user data, etc.) */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context?: any;
 
   /** Additional instructions to supplement the instruction set */
@@ -62,15 +63,15 @@ export interface AIGenerationRequest {
 
 /** AI generation type categories */
 export type AIGenerationType =
-  | "general"        // General purpose generation
-  | "analysis"       // Analytical and insight generation
+  | "general" // General purpose generation
+  | "analysis" // Analytical and insight generation
   | "recommendations" // Recommendation generation
-  | "custom"         // Custom specialized generation
-  | "json";          // Structured JSON output
+  | "custom" // Custom specialized generation
+  | "json"; // Structured JSON output
 
 /** AI response format options */
 export type AIResponseFormat =
-  | "text"  // Plain text response
+  | "text" // Plain text response
   | "json"; // Structured JSON response
 
 /** AI model identifiers */
@@ -110,10 +111,10 @@ export interface AIGenerationResult {
  * AI generation event types for streaming
  */
 export type AIStreamEventType =
-  | "start"     // Generation started
-  | "progress"  // Generation progress with partial content
-  | "complete"  // Generation completed successfully
-  | "error";    // Generation failed
+  | "start" // Generation started
+  | "progress" // Generation progress with partial content
+  | "complete" // Generation completed successfully
+  | "error"; // Generation failed
 
 /**
  * AI streaming event data
@@ -167,7 +168,7 @@ export const AI_GENERATION_DEFAULTS = {
   RESPONSE_FORMAT: "text" as AIResponseFormat,
 
   /** Default streaming enabled */
-  ENABLE_STREAMING: true
+  ENABLE_STREAMING: true,
 } as const;
 
 // ============================================================================
