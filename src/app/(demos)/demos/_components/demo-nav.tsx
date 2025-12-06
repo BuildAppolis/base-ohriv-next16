@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import {
-  Code2Icon,
   LayersIcon,
   FormInputIcon,
   TargetIcon,
@@ -81,12 +80,6 @@ export const demoLinks: DemoLink[] = [
   //   description: "Queue orchestration playground.",
   //   icon: PanelTopIcon,
   // },
-  {
-    title: "Scoring & Evaluation",
-    href: "/demos/scoring-and-evaluation",
-    description: "Human and AI evaluation demo.",
-    icon: Code2Icon,
-  },
   {
     title: "Candidates",
     href: "/demos/candidates",
