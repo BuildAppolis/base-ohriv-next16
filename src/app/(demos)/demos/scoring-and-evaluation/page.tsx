@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useState, useMemo, useRef, useEffect } from 'react'
@@ -6,15 +7,12 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Slider, SliderThumb } from '@/components/ui/slider'
-import { Info, CheckCircle2, AlertCircle, Zap, User, Briefcase, Target, FileJson, Upload } from 'lucide-react'
+import { Info, CheckCircle2, AlertCircle, Zap, User, Briefcase, Target, FileJson } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAtom, useAtomValue } from 'jotai'
 import { candidatesAtom } from '@/lib/atoms/candidate-atoms'
 import {
-  stageKSAScoresAtom,
-  evaluationSessionsAtom,
-  currentSessionIdAtom,
-  currentStageIdAtom,
+
   currentEvaluatorNameAtom,
   selectedKSAFrameworkAtom,
   selectedJobCategoryAtom,
@@ -22,10 +20,7 @@ import {
   saveAttributeScoreAtom,
   completeStageEvaluationAtom,
   currentSessionAtom,
-  currentStageScoresAtom,
-  getCandidateCompletionStatusAtom,
-  EVALUATION_STAGES,
-  EVALUATION_ATTRIBUTES
+
 } from '@/lib/atoms/multistage-ksa-atoms'
 import { evaluateCandidateKSA } from '@/lib/candidate-ksa-evaluator'
 import { KSAInterviewOutput } from '@/types/company_old/ksa'
@@ -1055,14 +1050,14 @@ export default function UIDemoPage() {
         {/* Header with Stage Switcher */}
         <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold">Enhanced Candidate Evaluation System</h1>
+            <h1 className="text-3xl font-bold">Candidate Evaluation System</h1>
             <p className="text-muted-foreground mt-2">
               Multi-stage evaluation with integrated KSA framework assessment
             </p>
           </div>
 
           {/* KSA Setup Card */}
-          <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+          <Card className="">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
@@ -1082,7 +1077,7 @@ export default function UIDemoPage() {
                     <option value="">Choose a candidate...</option>
                     {Object.values(candidates).map(candidate => (
                       <option key={candidate.id} value={candidate.id}>
-                        {candidate.personalInfo.firstName} {candidate.personalInfo.lastName} - {candidate.experience.currentPosition.title}
+                        {candidate.firstName} {candidate.lastName} - Age {candidate.age}
                       </option>
                     ))}
                   </select>
@@ -1208,7 +1203,7 @@ export default function UIDemoPage() {
           </Card>
 
           {/* Stage/Evaluator Selector */}
-          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+          <Card className="">
             <CardContent className="pt-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -1249,20 +1244,20 @@ export default function UIDemoPage() {
 
         {/* Candidate Info - Only show if candidate is selected and KSA is setup */}
         {selectedCandidate && ksaFramework && (
-          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+          <Card className="">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                  {selectedCandidate.personalInfo.firstName[0]}{selectedCandidate.personalInfo.lastName[0]}
+                  {selectedCandidate.firstName[0]}{selectedCandidate.lastName[0]}
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold flex items-center gap-2">
                     <User className="h-5 w-5" />
-                    {selectedCandidate.personalInfo.firstName} {selectedCandidate.personalInfo.lastName}
+                    {selectedCandidate.firstName} {selectedCandidate.lastName}
                   </h3>
                   <p className="text-muted-foreground flex items-center gap-2 mt-1">
                     <Briefcase className="h-4 w-4" />
-                    {selectedCandidate.experience.currentPosition.title}
+                    Age {selectedCandidate.age} • ID: {selectedCandidate.id.split('-')[1]}
                   </p>
                 </div>
                 <Badge variant="outline" className="text-sm">
@@ -1281,346 +1276,346 @@ export default function UIDemoPage() {
               <h2 className="text-xl font-semibold mb-3">Step 1: Select Attribute to Evaluate</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {stageAttributes.map(attr => {
-              const questionCount = demoQuestions.filter(q =>
-                q.stageId === currentStage && q.attributeIds.includes(attr.id)
-              ).length
-              const isCompleted = completedAttributes.has(attr.id)
+                  const questionCount = demoQuestions.filter(q =>
+                    q.stageId === currentStage && q.attributeIds.includes(attr.id)
+                  ).length
+                  const isCompleted = completedAttributes.has(attr.id)
 
-              return (
-                <Card
-                  key={attr.id}
-                  className={cn(
-                    "cursor-pointer transition-all hover:shadow-md py-2 relative",
-                    selectedAttribute === attr.id && "ring-2 ring-primary shadow-md",
-                    isCompleted && "opacity-60"
-                  )}
-                  onClick={() => setSelectedAttribute(attr.id)}
-                >
-                  {isCompleted && (
-                    <div className="absolute top-2 right-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    </div>
-                  )}
-                  <CardHeader className='border-none'>
-                    <div className="space-y-3">
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-2xl flex-shrink-0">{attr.icon}</span>
-                        <span className="flex-1">{attr.name}</span>
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        {attr.description}
-                      </CardDescription>
-                      <div className="flex gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {questionCount} {questionCount === 1 ? 'Question' : 'Questions'}
-                        </Badge>
-                        {isCompleted && (
-                          <Badge className="text-xs bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">
-                            Scored
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Questions and Answers */}
-        {selectedAttribute && relevantQuestions.length > 0 && (
-          <div>
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold">
-                    Step 2: Review Questions & Candidate Answers
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Ask as many questions as you need to get enough signal to score this attribute.
-                    You can adjust the score during or after the interview.
-                  </p>
-                </div>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-sm whitespace-nowrap",
-                    questionsAskedCount > 0 && "border-primary/50 bg-primary/10 text-primary"
-                  )}
-                >
-                  {questionsAskedCount} of {relevantQuestions.length} asked
-                </Badge>
-              </div>
-
-              {questionsAskedCount === 0 && (
-                <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <Info className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
-                    <strong>Getting started:</strong> Check the box next to each question as you ask it during the interview.
-                    This helps you track which questions you've covered.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4 mt-4">
-              {relevantQuestions.map((question, idx) => {
-                const answer = candidateAnswers.find(a => a.questionId === question.id)
-                const isAsked = askedQuestions.has(question.id)
-
-                return (
-                  <Card
-                    key={question.id}
-                    className={cn(
-                      "transition-all",
-                      isAsked && "border-primary/50 bg-primary/5"
-                    )}
-                  >
-                    <CardHeader className='py-4'>
-                      <div className="flex items-start gap-4 w-full">
-                        <div className="pt-1">
-                          <input
-                            type="checkbox"
-                            checked={isAsked}
-                            onChange={() => toggleQuestionAsked(question.id)}
-                            className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
-                            aria-label={`Mark question ${idx + 1} as asked`}
-                          />
+                  return (
+                    <Card
+                      key={attr.id}
+                      className={cn(
+                        "cursor-pointer transition-all hover:shadow-md py-2 relative",
+                        selectedAttribute === attr.id && "ring-2 ring-primary shadow-md",
+                        isCompleted && "opacity-60"
+                      )}
+                      onClick={() => setSelectedAttribute(attr.id)}
+                    >
+                      {isCompleted && (
+                        <div className="absolute top-2 right-2">
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <CardTitle className={cn(
-                                "text-lg",
-                                isAsked && "text-primary"
-                              )}>
-                                Question {idx + 1}: {question.text}
-                              </CardTitle>
-                              <CardDescription className="mt-1">
-                                {question.description}
-                              </CardDescription>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <Badge variant="outline">{question.difficultyLevel}</Badge>
-                              {isAsked && (
-                                <Badge className="bg-primary/10 text-primary border-primary/20">
-                                  Asked
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3 ml-9">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">
-                            Candidate's Answer:
-                          </label>
-                          <div className="mt-2 p-4 bg-muted rounded-lg">
-                            {answer ? (
-                              <p className="text-sm leading-relaxed">{answer.answer}</p>
-                            ) : (
-                              <p className="text-sm text-muted-foreground italic">
-                                No answer provided yet
-                              </p>
+                      )}
+                      <CardHeader className='border-none'>
+                        <div className="space-y-3">
+                          <CardTitle className="flex items-center gap-2">
+                            <span className="text-2xl flex-shrink-0">{attr.icon}</span>
+                            <span className="flex-1">{attr.name}</span>
+                          </CardTitle>
+                          <CardDescription className="text-sm">
+                            {attr.description}
+                          </CardDescription>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {questionCount} {questionCount === 1 ? 'Question' : 'Questions'}
+                            </Badge>
+                            {isCompleted && (
+                              <Badge className="text-xs bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">
+                                Scored
+                              </Badge>
                             )}
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Scoring Interface - Variant 2 (Compact) */}
-        {selectedAttribute && relevantQuestions.length > 0 && (
-          <Card className="border-2 border-primary/20">
-            <CardHeader className='py-4'>
-              <div className="flex items-center justify-between mb-2">
-                <Badge variant={"info"} className="text-xs">
-                  Step 3: Score the Attribute
-                </Badge>
+                      </CardHeader>
+                    </Card>
+                  )
+                })}
               </div>
-              <CardTitle className="flex items-center gap-2">
-                <Badge>{demoAttributes.find(a => a.id === selectedAttribute)?.name}</Badge>
-              </CardTitle>
-              <CardDescription>
-                Use the slider to score this attribute during or after the interview (1-10 scale).
-                You only need to ask enough questions to feel confident in your evaluation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Compact Score Slider with Floating Popover */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <LevelIcon className={cn("h-6 w-6", levelStyles.color)} />
+            </div>
+
+            {/* Questions and Answers */}
+            {selectedAttribute && relevantQuestions.length > 0 && (
+              <div>
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className={cn("font-semibold text-lg", levelStyles.color)}>
-                        {levelStyles.label}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Score: {score[0]} / 10
+                      <h2 className="text-xl font-semibold">
+                        Step 2: Review Questions & Candidate Answers
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Ask as many questions as you need to get enough signal to score this attribute.
+                        You can adjust the score during or after the interview.
                       </p>
                     </div>
-                  </div>
-                  <Badge variant="outline" className={cn(levelStyles.color, "text-sm")}>
-                    {scoringLevel === 'poor' && 'Needs Improvement'}
-                    {scoringLevel === 'average' && 'Acceptable'}
-                    {scoringLevel === 'great' && 'Excellent'}
-                  </Badge>
-                </div>
-
-                {/* Slider with Popover */}
-                <div className="relative space-y-3" ref={sliderRef}>
-                  <Slider
-                    value={score}
-                    onValueChange={(value) => {
-                      setScore(value)
-                      setIsDragging(true)
-                    }}
-                    onPointerDown={() => setIsDragging(true)}
-                    onPointerUp={() => setTimeout(() => setIsDragging(false), 300)}
-                    min={1}
-                    max={10}
-                    step={1}
-                    className="w-full"
-                  >
-                    <SliderThumb />
-                  </Slider>
-
-                  {/* Floating Popover that follows cursor */}
-                  {isDragging && currentCharacteristics.length > 0 && (
-                    <div
-                      className="fixed z-50 pointer-events-none animate-in fade-in-0 zoom-in-95"
-                      style={{
-                        left: `${popoverPosition.x}px`,
-                        top: `${popoverPosition.y}px`,
-                        transform: 'translate(-50%, -100%)',
-                      }}
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "text-sm whitespace-nowrap",
+                        questionsAskedCount > 0 && "border-primary/50 bg-primary/10 text-primary"
+                      )}
                     >
-                      <div
-                        className={cn(
-                          "relative mb-2 rounded-lg border-2 shadow-lg backdrop-blur-sm max-w-sm",
-                          levelStyles.bg,
-                          levelStyles.border
-                        )}
-                      >
-                        {/* Arrow pointing down to slider */}
-                        <div
-                          className={cn(
-                            "absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 border-r-2 border-b-2",
-                            levelStyles.bg,
-                            levelStyles.border
-                          )}
-                        />
+                      {questionsAskedCount} of {relevantQuestions.length} asked
+                    </Badge>
+                  </div>
 
-                        <div className="relative p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <LevelIcon className={cn("h-5 w-5", levelStyles.color)} />
-                            <h4 className={cn("font-semibold text-sm", levelStyles.color)}>
-                              {levelStyles.label} ({score[0]}/10)
-                            </h4>
-                          </div>
-                          <ul className="space-y-1.5">
-                            {currentCharacteristics.slice(0, 4).map((trait: string, idx: number) => (
-                              <li key={idx} className="text-xs flex items-start gap-2">
-                                <span className={cn("mt-0.5 flex-shrink-0", levelStyles.color)}>
-                                  {levelStyles.emoji}
-                                </span>
-                                <span className="leading-tight">{trait}</span>
-                              </li>
-                            ))}
-                            {currentCharacteristics.length > 4 && (
-                              <li className="text-xs text-muted-foreground italic">
-                                +{currentCharacteristics.length - 4} more traits...
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      </div>
+                  {questionsAskedCount === 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <Info className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
+                        <strong>Getting started:</strong> Check the box next to each question as you ask it during the interview.
+                        This helps you track which questions you&apos;ve covered.
+                      </p>
                     </div>
                   )}
-
-                  {/* Range Labels */}
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <span className="text-red-600">⚠️</span>
-                      Poor (1-3)
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="text-amber-600">⚡</span>
-                      Average (4-6)
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="text-green-600">✓</span>
-                      Great (7-10)
-                    </span>
-                  </div>
                 </div>
 
-                {/* Compact Summary - Only shown when not dragging */}
-                {!isDragging && (
-                  <div className="p-3 rounded-lg bg-muted/50 border border-muted animate-in fade-in-0 slide-in-from-bottom-2">
-                    <p className="text-sm text-muted-foreground">
-                      <strong className={cn("text-foreground", levelStyles.color)}>
-                        {score[0]}/10 ({levelStyles.label})
-                      </strong>
-                      {' - '}Drag slider to see detailed characteristics
-                    </p>
-                  </div>
-                )}
-              </div>
+                <div className="space-y-4 mt-4">
+                  {relevantQuestions.map((question, idx) => {
+                    const answer = candidateAnswers.find(a => a.questionId === question.id)
+                    const isAsked = askedQuestions.has(question.id)
 
-              {/* Notes Section */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Evaluation Notes (Optional)
-                </label>
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add any specific observations about this candidate's performance on this attribute..."
-                  className="min-h-[100px]"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setScore([5])
-                    setNotes('')
-                  }}
-                >
-                  Reset Score
-                </Button>
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedAttribute(null)
-                      setScore([5])
-                      setNotes('')
-                    }}
-                  >
-                    Skip Attribute
-                  </Button>
-                  <Button onClick={handleSaveScore}>
-                    Save Score & Continue
-                  </Button>
+                    return (
+                      <Card
+                        key={question.id}
+                        className={cn(
+                          "transition-all",
+                          isAsked && "border-primary/50 bg-primary/5"
+                        )}
+                      >
+                        <CardHeader className='py-4'>
+                          <div className="flex items-start gap-4 w-full">
+                            <div className="pt-1">
+                              <input
+                                type="checkbox"
+                                checked={isAsked}
+                                onChange={() => toggleQuestionAsked(question.id)}
+                                className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                aria-label={`Mark question ${idx + 1} as asked`}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <CardTitle className={cn(
+                                    "text-lg",
+                                    isAsked && "text-primary"
+                                  )}>
+                                    Question {idx + 1}: {question.text}
+                                  </CardTitle>
+                                  <CardDescription className="mt-1">
+                                    {question.description}
+                                  </CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <Badge variant="outline">{question.difficultyLevel}</Badge>
+                                  {isAsked && (
+                                    <Badge className="bg-primary/10 text-primary border-primary/20">
+                                      Asked
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3 ml-9">
+                            <div>
+                              <label className="text-sm font-medium text-muted-foreground">
+                                Candidate&apos;s Answer:
+                              </label>
+                              <div className="mt-2 p-4 bg-muted rounded-lg">
+                                {answer ? (
+                                  <p className="text-sm leading-relaxed">{answer.answer}</p>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground italic">
+                                    No answer provided yet
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+
+            {/* Scoring Interface - Variant 2 (Compact) */}
+            {selectedAttribute && relevantQuestions.length > 0 && (
+              <Card className="border-2 border-primary/20">
+                <CardHeader className='py-4'>
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant={"info"} className="text-xs">
+                      Step 3: Score the Attribute
+                    </Badge>
+                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Badge>{demoAttributes.find(a => a.id === selectedAttribute)?.name}</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Use the slider to score this attribute during or after the interview (1-10 scale).
+                    You only need to ask enough questions to feel confident in your evaluation.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Compact Score Slider with Floating Popover */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <LevelIcon className={cn("h-6 w-6", levelStyles.color)} />
+                        <div>
+                          <h3 className={cn("font-semibold text-lg", levelStyles.color)}>
+                            {levelStyles.label}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Score: {score[0]} / 10
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className={cn(levelStyles.color, "text-sm")}>
+                        {scoringLevel === 'poor' && 'Needs Improvement'}
+                        {scoringLevel === 'average' && 'Acceptable'}
+                        {scoringLevel === 'great' && 'Excellent'}
+                      </Badge>
+                    </div>
+
+                    {/* Slider with Popover */}
+                    <div className="relative space-y-3" ref={sliderRef}>
+                      <Slider
+                        value={score}
+                        onValueChange={(value) => {
+                          setScore(value)
+                          setIsDragging(true)
+                        }}
+                        onPointerDown={() => setIsDragging(true)}
+                        onPointerUp={() => setTimeout(() => setIsDragging(false), 300)}
+                        min={1}
+                        max={10}
+                        step={1}
+                        className="w-full"
+                      >
+                        <SliderThumb />
+                      </Slider>
+
+                      {/* Floating Popover that follows cursor */}
+                      {isDragging && currentCharacteristics.length > 0 && (
+                        <div
+                          className="fixed z-50 pointer-events-none animate-in fade-in-0 zoom-in-95"
+                          style={{
+                            left: `${popoverPosition.x}px`,
+                            top: `${popoverPosition.y}px`,
+                            transform: 'translate(-50%, -100%)',
+                          }}
+                        >
+                          <div
+                            className={cn(
+                              "relative mb-2 rounded-lg border-2 shadow-lg backdrop-blur-sm max-w-sm",
+                              levelStyles.bg,
+                              levelStyles.border
+                            )}
+                          >
+                            {/* Arrow pointing down to slider */}
+                            <div
+                              className={cn(
+                                "absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 border-r-2 border-b-2",
+                                levelStyles.bg,
+                                levelStyles.border
+                              )}
+                            />
+
+                            <div className="relative p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <LevelIcon className={cn("h-5 w-5", levelStyles.color)} />
+                                <h4 className={cn("font-semibold text-sm", levelStyles.color)}>
+                                  {levelStyles.label} ({score[0]}/10)
+                                </h4>
+                              </div>
+                              <ul className="space-y-1.5">
+                                {currentCharacteristics.slice(0, 4).map((trait: string, idx: number) => (
+                                  <li key={idx} className="text-xs flex items-start gap-2">
+                                    <span className={cn("mt-0.5 flex-shrink-0", levelStyles.color)}>
+                                      {levelStyles.emoji}
+                                    </span>
+                                    <span className="leading-tight">{trait}</span>
+                                  </li>
+                                ))}
+                                {currentCharacteristics.length > 4 && (
+                                  <li className="text-xs text-muted-foreground italic">
+                                    +{currentCharacteristics.length - 4} more traits...
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Range Labels */}
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <span className="text-red-600">⚠️</span>
+                          Poor (1-3)
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="text-amber-600">⚡</span>
+                          Average (4-6)
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="text-green-600">✓</span>
+                          Great (7-10)
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Compact Summary - Only shown when not dragging */}
+                    {!isDragging && (
+                      <div className="p-3 rounded-lg bg-muted/50 border border-muted animate-in fade-in-0 slide-in-from-bottom-2">
+                        <p className="text-sm text-muted-foreground">
+                          <strong className={cn("text-foreground", levelStyles.color)}>
+                            {score[0]}/10 ({levelStyles.label})
+                          </strong>
+                          {' - '}Drag slider to see detailed characteristics
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Notes Section */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Evaluation Notes (Optional)
+                    </label>
+                    <Textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Add any specific observations about this candidate's performance on this attribute..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 justify-between">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setScore([5])
+                        setNotes('')
+                      }}
+                    >
+                      Reset Score
+                    </Button>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedAttribute(null)
+                          setScore([5])
+                          setNotes('')
+                        }}
+                      >
+                        Skip Attribute
+                      </Button>
+                      <Button onClick={handleSaveScore}>
+                        Save Score & Continue
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
 
@@ -1633,7 +1628,7 @@ export default function UIDemoPage() {
                 <div>
                   <h3 className="text-lg font-semibold">All Attributes Completed</h3>
                   <p className="text-muted-foreground">
-                    You've evaluated all attributes for the {currentStageInfo?.name} stage.
+                    You&apos;ve evaluated all attributes for the {currentStageInfo?.name} stage.
                     {!ksaEvaluation && " Consider running a KSA evaluation for enhanced insights."}
                   </p>
                 </div>

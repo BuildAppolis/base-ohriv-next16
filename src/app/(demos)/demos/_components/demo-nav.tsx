@@ -6,7 +6,6 @@ import {
   FormInputIcon,
   TargetIcon,
   UsersIcon,
-  BarChart3Icon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -45,7 +44,7 @@ export const demoLinks: DemoLink[] = [
   },
   {
     title: "KSA Evaluation Center",
-    href: "/evaluation",
+    href: "/demos/evaluation",
     description: "Evaluate candidates against KSA interview frameworks.",
     icon: TargetIcon,
   },

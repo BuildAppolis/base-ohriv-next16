@@ -15,11 +15,13 @@ import {
   candidatesAtom,
   selectedCandidateIdsAtom,
   addCandidateEvaluationAtom,
-  currentCandidateEvaluationsAtom
+  currentCandidateEvaluationsAtom,
+  trackCandidateJobEvaluationAtom
 } from '@/lib/atoms/candidate-atoms'
 import { evaluateCandidateKSA } from '@/lib/candidate-ksa-evaluator'
 import { CandidateEvaluation } from '@/types/candidate'
 import { KSAInterviewOutput } from '@/types/company_old/ksa'
+import { SimpleCandidate } from '@/lib/candidate-generator'
 import {
   Upload,
   FileText,
@@ -61,14 +63,320 @@ function KSAInput({ onKSAUpload, ksaData }: {
   }
 
   const loadExampleKSA = () => {
-    fetch('/src/app/(demos)/test-response/expected_outputs/ksa_output.json')
-      .then(res => res.text())
-      .then(content => {
-        setJsonInput(content)
-      })
-      .catch(() => {
-        setError('Failed to load example KSA')
-      })
+    const ksaExample = {
+      "KSA_JobFit": {
+        "Knowledge": {
+          "attribute": {
+            "definition": "Understanding of enterprise software development principles and industry trends.",
+            "evaluation_scale": {
+              "1": "Cannot perform job duty",
+              "2": "Cannot perform job duty",
+              "3": "Requires significant training/guidance to perform job duty",
+              "4": "Requires significant training/guidance to perform job duty",
+              "5": "Able to perform job duties with minimal guidance",
+              "6": "Able to perform job duties with minimal guidance",
+              "7": "Able to perform job duties and positively impact performance of peers",
+              "8": "Able to perform job duties and positively impact performance of peers",
+              "9": "Transforms the way the team delivers",
+              "10": "Transforms the way the team delivers"
+            },
+            "weighting": 40,
+            "red_flags": [
+              "Low understanding of software development lifecycle",
+              "Not aware of industry trends",
+              "Struggles to connect business needs with software solutions"
+            ]
+          },
+          "questions": [
+            {
+              "id": 1,
+              "category": "Knowledge",
+              "type": "behavioral",
+              "difficulty": "intermediate",
+              "question_text": "Can you describe a recent major trend in enterprise software development and how it impacts business operations?",
+              "evaluation_criteria": "Depth of understanding of current trends and their relevance to business.",
+              "expected_answers": "Insight into the trend, its implications, and examples of applications.",
+              "follow_up_probes": [
+                "How have you implemented a similar trend in your previous work?",
+                "Can you provide a specific example of how this trend improved software delivery?"
+              ],
+              "red_flag_indicators": [
+                "Vague or unconvincing explanation of trends",
+                "Lack of practical application in previous experiences"
+              ]
+            },
+            {
+              "id": 2,
+              "category": "Knowledge",
+              "type": "behavioral",
+              "difficulty": "intermediate",
+              "question_text": "Describe how you ensure that you stay updated with evolving technologies in software development.",
+              "evaluation_criteria": "Engagement in continuous learning and knowledge application.",
+              "expected_answers": "Mentorship, courses attended, resources used (e.g., industry blogs, webinars).",
+              "follow_up_probes": [
+                "How often do you engage with these resources?",
+                "Give an example of how learning improved your work performance."
+              ],
+              "red_flag_indicators": [
+                "No specific examples of learning or engagement",
+                "Lack of motivation for professional development"
+              ]
+            }
+          ]
+        },
+        "Skills": {
+          "attribute": {
+            "definition": "Proficient use of collaboration tools and coding languages relevant to the role.",
+            "evaluation_scale": {
+              "1": "Cannot perform job duty",
+              "2": "Cannot perform job duty",
+              "3": "Requires significant training/guidance to perform job duty",
+              "4": "Requires significant training/guidance to perform job duty",
+              "5": "Able to perform job duties with minimal guidance",
+              "6": "Able to perform job duties with minimal guidance",
+              "7": "Able to perform job duties and positively impact performance of peers",
+              "8": "Able to perform job duties and positively impact performance of peers",
+              "9": "Transforms the way the team delivers",
+              "10": "Transforms the way the team delivers"
+            },
+            "weighting": 35,
+            "red_flags": [
+              "Struggles with basic programming tasks",
+              "Has difficulty using essential collaboration tools",
+              "Fails to demonstrate proficiency in relevant technologies"
+            ]
+          },
+          "questions": [
+            {
+              "id": 3,
+              "category": "Skills",
+              "type": "behavioral",
+              "difficulty": "advanced",
+              "question_text": "Provide an example of a complex problem you solved using programming skills. What was your approach?",
+              "evaluation_criteria": "Ability to articulate technical problem-solving processes.",
+              "expected_answers": "Clear steps taken, technologies used, and the outcome achieved.",
+              "follow_up_probes": [
+                "What challenges did you face during implementation?",
+                "How did you ensure the solution met user needs?"
+              ],
+              "red_flag_indicators": [
+                "Inability to explain problem-solving processes clearly",
+                "Lack of technical depth or specificity"
+              ]
+            },
+            {
+              "id": 4,
+              "category": "Skills",
+              "type": "behavioral",
+              "difficulty": "intermediate",
+              "question_text": "Discuss how you have utilized collaboration tools (like Jira or Slack) in managing a project.",
+              "evaluation_criteria": "Experience and proficiency with tools for project management and team collaboration.",
+              "expected_answers": "Examples of managing tasks or communication via tools.",
+              "follow_up_probes": [
+                "How did those tools improve project outcomes?",
+                "What features did you find most beneficial, and why?"
+              ],
+              "red_flag_indicators": [
+                "Negative or vague responses about tool effectiveness",
+                "Limited exposure to collaboration tools"
+              ]
+            }
+          ]
+        },
+        "Ability": {
+          "attribute": {
+            "definition": "Capacity to lead projects and produce results effectively.",
+            "evaluation_scale": {
+              "1": "Cannot perform job duty",
+              "2": "Cannot perform job duty",
+              "3": "Requires significant training/guidance to perform job duty",
+              "4": "Requires significant training/guidance to perform job duty",
+              "5": "Able to perform job duties with minimal guidance",
+              "6": "Able to perform job duties with minimal guidance",
+              "7": "Able to perform job duties and positively impact performance of peers",
+              "8": "Able to perform job duties and positively impact performance of peers",
+              "9": "Transforms the way the team delivers",
+              "10": "Transforms the way the team delivers"
+            },
+            "weighting": 25,
+            "red_flags": [
+              "Inconsistent performance in team or leadership roles",
+              "Failure to demonstrate initiative or accountability",
+              "Limited results in previous projects or roles"
+            ]
+          },
+          "questions": [
+            {
+              "id": 5,
+              "category": "Ability",
+              "type": "behavioral",
+              "difficulty": "advanced",
+              "question_text": "Can you describe a time when you were responsible for a project? What was the outcome, and what did you learn?",
+              "evaluation_criteria": "Demonstration of leadership skills and accountability for project outcomes.",
+              "expected_answers": "Clear descriptions of roles, challenges faced, and personal growth.",
+              "follow_up_probes": [
+                "How did you measure success for the project?",
+                "What would you do differently if you could lead that project again?"
+              ],
+              "red_flag_indicators": [
+                "Vague explanations of projects",
+                "Inability to accept responsibility for project outcomes"
+              ]
+            },
+            {
+              "id": 6,
+              "category": "Ability",
+              "type": "behavioral",
+              "difficulty": "intermediate",
+              "question_text": "Describe a situation where you identified a significant opportunity to improve a process. How did you approach it?",
+              "evaluation_criteria": "Ability to identify and implement process improvements.",
+              "expected_answers": "Specific improvements made and the impact on efficiency or outcomes.",
+              "follow_up_probes": [
+                "What factors did you consider while proposing the change?",
+                "How did you communicate this change to your team?"
+              ],
+              "red_flag_indicators": [
+                "Inability to identify opportunities for improvement",
+                "No clear examples of changes made or their results"
+              ]
+            }
+          ]
+        }
+      },
+      "CoreValues_CompanyFit": {
+        "Innovation": {
+          "questions": [
+            {
+              "id": 1,
+              "category": "Innovation",
+              "type": "behavioral",
+              "question_text": "Describe an innovative idea you proposed in a previous role. What was the idea, and what impact did it have?",
+              "sample_indicators": {
+                "strong_response": "Clearly articulates a novel idea and quantifies its positive impact.",
+                "weak_response": "Struggles to describe the idea or its outcomes."
+              },
+              "follow_up_probes": [
+                "What challenges did you face when implementing this idea?",
+                "How were you able to gain buy-in from your team?"
+              ]
+            },
+            {
+              "id": 2,
+              "category": "Innovation",
+              "type": "behavioral",
+              "question_text": "Can you provide an example when you took a calculated risk that led to a successful outcome?",
+              "sample_indicators": {
+                "strong_response": "Clearly explains the rationale for risk-taking and the successful result.",
+                "weak_response": "Fails to provide a concrete example or avoid responsibility."
+              },
+              "follow_up_probes": [
+                "How did you evaluate the potential risks?",
+                "If the idea did not succeed, what did you learn?"
+              ]
+            }
+          ]
+        },
+        "Excellence": {
+          "questions": [
+            {
+              "id": 3,
+              "category": "Excellence",
+              "type": "behavioral",
+              "question_text": "How do you ensure that your work consistently meets or exceeds quality standards?",
+              "sample_indicators": {
+                "strong_response": "Describes specific quality assurance processes employed.",
+                "weak_response": "General statements that lack detail."
+              },
+              "follow_up_probes": [
+                "Can you describe a time when you had to improve the quality of your work?",
+                "How do you handle feedback regarding your work's quality?"
+              ]
+            },
+            {
+              "id": 4,
+              "category": "Excellence",
+              "type": "behavioral",
+              "question_text": "Can you share a situation where you went above and beyond what was expected of you?",
+              "sample_indicators": {
+                "strong_response": "Details clear and measurable contributions beyond normal duties.",
+                "weak_response": "Lacks examples or dwells on responsibilities alone."
+              },
+              "follow_up_probes": [
+                "What prompted you to go above and beyond?",
+                "What was the outcome of your extra efforts?"
+              ]
+            }
+          ]
+        },
+        "Collaboration": {
+          "questions": [
+            {
+              "id": 5,
+              "category": "Collaboration",
+              "type": "behavioral",
+              "question_text": "Describe a time when you had to work with a difficult team member. How did you handle that situation?",
+              "sample_indicators": {
+                "strong_response": "Illustrates effective conflict resolution strategies.",
+                "weak_response": "Blames others without suggesting a resolution."
+              },
+              "follow_up_probes": [
+                "What was the outcome of your interaction?",
+                "What did you learn from that experience?"
+              ]
+            },
+            {
+              "id": 6,
+              "category": "Collaboration",
+              "type": "behavioral",
+              "question_text": "Tell me about a successful team project you contributed to. What was your role?",
+              "sample_indicators": {
+                "strong_response": "Describes a specific team project highlighting collaboration.",
+                "weak_response": "Vague descriptions of team contributions or lack of clarity."
+              },
+              "follow_up_probes": [
+                "How did you promote teamwork and cohesion?",
+                "What challenges did the team face, and how did you overcome them?"
+              ]
+            }
+          ]
+        },
+        "Growth": {
+          "questions": [
+            {
+              "id": 7,
+              "category": "Growth",
+              "type": "behavioral",
+              "question_text": "What steps have you taken in the past year to enhance your professional skills?",
+              "sample_indicators": {
+                "strong_response": "Details specific actions taken for professional development.",
+                "weak_response": "General statements about wanting to learn but without action steps."
+              },
+              "follow_up_probes": [
+                "Can you provide examples of how these skills have been applied?",
+                "How do you plan to continue your growth in the next year?"
+              ]
+            },
+            {
+              "id": 8,
+              "category": "Growth",
+              "type": "behavioral",
+              "question_text": "Describe a failure or setback you've experienced. How did you respond and what did you learn?",
+              "sample_indicators": {
+                "strong_response": "Openly discusses failure and identifies learning outcomes.",
+                "weak_response": "Blames others or avoids discussing failure."
+              },
+              "follow_up_probes": [
+                "What changes did you implement to prevent future setbacks?",
+                "How did this experience impact your approach to challenges?"
+              ]
+            }
+          ]
+        }
+      }
+    }
+
+    setJsonInput(JSON.stringify(ksaExample, null, 2))
+    setError('')
   }
 
   return (
@@ -141,7 +449,7 @@ function KSAInput({ onKSAUpload, ksaData }: {
  * Candidate Selection Component
  */
 function CandidateSelection({ candidates, selectedIds, onSelectionChange }: {
-  candidates: any[]
+  candidates: SimpleCandidate[]
   selectedIds: string[]
   onSelectionChange: (ids: string[]) => void
 }) {
@@ -200,25 +508,20 @@ function CandidateSelection({ candidates, selectedIds, onSelectionChange }: {
                   </div>
                   <div>
                     <div className="font-medium">
-                      {candidate.personalInfo.firstName} {candidate.personalInfo.lastName}
+                      {candidate.firstName} {candidate.lastName}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {candidate.experience.currentPosition.title} • {candidate.experience.currentPosition.company}
+                      Age: {candidate.age}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-right text-sm">
                     <div className="font-medium">
-                      {candidate.interviewPerformance.simulatedInterviewScores.behavioral.overall}/10
+                      ID: {candidate.id.split('-')[1]}
                     </div>
-                    <div className="text-muted-foreground">Score</div>
+                    <div className="text-muted-foreground">Candidate</div>
                   </div>
-                  {candidate.metadata.tags.includes('has-red-flags') && (
-                    <Badge variant="destructive" className="text-xs">
-                      <AlertTriangle className="h-3 w-3" />
-                    </Badge>
-                  )}
                 </div>
               </div>
             ))}
@@ -391,6 +694,7 @@ export default function EvaluationCenterPage() {
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [evaluationProgress, setEvaluationProgress] = useState(0)
   const [addEvaluation] = useAtom(addCandidateEvaluationAtom)
+  const [trackJobEvaluation] = useAtom(trackCandidateJobEvaluationAtom)
 
   const handleKSAUpload = (ksa: KSAInterviewOutput) => {
     setKSAData(ksa)
@@ -423,6 +727,10 @@ export default function EvaluationCenterPage() {
 
         // Store evaluation in atom
         addEvaluation({ candidateId, evaluation })
+
+        // Track job evaluation for this candidate
+        const jobTitle = evaluation.evaluationContext.jobTitle
+        trackJobEvaluation({ candidateId, jobTitle })
 
         setEvaluationProgress(((i + 1) / selectedCandidateIds.length) * 100)
       } catch (error) {
