@@ -8,6 +8,7 @@
 import { generateText } from 'ai'
 import { openai } from '@ai-sdk/openai'
 import { nanoid } from 'nanoid'
+import { faker } from '@faker-js/faker'
 import {
   Candidate,
   PersonalityTraits,
