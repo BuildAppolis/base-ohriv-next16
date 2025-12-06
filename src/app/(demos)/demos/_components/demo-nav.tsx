@@ -5,6 +5,9 @@ import {
   Code2Icon,
   LayersIcon,
   FormInputIcon,
+  TargetIcon,
+  UsersIcon,
+  BarChart3Icon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,6 +44,24 @@ export const demoLinks: DemoLink[] = [
     description: "Typeform-style flow powered by orchestrator hooks.",
     icon: FormInputIcon,
   },
+  {
+    title: "KSA Evaluation Center",
+    href: "/evaluation",
+    description: "Evaluate candidates against KSA interview frameworks.",
+    icon: TargetIcon,
+  },
+  {
+    title: "Scoring & Evaluation",
+    href: "/demos/scoring-and-evaluation",
+    description: "Advanced candidate scoring and analysis tools.",
+    icon: UsersIcon,
+  },
+  {
+    title: "Evaluation Reports",
+    href: "/demos/evaluation-reports",
+    description: "Comprehensive multi-stage evaluation reports and analytics.",
+    icon: BarChart3Icon,
+  },
 
   // {
   //   title: "Stream Demo",
@@ -66,6 +87,12 @@ export const demoLinks: DemoLink[] = [
     description: "Human and AI evaluation demo.",
     icon: Code2Icon,
   },
+  {
+    title: "Candidates",
+    href: "/demos/candidates",
+    description: "Candidates for demonstration purposes.",
+    icon: LayersIcon,
+  }
 ];
 
 export function DemoNav() {

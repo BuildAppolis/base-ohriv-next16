@@ -6,8 +6,29 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Slider, SliderThumb } from '@/components/ui/slider'
-import { Info, CheckCircle2, AlertCircle, Zap, User, Briefcase } from 'lucide-react'
+import { Info, CheckCircle2, AlertCircle, Zap, User, Briefcase, Target, FileJson, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAtom, useAtomValue } from 'jotai'
+import { candidatesAtom } from '@/lib/atoms/candidate-atoms'
+import {
+  stageKSAScoresAtom,
+  evaluationSessionsAtom,
+  currentSessionIdAtom,
+  currentStageIdAtom,
+  currentEvaluatorNameAtom,
+  selectedKSAFrameworkAtom,
+  selectedJobCategoryAtom,
+  startEvaluationSessionAtom,
+  saveAttributeScoreAtom,
+  completeStageEvaluationAtom,
+  currentSessionAtom,
+  currentStageScoresAtom,
+  getCandidateCompletionStatusAtom,
+  EVALUATION_STAGES,
+  EVALUATION_ATTRIBUTES
+} from '@/lib/atoms/multistage-ksa-atoms'
+import { evaluateCandidateKSA } from '@/lib/candidate-ksa-evaluator'
+import { KSAInterviewOutput } from '@/types/company_old/ksa'
 
 // Define types matching our schema
 interface AnswerCharacteristics {
@@ -722,6 +743,7 @@ const candidateAnswers: CandidateAnswer[] = [
 type ScoringLevel = 'poor' | 'average' | 'great'
 
 export default function UIDemoPage() {
+  // Original state
   const [currentStage, setCurrentStage] = useState<string>('stage-1') // Start with Phone Screen
   const [selectedAttribute, setSelectedAttribute] = useState<string | null>(null)
   const [score, setScore] = useState([5])
@@ -731,6 +753,29 @@ export default function UIDemoPage() {
   const [askedQuestions, setAskedQuestions] = useState<Set<string>>(new Set())
   const [completedAttributes, setCompletedAttributes] = useState<Set<string>>(new Set())
   const sliderRef = useRef<HTMLDivElement>(null)
+
+  // KSA Integration state
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string>('')
+  const [showKSAUpload, setShowKSAUpload] = useState(false)
+  const [ksaFile, setKSAFile] = useState<File | null>(null)
+  const [isEvaluatingKSA, setIsEvaluatingKSA] = useState(false)
+  const [ksaEvaluation, setKsaEvaluation] = useState<any>(null)
+
+  // Atoms for KSA integration
+  const candidates = useAtomValue(candidatesAtom)
+  const [, startSession] = useAtom(startEvaluationSessionAtom)
+  const [, saveScore] = useAtom(saveAttributeScoreAtom)
+  const [, completeStage] = useAtom(completeStageEvaluationAtom)
+  const currentSession = useAtomValue(currentSessionAtom)
+  const [ksaFramework, setKSAFramework] = useAtom(selectedKSAFrameworkAtom)
+  const [jobCategory, setJobCategory] = useAtom(selectedJobCategoryAtom)
+  const [evaluatorName, setEvaluatorName] = useAtom(currentEvaluatorNameAtom)
+
+  // Get selected candidate
+  const selectedCandidate = useMemo(() =>
+    selectedCandidateId ? candidates[selectedCandidateId] : null,
+    [selectedCandidateId, candidates]
+  )
 
   // Get current stage info
   const currentStageInfo = useMemo(() =>
@@ -871,6 +916,15 @@ export default function UIDemoPage() {
       if (!confirmSave) return
     }
 
+    // Save to KSA atoms if session is active
+    if (currentSession && selectedAttribute) {
+      saveScore({
+        attributeId: selectedAttribute,
+        score: score[0],
+        notes: notes
+      })
+    }
+
     // Mark attribute as completed
     if (selectedAttribute) {
       setCompletedAttributes(prev => new Set([...prev, selectedAttribute]))
@@ -882,17 +936,253 @@ export default function UIDemoPage() {
     }
   }
 
+  // KSA Integration Functions
+
+  // Handle KSA file upload
+  const handleKSAFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setKSAFile(file)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string
+        const parsed = JSON.parse(content) as KSAInterviewOutput
+        setKSAFramework(parsed)
+
+        // Extract job category from KSA framework
+        const jobCategories = Object.keys(parsed.KSA_JobFit || {})
+        setJobCategory(jobCategories[0] || 'Unknown')
+
+        setShowKSAUpload(false)
+      } catch (err) {
+        console.error('Failed to parse KSA JSON:', err)
+        alert('Invalid JSON file')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  // Run KSA evaluation
+  const runKSAEvaluation = async () => {
+    if (!selectedCandidate || !ksaFramework) return
+
+    setIsEvaluatingKSA(true)
+    try {
+      const evaluation = await evaluateCandidateKSA(
+        selectedCandidate,
+        ksaFramework,
+        undefined,
+        jobCategory
+      )
+      setKsaEvaluation(evaluation)
+    } catch (error) {
+      console.error('KSA evaluation failed:', error)
+      alert('KSA evaluation failed. Please try again.')
+    } finally {
+      setIsEvaluatingKSA(false)
+    }
+  }
+
+  // Start evaluation session
+  const startEvaluation = () => {
+    if (!selectedCandidateId || !ksaFramework) return
+
+    startSession({
+      candidateId: selectedCandidateId,
+      stageId: currentStage,
+      evaluatorName: evaluatorName,
+      ksaFramework,
+      jobCategory
+    })
+  }
+
+  // Complete entire stage evaluation with KSA integration
+  const completeEvaluationWithKSA = async () => {
+    if (!selectedCandidateId || !ksaFramework) return
+
+    // Collect all scores from the session
+    const attributeScores: Record<string, number> = {}
+    const strengths: string[] = []
+    const weaknesses: string[] = []
+
+    // Extract scores from KSA evaluation if available
+    if (ksaEvaluation) {
+      attributeScores.knowledge = ksaEvaluation.scores.knowledge.overall
+      attributeScores.skills = ksaEvaluation.scores.skills.overall
+      attributeScores.abilities = ksaEvaluation.scores.abilities.overall
+
+      strengths.push(...(ksaEvaluation.strengths || []))
+      weaknesses.push(...(ksaEvaluation.areasForImprovement || []))
+    }
+
+    // Map to stage attributes
+    const stageAttributeScores: Record<string, number> = {
+      technicalSkills: attributeScores.knowledge || 5,
+      communication: score[0], // Use current score as fallback
+      problemSolving: attributeScores.skills || 5,
+      leadership: 5, // Default score
+      adaptability: attributeScores.abilities || 5
+    }
+
+    await completeStage({
+      candidateId: selectedCandidateId,
+      stageId: currentStage,
+      evaluatorName,
+      ksaFramework,
+      jobCategory,
+      attributeScores: stageAttributeScores,
+      ksaScores: {
+        knowledge: {
+          overall: attributeScores.knowledge || 5,
+          breakdown: ksaEvaluation?.scores?.knowledge?.breakdown || {}
+        },
+        skills: {
+          overall: attributeScores.skills || 5,
+          breakdown: ksaEvaluation?.scores?.skills?.breakdown || {}
+        },
+        abilities: {
+          overall: attributeScores.abilities || 5,
+          breakdown: ksaEvaluation?.scores?.abilities?.breakdown || {}
+        }
+      },
+      notes: `Stage ${currentStageInfo?.name} evaluation completed with KSA integration`,
+      strengths,
+      weaknesses
+    })
+
+    alert(`✅ ${currentStageInfo?.name} evaluation completed successfully with KSA integration!`)
+  }
+
   return (
     <div className="container mx-auto py-8 max-w-7xl">
       <div className="space-y-6">
         {/* Header with Stage Switcher */}
         <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold">Candidate Evaluation System</h1>
+            <h1 className="text-3xl font-bold">Enhanced Candidate Evaluation System</h1>
             <p className="text-muted-foreground mt-2">
-              Each evaluator focuses on one interview stage at a time
+              Multi-stage evaluation with integrated KSA framework assessment
             </p>
           </div>
+
+          {/* KSA Setup Card */}
+          <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                KSA Framework Integration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Candidate Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Select Candidate</label>
+                  <select
+                    className="w-full mt-1 p-2 border rounded-md"
+                    value={selectedCandidateId}
+                    onChange={(e) => setSelectedCandidateId(e.target.value)}
+                  >
+                    <option value="">Choose a candidate...</option>
+                    {Object.values(candidates).map(candidate => (
+                      <option key={candidate.id} value={candidate.id}>
+                        {candidate.personalInfo.firstName} {candidate.personalInfo.lastName} - {candidate.experience.currentPosition.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Evaluator Name</label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 p-2 border rounded-md"
+                    value={evaluatorName}
+                    onChange={(e) => setEvaluatorName(e.target.value)}
+                    placeholder="Your name"
+                  />
+                </div>
+              </div>
+
+              {/* KSA Framework Upload */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">KSA Framework</label>
+                {ksaFramework ? (
+                  <div className="p-3 border rounded-md bg-green-50">
+                    <p className="text-sm text-green-800">
+                      ✓ KSA Framework loaded: {jobCategory}
+                    </p>
+                    <div className="flex gap-2 mt-2">
+                      <Button size="sm" variant="outline" onClick={runKSAEvaluation} disabled={isEvaluatingKSA}>
+                        {isEvaluatingKSA ? 'Evaluating...' : 'Run KSA Evaluation'}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setShowKSAUpload(true)}>
+                        Change Framework
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                    <div className="text-center">
+                      <FileJson className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                      <div className="mt-2">
+                        <label htmlFor="ksa-file-upload" className="cursor-pointer">
+                          <span className="text-primary">Click to upload</span> or drag and drop
+                          <span className="text-muted-foreground"> KSA JSON framework</span>
+                        </label>
+                        <input
+                          id="ksa-file-upload"
+                          type="file"
+                          accept=".json"
+                          onChange={handleKSAFileUpload}
+                          className="hidden"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* KSA Evaluation Results */}
+              {ksaEvaluation && (
+                <div className="p-4 border rounded-md bg-blue-50">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-blue-600">
+                        {ksaEvaluation.scores.knowledge.overall}/10
+                      </div>
+                      <div className="text-xs text-muted-foreground">Knowledge</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-purple-600">
+                        {ksaEvaluation.scores.skills.overall}/10
+                      </div>
+                      <div className="text-xs text-muted-foreground">Skills</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-green-600">
+                        {ksaEvaluation.scores.abilities.overall}/10
+                      </div>
+                      <div className="text-xs text-muted-foreground">Abilities</div>
+                    </div>
+                  </div>
+                  <div className="text-sm">
+                    <strong>Overall:</strong> {ksaEvaluation.overallCompatibility.score}/10 - {ksaEvaluation.overallCompatibility.recommendation.replace('-', ' ')}
+                  </div>
+                </div>
+              )}
+
+              {/* Start Evaluation Button */}
+              {selectedCandidateId && ksaFramework && !currentSession && (
+                <Button onClick={startEvaluation} className="w-full">
+                  <Target className="h-4 w-4 mr-2" />
+                  Start {currentStageInfo?.name} Evaluation with KSA
+                </Button>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Stage/Evaluator Selector */}
           <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
@@ -934,35 +1224,40 @@ export default function UIDemoPage() {
           </Card>
         </div>
 
-        {/* Candidate Info */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                JD
+        {/* Candidate Info - Only show if candidate is selected and KSA is setup */}
+        {selectedCandidate && ksaFramework && (
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
+                  {selectedCandidate.personalInfo.firstName[0]}{selectedCandidate.personalInfo.lastName[0]}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    {selectedCandidate.personalInfo.firstName} {selectedCandidate.personalInfo.lastName}
+                  </h3>
+                  <p className="text-muted-foreground flex items-center gap-2 mt-1">
+                    <Briefcase className="h-4 w-4" />
+                    {selectedCandidate.experience.currentPosition.title}
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-sm">
+                  {currentSession ? 'Evaluation in Progress' : 'Ready to Start'}
+                </Badge>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  John Doe
-                </h3>
-                <p className="text-muted-foreground flex items-center gap-2 mt-1">
-                  <Briefcase className="h-4 w-4" />
-                  Senior Full Stack Developer - Applied 3 days ago
-                </p>
-              </div>
-              <Badge variant="outline" className="text-sm">
-                In Progress
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Attribute Selection */}
-        <div>
-          <h2 className="text-xl font-semibold mb-3">Step 1: Select Attribute to Evaluate</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stageAttributes.map(attr => {
+        {/* Traditional Evaluation UI - Only show when KSA setup is complete */}
+        {selectedCandidate && ksaFramework && (
+          <>
+            {/* Attribute Selection */}
+            <div>
+              <h2 className="text-xl font-semibold mb-3">Step 1: Select Attribute to Evaluate</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {stageAttributes.map(attr => {
               const questionCount = demoQuestions.filter(q =>
                 q.stageId === currentStage && q.attributeIds.includes(attr.id)
               ).length
@@ -1299,6 +1594,42 @@ export default function UIDemoPage() {
                     Save Score & Continue
                   </Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+          </>
+        )}
+
+        {/* KSA Enhanced Stage Completion */}
+        {currentSession && completedAttributes.size === stageAttributes.length && (
+          <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
+                <div>
+                  <h3 className="text-lg font-semibold">All Attributes Completed</h3>
+                  <p className="text-muted-foreground">
+                    You've evaluated all attributes for the {currentStageInfo?.name} stage.
+                    {!ksaEvaluation && " Consider running a KSA evaluation for enhanced insights."}
+                  </p>
+                </div>
+                <div className="flex gap-3 justify-center">
+                  {!ksaEvaluation && (
+                    <Button variant="outline" onClick={runKSAEvaluation} disabled={isEvaluatingKSA}>
+                      {isEvaluatingKSA ? 'Running KSA Analysis...' : 'Enhance with KSA Evaluation'}
+                    </Button>
+                  )}
+                  <Button onClick={completeEvaluationWithKSA} size="lg">
+                    Complete {currentStageInfo?.name} Evaluation
+                    {ksaEvaluation && ' with KSA Integration'}
+                  </Button>
+                </div>
+                {ksaEvaluation && (
+                  <div className="text-sm text-muted-foreground">
+                    ✅ KSA evaluation data will be integrated into your final assessment
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

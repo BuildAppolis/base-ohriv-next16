@@ -177,5 +177,135 @@
         }
       ]
     }
+  },
+  "CoreValues_CompanyFit": {
+    "Innovation": {
+      "questions": [
+        {
+          "id": 1,
+          "category": "Innovation",
+          "type": "behavioral",
+          "question_text": "Describe an innovative idea you proposed in a previous role. What was the idea, and what impact did it have?",
+          "sample_indicators": {
+            "strong_response": "Clearly articulates a novel idea and quantifies its positive impact.",
+            "weak_response": "Struggles to describe the idea or its outcomes."
+          },
+          "follow_up_probes": [
+            "What challenges did you face when implementing this idea?",
+            "How were you able to gain buy-in from your team?"
+          ]
+        },
+        {
+          "id": 2,
+          "category": "Innovation",
+          "type": "behavioral",
+          "question_text": "Can you provide an example when you took a calculated risk that led to a successful outcome?",
+          "sample_indicators": {
+            "strong_response": "Clearly explains the rationale for risk-taking and the successful result.",
+            "weak_response": "Fails to provide a concrete example or avoid responsibility."
+          },
+          "follow_up_probes": [
+            "How did you evaluate the potential risks?",
+            "If the idea did not succeed, what did you learn?"
+          ]
+        }
+      ]
+    },
+    "Excellence": {
+      "questions": [
+        {
+          "id": 3,
+          "category": "Excellence",
+          "type": "behavioral",
+          "question_text": "How do you ensure that your work consistently meets or exceeds quality standards?",
+          "sample_indicators": {
+            "strong_response": "Describes specific quality assurance processes employed.",
+            "weak_response": "General statements that lack detail."
+          },
+          "follow_up_probes": [
+            "Can you describe a time when you had to improve the quality of your work?",
+            "How do you handle feedback regarding your work's quality?"
+          ]
+        },
+        {
+          "id": 4,
+          "category": "Excellence",
+          "type": "behavioral",
+          "question_text": "Can you share a situation where you went above and beyond what was expected of you?",
+          "sample_indicators": {
+            "strong_response": "Details clear and measurable contributions beyond normal duties.",
+            "weak_response": "Lacks examples or dwells on responsibilities alone."
+          },
+          "follow_up_probes": [
+            "What prompted you to go above and beyond?",
+            "What was the outcome of your extra efforts?"
+          ]
+        }
+      ]
+    },
+    "Collaboration": {
+      "questions": [
+        {
+          "id": 5,
+          "category": "Collaboration",
+          "type": "behavioral",
+          "question_text": "Describe a time when you had to work with a difficult team member. How did you handle that situation?",
+          "sample_indicators": {
+            "strong_response": "Illustrates effective conflict resolution strategies.",
+            "weak_response": "Blames others without suggesting a resolution."
+          },
+          "follow_up_probes": [
+            "What was the outcome of your interaction?",
+            "What did you learn from that experience?"
+          ]
+        },
+        {
+          "id": 6,
+          "category": "Collaboration",
+          "type": "behavioral",
+          "question_text": "Tell me about a successful team project you contributed to. What was your role?",
+          "sample_indicators": {
+            "strong_response": "Describes a specific team project highlighting collaboration.",
+            "weak_response": "Vague descriptions of team contributions or lack of clarity."
+          },
+          "follow_up_probes": [
+            "How did you promote teamwork and cohesion?",
+            "What challenges did the team face, and how did you overcome them?"
+          ]
+        }
+      ]
+    },
+    "Growth": {
+      "questions": [
+        {
+          "id": 7,
+          "category": "Growth",
+          "type": "behavioral",
+          "question_text": "What steps have you taken in the past year to enhance your professional skills?",
+          "sample_indicators": {
+            "strong_response": "Details specific actions taken for professional development.",
+            "weak_response": "General statements about wanting to learn but without action steps."
+          },
+          "follow_up_probes": [
+            "Can you provide examples of how these skills have been applied?",
+            "How do you plan to continue your growth in the next year?"
+          ]
+        },
+        {
+          "id": 8,
+          "category": "Growth",
+          "type": "behavioral",
+          "question_text": "Describe a failure or setback you've experienced. How did you respond and what did you learn?",
+          "sample_indicators": {
+            "strong_response": "Openly discusses failure and identifies learning outcomes.",
+            "weak_response": "Blames others or avoids discussing failure."
+          },
+          "follow_up_probes": [
+            "What changes did you implement to prevent future setbacks?",
+            "How did this experience impact your approach to challenges?"
+          ]
+        }
+      ]
+    }
   }
 }

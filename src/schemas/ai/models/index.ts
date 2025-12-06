@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { AIModelCategorySchema } from '../core/types'
+import { z } from "zod";
+import { AIModelCategorySchema } from "../core/types";
 
 /**
  * AI Model Configuration Schemas
@@ -15,19 +15,19 @@ export const AIModelCapabilitySchema = z.object({
   streaming: z.boolean().default(true),
   jsonMode: z.boolean().default(false),
   vision: z.boolean().default(false),
-  audio: z.boolean().default(false)
-})
+  audio: z.boolean().default(false),
+});
 
-export type AIModelCapability = z.infer<typeof AIModelCapabilitySchema>
+export type AIModelCapability = z.infer<typeof AIModelCapabilitySchema>;
 
 // Model Cost Information
 export const AIModelCostSchema = z.object({
   inputTokens: z.number().nonnegative(), // cost per 1M tokens
   outputTokens: z.number().nonnegative(),
-  currency: z.string().default('USD')
-})
+  currency: z.string().default("USD"),
+});
 
-export type AIModelCost = z.infer<typeof AIModelCostSchema>
+export type AIModelCost = z.infer<typeof AIModelCostSchema>;
 
 // Model Constraints
 export const AIModelConstraintsSchema = z.object({
@@ -35,18 +35,18 @@ export const AIModelConstraintsSchema = z.object({
   maxInputLength: z.number().int().positive(),
   temperature: z.object({
     min: z.number(),
-    max: z.number()
+    max: z.number(),
   }),
   topP: z.object({
     min: z.number(),
-    max: z.number()
+    max: z.number(),
   }),
   supportsStreaming: z.boolean().default(true),
   supportsJsonMode: z.boolean().default(false),
-  supportsImages: z.boolean().default(false)
-})
+  supportsImages: z.boolean().default(false),
+});
 
-export type AIModelConstraints = z.infer<typeof AIModelConstraintsSchema>
+export type AIModelConstraints = z.infer<typeof AIModelConstraintsSchema>;
 
 // Complete Model Definition
 export const AIModelSchema = z.object({
@@ -68,16 +68,16 @@ export const AIModelSchema = z.object({
   version: z.string().optional(),
 
   // Status and availability
-  status: z.enum(['active', 'deprecated', 'beta', 'experimental']),
+  status: z.enum(["active", "deprecated", "beta", "experimental"]),
   deprecatedAt: z.string().datetime().optional(),
   experimental: z.boolean().default(false),
 
   // Usage statistics
   popularity: z.number().min(0).max(100).optional(),
-  recommendedUses: z.array(z.string()).optional()
-})
+  recommendedUses: z.array(z.string()).optional(),
+});
 
-export type AIModel = z.infer<typeof AIModelSchema>
+export type AIModel = z.infer<typeof AIModelSchema>;
 
 // Model Selection Criteria
 export const AIModelSelectionSchema = z.object({
@@ -96,20 +96,23 @@ export const AIModelSelectionSchema = z.object({
   requiresFunctionCalling: z.boolean().optional(),
 
   // User preferences
-  preferredCategory: z.enum(['reasoning', 'generation', 'multimodal', 'legacy']).optional(),
-  excludeExperimental: z.boolean().default(true)
-})
+  preferredCategory: z
+    .enum(["reasoning", "generation", "multimodal", "legacy"])
+    .optional(),
+  excludeExperimental: z.boolean().default(true),
+});
 
-export type AIModelSelection = z.infer<typeof AIModelSelectionSchema>
+export type AIModelSelection = z.infer<typeof AIModelSelectionSchema>;
 
 // Predefined model registry (this would typically be loaded from config)
 export const AI_MODELS = {
   // Reasoning Models
-  'gpt-5.1': {
-    id: 'gpt-5.1',
-    name: 'GPT-5.1',
-    description: 'Advanced reasoning model with enhanced problem-solving capabilities',
-    category: 'reasoning' as const,
+  "gpt-5.1": {
+    id: "gpt-5.1",
+    name: "GPT-5.1",
+    description:
+      "Advanced reasoning model with enhanced problem-solving capabilities",
+    category: "reasoning" as const,
     capabilities: {
       code: true,
       reasoning: true,
@@ -118,12 +121,12 @@ export const AI_MODELS = {
       streaming: true,
       jsonMode: true,
       vision: false,
-      audio: false
+      audio: false,
     },
     cost: {
       inputTokens: 15.0,
       outputTokens: 60.0,
-      currency: 'USD'
+      currency: "USD",
     },
     constraints: {
       maxTokens: 200000,
@@ -132,56 +135,20 @@ export const AI_MODELS = {
       topP: { min: 0, max: 1 },
       supportsStreaming: true,
       supportsJsonMode: true,
-      supportsImages: false
+      supportsImages: false,
     },
-    provider: 'OpenAI',
-    modelFamily: 'GPT-5',
-    status: 'beta' as const,
-    experimental: true
+    provider: "OpenAI",
+    modelFamily: "GPT-5",
+    status: "beta" as const,
+    experimental: true,
   },
 
   // Generation Models
-  'gpt-4o': {
-    id: 'gpt-5.1',
-    name: 'GPT-5.1',
-    description: 'Advanced reasoning model with enhanced problem-solving capabilities',
-    category: 'reasoning' as const,
-    capabilities: {
-      code: true,
-      reasoning: true,
-      multimodal: false,
-      functionCalling: true,
-      streaming: true,
-      jsonMode: true,
-      vision: false,
-      audio: false
-    },
-    cost: {
-      inputTokens: 15.0,
-      outputTokens: 60.0,
-      currency: 'USD'
-    },
-    constraints: {
-      maxTokens: 200000,
-      maxInputLength: 1000000,
-      temperature: { min: 0, max: 2 },
-      topP: { min: 0, max: 1 },
-      supportsStreaming: true,
-      supportsJsonMode: true,
-      supportsImages: false
-    },
-    provider: 'OpenAI',
-    modelFamily: 'GPT-5',
-    status: 'beta' as const,
-    experimental: true
-  },
-
-  // Generation Models
-  'gpt-4o': {
-    id: 'gpt-4o',
-    name: 'GPT-4o',
-    description: 'Optimized model for efficient general-purpose generation',
-    category: 'generation' as const,
+  "gpt-4o": {
+    id: "gpt-4o",
+    name: "GPT-4o",
+    description: "Optimized model for efficient general-purpose generation",
+    category: "generation" as const,
     capabilities: {
       code: true,
       reasoning: false,
@@ -190,12 +157,12 @@ export const AI_MODELS = {
       streaming: true,
       jsonMode: true,
       vision: true,
-      audio: false
+      audio: false,
     },
     cost: {
       inputTokens: 5.0,
       outputTokens: 15.0,
-      currency: 'USD'
+      currency: "USD",
     },
     constraints: {
       maxTokens: 128000,
@@ -204,20 +171,20 @@ export const AI_MODELS = {
       topP: { min: 0, max: 1 },
       supportsStreaming: true,
       supportsJsonMode: true,
-      supportsImages: true
+      supportsImages: true,
     },
-    provider: 'OpenAI',
-    modelFamily: 'GPT-4',
-    status: 'active' as const,
-    experimental: false
+    provider: "OpenAI",
+    modelFamily: "GPT-4",
+    status: "active" as const,
+    experimental: false,
   },
 
   // Legacy Models
-  'gpt-3.5-turbo': {
-    id: 'gpt-3.5-turbo',
-    name: 'GPT-3.5 Turbo',
-    description: 'Fast and efficient model for simple tasks',
-    category: 'legacy' as const,
+  "gpt-3.5-turbo": {
+    id: "gpt-3.5-turbo",
+    name: "GPT-3.5 Turbo",
+    description: "Fast and efficient model for simple tasks",
+    category: "legacy" as const,
     capabilities: {
       code: true,
       reasoning: false,
@@ -226,12 +193,12 @@ export const AI_MODELS = {
       streaming: true,
       jsonMode: true,
       vision: false,
-      audio: false
+      audio: false,
     },
     cost: {
       inputTokens: 0.5,
       outputTokens: 1.5,
-      currency: 'USD'
+      currency: "USD",
     },
     constraints: {
       maxTokens: 4096,
@@ -240,11 +207,11 @@ export const AI_MODELS = {
       topP: { min: 0, max: 1 },
       supportsStreaming: true,
       supportsJsonMode: true,
-      supportsImages: false
+      supportsImages: false,
     },
-    provider: 'OpenAI',
-    modelFamily: 'GPT-3.5',
-    status: 'active' as const,
-    experimental: false
-  }
-} satisfies Record<string, Omit<AIModel, 'id'>>
+    provider: "OpenAI",
+    modelFamily: "GPT-3.5",
+    status: "active" as const,
+    experimental: false,
+  },
+} satisfies Record<string, AIModel>;
