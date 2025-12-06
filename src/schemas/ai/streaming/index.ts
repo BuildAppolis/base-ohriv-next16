@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { AIStreamEventTypeSchema } from '../core/types'
-import { AIUsageSchema } from '../core/response'
+// import { AIStreamEventTypeSchema } from '../core/types'
+// import { AIUsageSchema } from '../core/response'
 
 /**
  * Streaming AI Operation Schemas
@@ -56,7 +56,7 @@ export type StreamProgress = z.infer<typeof StreamProgressSchema>
 // Stream Event Types with comprehensive data
 export const StreamEventSchema = z.object({
   // Core event information
-  type: AIStreamEventTypeSchema,
+  type: z.enum(['start', 'progress', 'chunk', 'complete', 'error']),
   id: z.string(),
   timestamp: z.string().datetime(),
   requestId: z.string(),
@@ -71,7 +71,11 @@ export const StreamEventSchema = z.object({
   progress: StreamProgressSchema.optional(),
 
   // Usage and statistics
-  usage: AIUsageSchema.optional(),
+  usage: z.object({
+    promptTokens: z.number().optional(),
+    completionTokens: z.number().optional(),
+    totalTokens: z.number().optional()
+  }).optional(),
   stats: z.object({
     chunksReceived: z.number().int().nonnegative(),
     bytesReceived: z.number().int().nonnegative(),
@@ -165,13 +169,13 @@ export type StreamState = z.infer<typeof StreamStateSchema>
 
 // Stream Callback Function Types
 export const StreamCallbacksSchema = z.object({
-  onStart: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onProgress: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onChunk: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onComplete: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onError: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onAbort: z.function().args(StreamEventSchema).returns(z.void()).optional(),
-  onStateChange: z.function().args(StreamStateSchema).returns(z.void()).optional()
+  onStart: z.function().optional(),
+  onProgress: z.function().optional(),
+  onChunk: z.function().optional(),
+  onComplete: z.function().optional(),
+  onError: z.function().optional(),
+  onAbort: z.function().optional(),
+  onStateChange: z.function().optional()
 })
 
 export type StreamCallbacks = z.infer<typeof StreamCallbacksSchema>

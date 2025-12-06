@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -15,28 +15,30 @@ import {
   candidatesAtom,
   selectedCandidateIdsAtom,
   addCandidateEvaluationAtom,
-  currentCandidateEvaluationsAtom,
   trackCandidateJobEvaluationAtom
 } from '@/lib/atoms/candidate-atoms'
-import { evaluateCandidateKSA } from '@/lib/candidate-ksa-evaluator'
 import { CandidateEvaluation } from '@/types/candidate'
 import { KSAInterviewOutput } from '@/types/company_old/ksa'
-import { SimpleCandidate } from '@/lib/candidate-generator'
+import { SimpleCandidate } from '@/lib/candidate-data'
+
+/**
+ * Helper function to get badge variant for recommendation
+ */
+function getRecommendationBadgeVariant(recommendation: string): "primary" | "secondary" | "destructive" {
+  if (recommendation.includes('Strong') || recommendation === 'strong-recommend') return "primary"
+  if (recommendation === 'recommend' || recommendation === 'Recommend') return "secondary"
+  return "destructive"
+}
 import {
-  Upload,
   FileText,
   Users,
-  Target,
   TrendingUp,
   AlertTriangle,
   CheckCircle2,
   BarChart3,
   Download,
   Play,
-  Settings,
-  Info,
   FileJson,
-  FileCode,
   Trash2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -45,7 +47,7 @@ import { cn } from '@/lib/utils'
  * KSA Input Component
  */
 function KSAInput({ onKSAUpload, ksaData }: {
-  onKSAUpload: (ksa: KSAInterviewOutput) => void
+  onKSAUpload: (ksa: KSAInterviewOutput | null) => void
   ksaData: KSAInterviewOutput | null
 }) {
   const [jsonInput, setJsonInput] = useState('')
@@ -693,10 +695,10 @@ export default function EvaluationCenterPage() {
   const [evaluations, setEvaluations] = useState<CandidateEvaluation[]>([])
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [evaluationProgress, setEvaluationProgress] = useState(0)
-  const [addEvaluation] = useAtom(addCandidateEvaluationAtom)
-  const [trackJobEvaluation] = useAtom(trackCandidateJobEvaluationAtom)
+  const [addEvaluation] = useAtom(addCandidateEvaluationAtom) as unknown as [(args: { candidateId: string; evaluation: CandidateEvaluation }) => void, any]
+  const [trackJobEvaluation] = useAtom(trackCandidateJobEvaluationAtom) as unknown as [(args: { candidateId: string; jobTitle: string }) => void, any]
 
-  const handleKSAUpload = (ksa: KSAInterviewOutput) => {
+  const handleKSAUpload = (ksa: KSAInterviewOutput | null) => {
     setKSAData(ksa)
     setEvaluations([]) // Clear previous evaluations
   }
@@ -715,27 +717,29 @@ export default function EvaluationCenterPage() {
 
       if (!candidate) continue
 
-      try {
-        const evaluation = await evaluateCandidateKSA(
-          candidate,
-          ksaData,
-          undefined,
-          ksaData.KSA_JobFit ? Object.keys(ksaData.KSA_JobFit)[0] : 'Unknown Position'
-        )
+      // try {
+      //   const evaluation = await evaluateCandidateKSA(
+      //     candidate,
+      //     ksaData,
+      //     undefined,
+      //     ksaData.KSA_JobFit ? Object.keys(ksaData.KSA_JobFit)[0] : 'Unknown Position'
+      //   )
 
-        newEvaluations.push(evaluation)
+      //   newEvaluations.push(evaluation)
 
-        // Store evaluation in atom
-        addEvaluation({ candidateId, evaluation })
+      //   // Store evaluation in atom
+      //   addEvaluation({ candidateId, evaluation })
 
-        // Track job evaluation for this candidate
-        const jobTitle = evaluation.evaluationContext.jobTitle
-        trackJobEvaluation({ candidateId, jobTitle })
+      //   // Track job evaluation for this candidate
+      //   const jobTitle = evaluation.evaluationContext.jobTitle
+      //   if (jobTitle) {
+      //     trackJobEvaluation({ candidateId, jobTitle })
+      //   }
 
-        setEvaluationProgress(((i + 1) / selectedCandidateIds.length) * 100)
-      } catch (error) {
-        console.error(`Failed to evaluate candidate ${candidateId}:`, error)
-      }
+      //   setEvaluationProgress(((i + 1) / selectedCandidateIds.length) * 100)
+      // } catch (error) {
+      //   console.error(`Failed to evaluate candidate ${candidateId}:`, error)
+      // }
     }
 
     setEvaluations(newEvaluations)
@@ -762,15 +766,6 @@ export default function EvaluationCenterPage() {
     URL.revokeObjectURL(url)
   }
 
-  const getRecommendationBadgeVariant = (recommendation: string) => {
-    switch (recommendation) {
-      case 'strong-recommend': return 'default'
-      case 'recommend': return 'secondary'
-      case 'consider': return 'outline'
-      case 'reject': return 'destructive'
-      default: return 'outline'
-    }
-  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">

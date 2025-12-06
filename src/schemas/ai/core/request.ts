@@ -15,7 +15,7 @@ import {
 export const AIContextSchema = z.object({
   type: z.string(),
   content: z.any(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   timestamp: z.string().datetime().optional(),
   source: z.string().optional()
 })

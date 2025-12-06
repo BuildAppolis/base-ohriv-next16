@@ -8,7 +8,7 @@
 
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { FIXED_CANDIDATES, SimpleCandidate } from "@/lib/candidate-generator";
+import { FIXED_CANDIDATES, SimpleCandidate } from "@/lib/candidate-data";
 import { CandidateEvaluation } from "@/types/candidate";
 
 /**

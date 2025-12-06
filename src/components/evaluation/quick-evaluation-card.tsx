@@ -65,7 +65,7 @@ export function QuickEvaluationCard({ className }: QuickEvaluationCardProps) {
     const evaluationResults = []
 
     for (const candidateId of selectedIds) {
-      const candidate = candidates.find(c => c.id === candidateId)
+      const candidate = candidates[candidateId]
       if (!candidate) continue
 
       try {
@@ -76,7 +76,7 @@ export function QuickEvaluationCard({ className }: QuickEvaluationCardProps) {
           ksaData.KSA_JobFit ? Object.keys(ksaData.KSA_JobFit)[0] : 'Unknown Position'
         )
         evaluationResults.push({
-          candidate: candidate.personalInfo.firstName + ' ' + candidate.personalInfo.lastName,
+          candidate: candidate.firstName + ' ' + candidate.lastName,
           score: evaluation.overallCompatibility.score,
           recommendation: evaluation.overallCompatibility.recommendation,
           knowledge: evaluation.scores.knowledge.overall,
@@ -223,11 +223,11 @@ export function QuickEvaluationCard({ className }: QuickEvaluationCardProps) {
                         <Users className="h-4 w-4" />
                         Select Candidates
                         <Badge variant="secondary">
-                          {selectedIds.length}/{candidates.length}
+                          {selectedIds.length}/{Object.values(candidates).length}
                         </Badge>
                       </h3>
                       <div className="max-h-48 overflow-y-auto border rounded-md p-2 space-y-2">
-                        {candidates.map((candidate) => (
+                        {Object.values(candidates).map((candidate) => (
                           <label
                             key={candidate.id}
                             className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
@@ -247,15 +247,15 @@ export function QuickEvaluationCard({ className }: QuickEvaluationCardProps) {
                               />
                               <div>
                                 <div className="text-sm font-medium">
-                                  {candidate.personalInfo.firstName} {candidate.personalInfo.lastName}
+                                  {candidate.firstName} {candidate.lastName}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {candidate.experience.currentPosition.title}
+                                  Age {candidate.age}
                                 </div>
                               </div>
                             </div>
                             <div className="text-sm font-medium">
-                              {candidate.interviewPerformance.simulatedInterviewScores.behavioral.overall}/10
+                              ID: {candidate.id.split('-')[1]}
                             </div>
                           </label>
                         ))}
@@ -335,7 +335,7 @@ export function QuickEvaluationCard({ className }: QuickEvaluationCardProps) {
           </div>
 
           <div className="text-sm text-muted-foreground">
-            {candidates.length} candidates available for evaluation
+            {Object.values(candidates).length} candidates available for evaluation
           </div>
         </CardContent>
       </Card>

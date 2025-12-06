@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { AIRequestSchema, AIResponseSchema } from '../core/request'
+import { AIRequestSchema } from '../core/request'
+// import { AIResponseSchema } from '../core/request'
 
 /**
  * Company Analysis Operation Schemas
@@ -143,7 +144,7 @@ export const CompanyAnalysisRequestSchema = AIRequestSchema.extend({
 export type CompanyAnalysisRequest = z.infer<typeof CompanyAnalysisRequestSchema>
 
 // Company Analysis Response
-export const CompanyAnalysisResponseSchema = AIResponseSchema.extend({
+export const CompanyAnalysisResponseSchema = z.object({
   // Analysis-specific data structure
   data: z.object({
     summary: z.string(),

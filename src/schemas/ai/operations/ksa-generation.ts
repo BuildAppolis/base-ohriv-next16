@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { AIRequestSchema, AIResponseSchema } from '../core/request'
+import { AIRequestSchema } from '../core/request'
+// import { AIResponseSchema } from '../core/request'
 
 /**
  * KSA (Knowledge, Skills, Abilities) Generation Schemas
@@ -136,7 +137,7 @@ export const KSAGenerationRequestSchema = AIRequestSchema.extend({
 export type KSAGenerationRequest = z.infer<typeof KSAGenerationRequestSchema>
 
 // KSA Generation Response
-export const KSAGenerationResponseSchema = AIResponseSchema.extend({
+export const KSAGenerationResponseSchema = z.object({
   // KSA-specific data structure
   data: z.object({
     framework: KSAFrameworkSchema.optional(),

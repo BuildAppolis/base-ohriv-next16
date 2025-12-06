@@ -8,10 +8,8 @@ import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAtomValue } from 'jotai'
 import { currentCandidateAtom, currentCandidateEvaluationsAtom, currentCandidateJobEvaluationsAtom } from '@/lib/atoms/candidate-atoms'
-import { SimpleCandidate } from '@/lib/candidate-generator'
 import { CandidateEvaluation } from '@/types/candidate'
 import {
-  User,
   Briefcase,
   TrendingUp,
   Star,
@@ -175,10 +173,12 @@ export function CandidateScorecard({ open, onOpenChange }: CandidateScorecardPro
   // Group evaluations by job title
   const evaluationsByJob = evaluations.reduce((acc, evaluation) => {
     const jobTitle = evaluation.evaluationContext.jobTitle
-    if (!acc[jobTitle]) {
+    if (jobTitle && !acc[jobTitle]) {
       acc[jobTitle] = []
     }
-    acc[jobTitle].push(evaluation)
+    if (jobTitle) {
+      acc[jobTitle].push(evaluation)
+    }
     return acc
   }, {} as Record<string, CandidateEvaluation[]>)
 
@@ -283,7 +283,7 @@ export function CandidateScorecard({ open, onOpenChange }: CandidateScorecardPro
                 <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Evaluations Yet</h3>
                 <p className="text-muted-foreground">
-                  This candidate hasn't been evaluated for any positions yet.
+                  This candidate hasn&apos;t been evaluated for any positions yet.
                 </p>
               </CardContent>
             </Card>

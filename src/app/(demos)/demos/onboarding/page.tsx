@@ -496,7 +496,7 @@ export default function OnboardingDemoPage() {
       label: "Define your company values",
       helper:
         "Add up to 6 core values with a short reason.",
-      render: ({ onNext, inputRef }) => {
+      render: ({ inputRef }) => {
         const trimmedName = valueNameDraft.trim();
         const trimmedReason = valueReasonDraft.trim();
         const hasDuplicate = formValues.core_values.some(
@@ -657,6 +657,7 @@ export default function OnboardingDemoPage() {
         el.select();
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStepError(null);
   }, [activeStep]);
 

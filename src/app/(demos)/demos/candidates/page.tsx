@@ -1,31 +1,22 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import {
   filteredCandidatesAtom,
   candidateViewModeAtom,
-  candidateFiltersAtom,
-  sortByAtom,
   selectedCandidateIdsAtom,
   currentCandidateIdAtom,
   resetFiltersAtom
 } from '@/lib/atoms/candidate-atoms'
-import { SimpleCandidate } from '@/lib/candidate-generator'
+import { SimpleCandidate } from '@/lib/candidate-data'
 import { CandidateScorecard } from './_components/candidate-scorecard'
-import {
-  Search,
-  Filter,
-  Grid3X3,
-  List,
-  User,
-  RotateCcw
-} from 'lucide-react'
+import { User } from 'lucide-react'
+
 
 /**
  * Candidate Card Component
@@ -123,9 +114,7 @@ function CandidateListView({ candidates, selectedIds, onView }: {
  */
 export default function CandidatesPage() {
   const filteredCandidates = useAtomValue(filteredCandidatesAtom)
-  const [viewMode, setViewMode] = useAtom(candidateViewModeAtom)
-  const [filters, setFilters] = useAtom(candidateFiltersAtom)
-  const [sortBy, setSortBy] = useAtom(sortByAtom)
+  const [viewMode,] = useAtom(candidateViewModeAtom)
   const [selectedIds, setSelectedIds] = useAtom(selectedCandidateIdsAtom)
   const [, setCurrentId] = useAtom(currentCandidateIdAtom)
   const resetFilters = useSetAtom(resetFiltersAtom)
@@ -144,13 +133,6 @@ export default function CandidatesPage() {
     setShowScorecard(true)
   }
 
-  const handleSelectAll = () => {
-    if (selectedIds.length === filteredCandidates.length) {
-      setSelectedIds([])
-    } else {
-      setSelectedIds(filteredCandidates.map(c => c.id))
-    }
-  }
 
   const handleResetFilters = () => {
     resetFilters()
