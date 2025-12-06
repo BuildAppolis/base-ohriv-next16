@@ -55,12 +55,6 @@ export const demoLinks: DemoLink[] = [
     description: "Advanced candidate scoring and analysis tools.",
     icon: UsersIcon,
   },
-  {
-    title: "Evaluation Reports",
-    href: "/demos/evaluation-reports",
-    description: "Comprehensive multi-stage evaluation reports and analytics.",
-    icon: BarChart3Icon,
-  },
 
   // {
   //   title: "Stream Demo",

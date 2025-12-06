@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -41,32 +40,15 @@ import {
 import { cn } from '@/lib/utils'
 
 /**
- * KSA Upload Component
+ * KSA Input Component
  */
-function KSAUpload({ onKSAUpload, ksaData }: {
+function KSAInput({ onKSAUpload, ksaData }: {
   onKSAUpload: (ksa: KSAInterviewOutput) => void
   ksaData: KSAInterviewOutput | null
 }) {
   const [jsonInput, setJsonInput] = useState('')
   const [error, setError] = useState('')
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string
-        const parsed = JSON.parse(content)
-        setJsonInput(JSON.stringify(parsed, null, 2))
-        setError('')
-      } catch (err) {
-        setError('Invalid JSON file')
-      }
-    }
-    reader.readAsText(file)
-  }
+  const [showInput, setShowInput] = useState(false)
 
   const handleJsonSubmit = () => {
     try {
@@ -116,22 +98,16 @@ function KSAUpload({ onKSAUpload, ksaData }: {
             <FileText className="h-4 w-4 mr-2" />
             Load Example
           </Button>
-          <div className="relative">
-            <Input
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              className="opacity-0 absolute inset-0 cursor-pointer"
-            />
-            <Button variant="outline" size="sm">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload File
+          {ksaData && (
+            <Button variant="outline" onClick={() => onKSAUpload(null)} size="sm">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear
             </Button>
-          </div>
+          )}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Paste KSA JSON (optional)</label>
+          <label className="text-sm font-medium">Paste KSA JSON</label>
           <Textarea
             placeholder="Paste your KSA framework JSON here..."
             value={jsonInput}
@@ -407,7 +383,8 @@ function EvaluationResults({ evaluations }: {
  * Main Evaluation Center Page
  */
 export default function EvaluationCenterPage() {
-  const candidates = useAtomValue(candidatesAtom)
+  const candidatesAtomValue = useAtomValue(candidatesAtom)
+  const candidates = Object.values(candidatesAtomValue)
   const [selectedCandidateIds, setSelectedCandidateIds] = useAtom(selectedCandidateIdsAtom)
   const [ksaData, setKSAData] = useState<KSAInterviewOutput | null>(null)
   const [evaluations, setEvaluations] = useState<CandidateEvaluation[]>([])
@@ -507,9 +484,9 @@ export default function EvaluationCenterPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="ksa-upload" className="space-y-6">
+      <Tabs defaultValue="ksa-framework" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="ksa-upload" className="flex items-center gap-2">
+          <TabsTrigger value="ksa-framework" className="flex items-center gap-2">
             <FileJson className="h-4 w-4" />
             KSA Framework
           </TabsTrigger>
@@ -525,9 +502,9 @@ export default function EvaluationCenterPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* KSA Upload Tab */}
-        <TabsContent value="ksa-upload">
-          <KSAUpload onKSAUpload={handleKSAUpload} ksaData={ksaData} />
+        {/* KSA Framework Tab */}
+        <TabsContent value="ksa-framework">
+          <KSAInput onKSAUpload={handleKSAUpload} ksaData={ksaData} />
         </TabsContent>
 
         {/* Candidate Selection Tab */}

@@ -756,8 +756,8 @@ export default function UIDemoPage() {
 
   // KSA Integration state
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>('')
-  const [showKSAUpload, setShowKSAUpload] = useState(false)
-  const [ksaFile, setKSAFile] = useState<File | null>(null)
+  const [showKSAInput, setShowKSAInput] = useState(false)
+  const [ksaJsonInput, setKsaJsonInput] = useState<string>('')
   const [isEvaluatingKSA, setIsEvaluatingKSA] = useState(false)
   const [ksaEvaluation, setKsaEvaluation] = useState<any>(null)
 
@@ -938,30 +938,24 @@ export default function UIDemoPage() {
 
   // KSA Integration Functions
 
-  // Handle KSA file upload
-  const handleKSAFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  // Handle KSA JSON input
+  const handleKSAJsonSubmit = () => {
+    if (!ksaJsonInput.trim()) return
 
-    setKSAFile(file)
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string
-        const parsed = JSON.parse(content) as KSAInterviewOutput
-        setKSAFramework(parsed)
+    try {
+      const parsed = JSON.parse(ksaJsonInput) as KSAInterviewOutput
+      setKSAFramework(parsed)
 
-        // Extract job category from KSA framework
-        const jobCategories = Object.keys(parsed.KSA_JobFit || {})
-        setJobCategory(jobCategories[0] || 'Unknown')
+      // Extract job category from KSA framework
+      const jobCategories = Object.keys(parsed.KSA_JobFit || {})
+      setJobCategory(jobCategories[0] || 'Unknown')
 
-        setShowKSAUpload(false)
-      } catch (err) {
-        console.error('Failed to parse KSA JSON:', err)
-        alert('Invalid JSON file')
-      }
+      setShowKSAInput(false)
+      setKsaJsonInput('')
+    } catch (err) {
+      console.error('Failed to parse KSA JSON:', err)
+      alert('Invalid JSON format. Please check your input and try again.')
     }
-    reader.readAsText(file)
   }
 
   // Run KSA evaluation
@@ -1106,7 +1100,7 @@ export default function UIDemoPage() {
                 </div>
               </div>
 
-              {/* KSA Framework Upload */}
+              {/* KSA Framework Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">KSA Framework</label>
                 {ksaFramework ? (
@@ -1118,29 +1112,58 @@ export default function UIDemoPage() {
                       <Button size="sm" variant="outline" onClick={runKSAEvaluation} disabled={isEvaluatingKSA}>
                         {isEvaluatingKSA ? 'Evaluating...' : 'Run KSA Evaluation'}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => setShowKSAUpload(true)}>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        setKSAFramework(null)
+                        setJobCategory('')
+                      }}>
                         Change Framework
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
-                    <div className="text-center">
-                      <FileJson className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                      <div className="mt-2">
-                        <label htmlFor="ksa-file-upload" className="cursor-pointer">
-                          <span className="text-primary">Click to upload</span> or drag and drop
-                          <span className="text-muted-foreground"> KSA JSON framework</span>
-                        </label>
-                        <input
-                          id="ksa-file-upload"
-                          type="file"
-                          accept=".json"
-                          onChange={handleKSAFileUpload}
-                          className="hidden"
-                        />
+                  <div className="space-y-3">
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
+                      <div className="text-center">
+                        <FileJson className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                        <div className="mt-2">
+                          <span
+                            className="text-primary cursor-pointer hover:underline"
+                            onClick={() => setShowKSAInput(true)}
+                          >
+                            Click to input KSA JSON framework
+                          </span>
+                        </div>
                       </div>
                     </div>
+
+                    {showKSAInput && (
+                      <div className="space-y-3 p-4 border rounded-md bg-muted/50">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">Paste KSA Framework JSON</h4>
+                          <Button size="sm" variant="outline" onClick={() => setShowKSAInput(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={ksaJsonInput}
+                          onChange={(e) => setKsaJsonInput(e.target.value)}
+                          placeholder="Paste your KSA framework JSON here..."
+                          rows={8}
+                          className="font-mono text-xs"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={handleKSAJsonSubmit} disabled={!ksaJsonInput.trim()}>
+                            Parse JSON
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => {
+                            setKsaJsonInput('')
+                            setShowKSAInput(false)
+                          }}>
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
