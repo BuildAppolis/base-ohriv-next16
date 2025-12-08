@@ -48,12 +48,12 @@ export const demoLinks: DemoLink[] = [
     description: "Evaluate candidates against KSA interview frameworks.",
     icon: TargetIcon,
   },
-  {
-    title: "Scoring & Evaluation",
-    href: "/demos/scoring-and-evaluation",
-    description: "Advanced candidate scoring and analysis tools.",
-    icon: UsersIcon,
-  },
+  // {
+  //   title: "Scoring & Evaluation",
+  //   href: "/demos/scoring-and-evaluation",
+  //   description: "Advanced candidate scoring and analysis tools.",
+  //   icon: UsersIcon,
+  // },
 
   // {
   //   title: "Stream Demo",

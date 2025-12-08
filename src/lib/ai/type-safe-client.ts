@@ -195,7 +195,7 @@ export async function generateTypeSafe(
     // Validate response using our schema
     const validatedResponse = AIResponseSchema.parse(response);
 
-    return validatedResponse;
+    return validatedResponse as any;
   } catch (error) {
     const processingTime = Date.now() - startTime;
     console.error("TypeSafe AI generation failed:", error);
@@ -288,12 +288,11 @@ export async function generateTypeSafeStream(
     }
 
     // Send start event
-    const startEvent: AIStreamEvent = {
+    const startEvent = {
       type: "start",
-      id: crypto.randomUUID(),
       requestId,
       timestamp: new Date().toISOString(),
-    };
+    } as any;
 
     if (options.onStart) options.onStart();
     if (options.onEvent) options.onEvent(startEvent);
@@ -322,7 +321,7 @@ export async function generateTypeSafeStream(
       // Create progress event
       const progressEvent: AIStreamEvent = {
         type: "progress",
-        id: crypto.randomUUID(),
+        // id: crypto.randomUUID(),
         requestId,
         timestamp: new Date().toISOString(),
         content: fullContent,
@@ -367,7 +366,7 @@ export async function generateTypeSafeStream(
     // Create complete event
     const completeEvent: AIStreamEvent = {
       type: "complete",
-      id: crypto.randomUUID(),
+      // id: crypto.randomUUID(),
       requestId,
       timestamp: new Date().toISOString(),
       result: completionResult,
@@ -381,7 +380,7 @@ export async function generateTypeSafeStream(
 
     const errorEvent: AIStreamEvent = {
       type: "error",
-      id: crypto.randomUUID(),
+      // id: crypto.randomUUID(),
       requestId,
       timestamp: new Date().toISOString(),
       error: {

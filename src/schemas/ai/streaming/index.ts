@@ -36,7 +36,7 @@ export const StreamChunkSchema = z.object({
   content: z.string(),
   index: z.number().int().nonnegative(),
   isComplete: z.boolean().default(false),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.string(), z.any()).optional()
 })
 
 export type StreamChunk = z.infer<typeof StreamChunkSchema>
@@ -94,7 +94,7 @@ export const StreamEventSchema = z.object({
 
   // Completion information
   result: z.any().optional(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.string(), z.any()).optional()
 })
 
 export type StreamEvent = z.infer<typeof StreamEventSchema>
@@ -162,7 +162,7 @@ export const StreamStateSchema = z.object({
 
   // Configuration and metadata
   config: StreamConfigSchema.optional(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.string(), z.any()).optional()
 })
 
 export type StreamState = z.infer<typeof StreamStateSchema>
@@ -202,7 +202,7 @@ export type MultiStreamConfig = z.infer<typeof MultiStreamConfigSchema>
 export const MultiStreamStateSchema = z.object({
   id: z.string(),
   config: MultiStreamConfigSchema,
-  streams: z.record(StreamStateSchema),
+  streams: z.record(z.string(), StreamStateSchema),
   status: z.enum([
     'initializing',
     'running',

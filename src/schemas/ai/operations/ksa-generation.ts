@@ -146,8 +146,8 @@ export const KSAGenerationResponseSchema = z.object({
     // Generation metadata
     generationStats: z.object({
       totalQuestions: z.number().int(),
-      questionsByCategory: z.record(z.number().int()),
-      questionsByType: z.record(z.number().int()),
+      questionsByCategory: z.record(z.string(), z.number().int()),
+      questionsByType: z.record(z.string(), z.number().int()),
       averageDifficulty: z.number().optional(),
       estimatedDuration: z.number().positive() // minutes
     }).optional(),
