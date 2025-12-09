@@ -33,6 +33,7 @@ type KSACategoryKey = 'Knowledge' | 'Skills' | 'Ability'
 
 type WeightRangeState = Record<KSACategoryKey, [number, number]>
 type ValueWeightRangeState = Record<string, [number, number]>
+type WeightMode = 'range' | 'fixed'
 
 type AttributeEvaluationState = {
   score: number
@@ -53,6 +54,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Progress } from '@/components/ui/progress'
 
 /**
  * KSA Input Component
@@ -394,7 +396,7 @@ function KSAInput({ onKSAUpload, ksaData }: {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className='py-4'>
         <CardTitle className="flex items-center gap-2">
           <FileJson className="h-5 w-5" />
           KSA Framework Upload
@@ -484,7 +486,7 @@ function CandidateSelection({ candidates, selectedIds, onSelectionChange }: {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className='py-4'>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5" />
@@ -705,12 +707,19 @@ export default function EvaluationCenterPage() {
   const [selectedCandidateIds, setSelectedCandidateIds] = useAtom(selectedCandidateIdsAtom)
   const [ksaData, setKSAData] = useState<KSAInterviewOutput | null>(null)
   const [evaluations, setEvaluations] = useState<CandidateEvaluation[]>([])
+  const [weightMode, setWeightMode] = useState<WeightMode>('range')
   const [weightRanges, setWeightRanges] = useState<WeightRangeState>({
     Knowledge: [35, 45],
     Skills: [30, 40],
     Ability: [20, 35]
   })
+  const [fixedKSAWeights, setFixedKSAWeights] = useState<Record<KSACategoryKey, number>>({
+    Knowledge: 34,
+    Skills: 33,
+    Ability: 33
+  })
   const [valueWeightRanges, setValueWeightRanges] = useState<ValueWeightRangeState>({})
+  const [fixedValueWeights, setFixedValueWeights] = useState<Record<string, number>>({})
   const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<KSACategoryKey | null>(null)
   const [candidateStates, setCandidateStates] = useState<Record<string, Record<KSACategoryKey, AttributeEvaluationState>>>({})
@@ -746,11 +755,11 @@ export default function EvaluationCenterPage() {
 
   const ksaCategories = useMemo(() => {
     const available: KSACategoryKey[] = []
-    ;(['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
-      if ((jobFitData as any)?.[key]) {
-        available.push(key)
-      }
-    })
+      ; (['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
+        if ((jobFitData as any)?.[key]) {
+          available.push(key)
+        }
+      })
     return available
   }, [jobFitData])
 
@@ -811,6 +820,7 @@ export default function EvaluationCenterPage() {
   useEffect(() => {
     if (!coreValueKeys.length) {
       setValueWeightRanges({})
+      setFixedValueWeights({})
       return
     }
     const equalShare = Math.round(100 / coreValueKeys.length)
@@ -825,9 +835,19 @@ export default function EvaluationCenterPage() {
       })
       return next
     })
+    setFixedValueWeights((prev) => {
+      const next: Record<string, number> = {}
+      const existingTotal = coreValueKeys.reduce((acc, key) => acc + (prev[key] ?? 0), 0)
+      coreValueKeys.forEach((key) => {
+        next[key] = prev[key] ?? (existingTotal ? Math.round(100 / coreValueKeys.length) : equalShare)
+      })
+      return next
+    })
   }, [coreValueKeys])
 
   const normalizedWeights = useMemo(() => {
+    if (weightMode === 'fixed') return fixedKSAWeights
+
     const midpoints = {
       Knowledge: (weightRanges.Knowledge[0] + weightRanges.Knowledge[1]) / 2,
       Skills: (weightRanges.Skills[0] + weightRanges.Skills[1]) / 2,
@@ -847,10 +867,13 @@ export default function EvaluationCenterPage() {
       Skills: skillsWeight,
       Ability: abilityWeight
     }
-  }, [weightRanges])
+  }, [weightRanges, weightMode, fixedKSAWeights])
 
   const normalizedValueWeights = useMemo(() => {
     if (!coreValueKeys.length) return {}
+
+    if (weightMode === 'fixed') return fixedValueWeights
+
     const midpointEntries = coreValueKeys.map((key) => {
       const range = valueWeightRanges[key] || [30, 40]
       return [key, (range[0] + range[1]) / 2] as const
@@ -862,7 +885,7 @@ export default function EvaluationCenterPage() {
     }
     const weights = midpointEntries.map(([key, mid]) => [key, Math.round((mid / total) * 100)] as const)
     return Object.fromEntries(weights)
-  }, [coreValueKeys, valueWeightRanges])
+  }, [coreValueKeys, valueWeightRanges, fixedValueWeights, weightMode])
 
   const handleKSAUpload = (ksa: KSAInterviewOutput | null) => {
     setKSAData(ksa)
@@ -974,13 +997,13 @@ export default function EvaluationCenterPage() {
     const concerns: string[] = []
     const interviewFocus: string[] = []
 
-    ;(['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
-      const score = candidateState[key].score
-      const weight = normalizedWeights[key]
-      if (score >= 8) strengths.push(`${key} is a standout (${score}/10, weight ${weight}%)`)
-      if (score <= 5) concerns.push(`${key} needs attention (${score}/10)`)
-      if (score < 7 && weight >= 30) interviewFocus.push(`${key} deep dive`)
-    })
+      ; (['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
+        const score = candidateState[key].score
+        const weight = normalizedWeights[key]
+        if (score >= 8) strengths.push(`${key} is a standout (${score}/10, weight ${weight}%)`)
+        if (score <= 5) concerns.push(`${key} needs attention (${score}/10)`)
+        if (score < 7 && weight >= 30) interviewFocus.push(`${key} deep dive`)
+      })
 
     const jobTitle = activePosition?.title || activePosition?.position || 'KSA Job Fit'
 
@@ -1047,10 +1070,13 @@ export default function EvaluationCenterPage() {
     const exportData = {
       evaluations,
       ksaFramework: ksaData,
+      weightMode,
       weightRanges,
       valueWeightRanges,
       normalizedValueWeights,
       normalizedWeights,
+      fixedKSAWeights,
+      fixedValueWeights,
       evaluationDate: new Date().toISOString(),
       totalCandidates: selectedCandidateIds.length
     }
@@ -1081,9 +1107,6 @@ export default function EvaluationCenterPage() {
               KSA Loaded
             </Badge>
           )}
-          <Badge variant="secondary">
-            {selectedCandidateIds.length > 0 ? `${selectedCandidateIds.length} candidate(s) selected` : 'Pick candidates to start grading'}
-          </Badge>
         </div>
       </div>
 
@@ -1095,7 +1118,7 @@ export default function EvaluationCenterPage() {
 
         {ksaData && (
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="py-4">
               <CardTitle className="flex items-center gap-2">
                 <SlidersHorizontal className="h-5 w-5" />
                 Step 2 · Choose weight acceptance ranges
@@ -1105,11 +1128,32 @@ export default function EvaluationCenterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">Weighting Mode</Badge>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant={weightMode === 'range' ? "primary" : "outline"}
+                    onClick={() => setWeightMode('range')}
+                  >
+                    Ranges
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={weightMode === 'fixed' ? "primary" : "outline"}
+                    onClick={() => setWeightMode('fixed')}
+                  >
+                    Fixed (100% total)
+                  </Button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {( ['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).map((category) => {
+                {(['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).map((category) => {
                   const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
                   const [minWeight, maxWeight] = weightRanges[category]
                   const inRange = distributionValue >= minWeight && distributionValue <= maxWeight
+                  const fixedValue = fixedKSAWeights[category]
                   return (
                     <Card
                       key={category}
@@ -1125,24 +1169,47 @@ export default function EvaluationCenterPage() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <Slider
-                          value={weightRanges[category]}
-                          min={0}
-                          max={100}
-                          step={1}
-                          onValueChange={(value) => setWeightRanges((prev) => ({ ...prev, [category]: value as [number, number] }))}
-                          className="pt-2"
-                        >
-                          <SliderThumb />
-                          <SliderThumb />
-                        </Slider>
-                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                          <span>{minWeight}%</span>
-                          <span>{maxWeight}%</span>
-                        </div>
-                        <Badge variant={inRange ? "outline" : "destructive"} className="w-full justify-center">
-                          {inRange ? 'Within preferred range' : 'Outside preferred range'}
-                        </Badge>
+                        {weightMode === 'range' ? (
+                          <>
+                            <Slider
+                              value={weightRanges[category]}
+                              min={0}
+                              max={100}
+                              step={1}
+                              onValueChange={(value) => setWeightRanges((prev) => ({ ...prev, [category]: value as [number, number] }))}
+                              className="pt-2"
+                            >
+                              <SliderThumb />
+                              <SliderThumb />
+                            </Slider>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                              <span>{minWeight}%</span>
+                              <span>{maxWeight}%</span>
+                            </div>
+                            <Badge variant={inRange ? "outline" : "destructive"} className="w-full justify-center">
+                              {inRange ? 'Within preferred range' : 'Outside preferred range'}
+                            </Badge>
+                          </>
+                        ) : (
+                          <>
+                            <Slider
+                              value={[fixedValue]}
+                              min={0}
+                              max={100}
+                              step={1}
+                              onValueChange={(value) => setFixedKSAWeights((prev) => rebalanceWeights(prev, category, value[0]))}
+                              className="pt-2"
+                            >
+                              <SliderThumb />
+                            </Slider>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                              <span>0%</span>
+                              <span>{fixedValue}%</span>
+                              <span>100%</span>
+                            </div>
+
+                          </>
+                        )}
                       </CardContent>
                     </Card>
                   )
@@ -1163,6 +1230,7 @@ export default function EvaluationCenterPage() {
                     {coreValueKeys.map((valueKey) => {
                       const [minWeight, maxWeight] = valueWeightRanges[valueKey] || [25, 35]
                       const scoringWeight = normalizedValueWeights[valueKey] || Math.round(100 / coreValueKeys.length)
+                      const fixedValue = fixedValueWeights[valueKey] ?? Math.round(100 / coreValueKeys.length)
                       return (
                         <Card key={valueKey} className="border-dashed">
                           <CardHeader className="pb-2">
@@ -1170,21 +1238,43 @@ export default function EvaluationCenterPage() {
                             <CardDescription>Scoring weight: {scoringWeight}%</CardDescription>
                           </CardHeader>
                           <CardContent className="space-y-3">
-                            <Slider
-                              value={valueWeightRanges[valueKey] || [25, 35]}
-                              min={0}
-                              max={100}
-                              step={1}
-                              onValueChange={(value) => setValueWeightRanges((prev) => ({ ...prev, [valueKey]: value as [number, number] }))}
-                              className="pt-2"
-                            >
-                              <SliderThumb />
-                              <SliderThumb />
-                            </Slider>
-                            <div className="flex items-center justify-between text-sm text-muted-foreground">
-                              <span>{minWeight}%</span>
-                              <span>{maxWeight}%</span>
-                            </div>
+                            {weightMode === 'range' ? (
+                              <>
+                                <Slider
+                                  value={valueWeightRanges[valueKey] || [25, 35]}
+                                  min={0}
+                                  max={100}
+                                  step={1}
+                                  onValueChange={(value) => setValueWeightRanges((prev) => ({ ...prev, [valueKey]: value as [number, number] }))}
+                                  className="pt-2"
+                                >
+                                  <SliderThumb />
+                                  <SliderThumb />
+                                </Slider>
+                                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                  <span>{minWeight}%</span>
+                                  <span>{maxWeight}%</span>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <Slider
+                                  value={[fixedValue]}
+                                  min={0}
+                                  max={100}
+                                  step={1}
+                                  onValueChange={(value) => setFixedValueWeights((prev) => rebalanceWeights(prev, valueKey, value[0]))}
+                                  className="pt-2"
+                                >
+                                  <SliderThumb />
+                                </Slider>
+                                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                  <span>0%</span>
+                                  <span>{fixedValue}%</span>
+                                  <span>100%</span>
+                                </div>
+                              </>
+                            )}
                           </CardContent>
                         </Card>
                       )
@@ -1213,7 +1303,7 @@ export default function EvaluationCenterPage() {
                     <Button
                       key={id}
                       size="sm"
-                      variant={activeCandidateId === id ? "default" : "outline"}
+                      variant={activeCandidateId === id ? "primary" : "outline"}
                       onClick={() => setActiveCandidateId(id)}
                     >
                       {candidate?.firstName} {candidate?.lastName}
@@ -1401,4 +1491,36 @@ export default function EvaluationCenterPage() {
       </div>
     </div>
   )
+}
+const rebalanceWeights = <T extends string>(weights: Record<T, number>, targetKey: T, newValue: number) => {
+  const keys = Object.keys(weights) as T[]
+  const next: Record<T, number> = { ...weights }
+  const clampedValue = Math.max(0, Math.min(100, Math.round(newValue)))
+  const others = keys.filter((k) => k !== targetKey)
+  if (!others.length) {
+    next[targetKey] = 100
+    return next
+  }
+
+  const remaining = Math.max(0, 100 - clampedValue)
+  const otherTotal = others.reduce((acc, key) => acc + (weights[key] ?? 0), 0)
+
+  if (otherTotal === 0) {
+    const share = Math.round(remaining / others.length)
+    others.forEach((key) => { next[key] = share })
+  } else {
+    others.forEach((key) => {
+      next[key] = Math.max(0, Math.round(((weights[key] ?? 0) / otherTotal) * remaining))
+    })
+  }
+
+  next[targetKey] = clampedValue
+
+  const totalAfter = Object.values(next).reduce((acc, v) => acc + v, 0)
+  const delta = 100 - totalAfter
+  if (delta !== 0) {
+    const adjustKey = others[0] ?? targetKey
+    next[adjustKey] = Math.max(0, next[adjustKey] + delta)
+  }
+  return next
 }
