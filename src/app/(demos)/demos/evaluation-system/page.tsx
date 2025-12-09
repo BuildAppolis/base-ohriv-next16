@@ -983,7 +983,7 @@ function UIDemoPage() {
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                                         </div>
                                     )}
-                                    <CardHeader className='border-none'>
+                                    <CardHeader className='py-4 border-none'>
                                         <div className="space-y-3">
                                             <CardTitle className="flex items-center gap-2">
                                                 <span className="text-2xl flex-shrink-0">{attr.icon}</span>
@@ -1306,7 +1306,7 @@ function UIDemoPage() {
 
                 {/* Info Box */}
                 <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
-                    <CardHeader>
+                    <CardHeader className="py-4">
                         <CardTitle className="text-blue-900 dark:text-blue-100 flex items-center gap-2">
                             <Info className="h-5 w-5" />
                             How the Evaluation System Works

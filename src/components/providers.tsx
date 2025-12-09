@@ -3,11 +3,12 @@
 // import { AuthUIProvider } from "@daveyplate/better-auth-ui"
 // import Link from "next/link"
 // import { useRouter, usePathname } from "next/navigation"
-import type { ReactNode } from "react"
+import { useMemo, type ReactNode } from "react"
 // import { client } from "@/lib/auth/client"
 import { ThemeProvider } from "next-themes"
 // import { Wrapper, WrapperWithQuery } from "./wrapper"
 import { Toaster } from "@/components/ui/sonner"
+import { Provider as JotaiProvider, createStore } from "jotai"
 // React DevTools - only imported in development
 // import dynamic from "next/dynamic";
 
@@ -25,6 +26,8 @@ import { Toaster } from "@/components/ui/sonner"
 // import { Provider as JotaiProvider } from "jotai"
 
 export function Providers({ children }: { children: ReactNode }) {
+    const jotaiStore = useMemo(() => createStore(), [])
+
     // const router = useRouter()
     // const pathname = usePathname()
     // Exclude both admin and dashboard routes from the wrapper
@@ -62,12 +65,16 @@ export function Providers({ children }: { children: ReactNode }) {
     //     </JotaiProvider>
     // )
     return (
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >{children}
-            <Toaster richColors closeButton />
-        </ThemeProvider>)
+        <JotaiProvider store={jotaiStore}>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                {children}
+                <Toaster richColors closeButton />
+            </ThemeProvider>
+        </JotaiProvider>
+    )
 }

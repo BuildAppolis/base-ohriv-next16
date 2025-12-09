@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Slider, SliderThumb } from '@/components/ui/slider'
 import { useAtom, useAtomValue } from 'jotai'
 import {
   candidatesAtom,
@@ -26,8 +25,18 @@ import { SimpleCandidate } from '@/lib/candidate-data'
  */
 function getRecommendationBadgeVariant(recommendation: string): "primary" | "secondary" | "destructive" {
   if (recommendation.includes('Strong') || recommendation === 'strong-recommend') return "primary"
-  if (recommendation === 'recommend' || recommendation === 'Recommend') return "secondary"
+  if (recommendation === 'recommend' || recommendation === 'Recommend' || recommendation === 'consider') return "secondary"
   return "destructive"
+}
+
+type KSACategoryKey = 'Knowledge' | 'Skills' | 'Ability'
+
+type WeightRangeState = Record<KSACategoryKey, [number, number]>
+
+type AttributeEvaluationState = {
+  score: number
+  notes: string
+  askedQuestions: number[]
 }
 import {
   FileText,
@@ -35,9 +44,10 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle2,
+  Info,
   BarChart3,
   Download,
-  Play,
+  SlidersHorizontal,
   FileJson,
   Trash2
 } from 'lucide-react'
@@ -687,70 +697,315 @@ function EvaluationResults({ evaluations }: {
 /**
  * Main Evaluation Center Page
  */
+
 export default function EvaluationCenterPage() {
   const candidatesAtomValue = useAtomValue(candidatesAtom)
   const candidates = Object.values(candidatesAtomValue)
   const [selectedCandidateIds, setSelectedCandidateIds] = useAtom(selectedCandidateIdsAtom)
   const [ksaData, setKSAData] = useState<KSAInterviewOutput | null>(null)
   const [evaluations, setEvaluations] = useState<CandidateEvaluation[]>([])
-  const [isEvaluating, setIsEvaluating] = useState(false)
-  const [evaluationProgress, setEvaluationProgress] = useState(0)
+  const [weightRanges, setWeightRanges] = useState<WeightRangeState>({
+    Knowledge: [35, 45],
+    Skills: [30, 40],
+    Ability: [20, 35]
+  })
+  const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<KSACategoryKey | null>(null)
+  const [candidateStates, setCandidateStates] = useState<Record<string, Record<KSACategoryKey, AttributeEvaluationState>>>({})
+  const [completedAttributes, setCompletedAttributes] = useState<Record<string, KSACategoryKey[]>>({})
   const [addEvaluation] = useAtom(addCandidateEvaluationAtom) as unknown as [(args: { candidateId: string; evaluation: CandidateEvaluation }) => void, any]
   const [trackJobEvaluation] = useAtom(trackCandidateJobEvaluationAtom) as unknown as [(args: { candidateId: string; jobTitle: string }) => void, any]
 
-  const handleKSAUpload = (ksa: KSAInterviewOutput | null) => {
-    setKSAData(ksa)
-    setEvaluations([]) // Clear previous evaluations
-  }
+  const activePosition = useMemo(() => (ksaData?.positions || ksaData?.Positions)?.[0], [ksaData])
 
-  const handleRunEvaluation = async () => {
-    if (!ksaData || selectedCandidateIds.length === 0) return
+  const jobFitData = useMemo(() => {
+    return ksaData?.KSA_JobFit || activePosition?.KSA_JobFit || null
+  }, [ksaData, activePosition])
 
-    setIsEvaluating(true)
-    setEvaluationProgress(0)
+  const weightingDistribution = useMemo(() => {
+    const fromFramework = ksaData?.KSA_Framework?.weightingDistribution || activePosition?.KSA_Framework?.weightingDistribution
+    if (fromFramework) return fromFramework
 
-    const newEvaluations: CandidateEvaluation[] = []
-
-    for (let i = 0; i < selectedCandidateIds.length; i++) {
-      const candidateId = selectedCandidateIds[i]
-      const candidate = candidates.find(c => c.id === candidateId)
-
-      if (!candidate) continue
-
-      // try {
-      //   const evaluation = await evaluateCandidateKSA(
-      //     candidate,
-      //     ksaData,
-      //     undefined,
-      //     ksaData.KSA_JobFit ? Object.keys(ksaData.KSA_JobFit)[0] : 'Unknown Position'
-      //   )
-
-      //   newEvaluations.push(evaluation)
-
-      //   // Store evaluation in atom
-      //   addEvaluation({ candidateId, evaluation })
-
-      //   // Track job evaluation for this candidate
-      //   const jobTitle = evaluation.evaluationContext.jobTitle
-      //   if (jobTitle) {
-      //     trackJobEvaluation({ candidateId, jobTitle })
-      //   }
-
-      //   setEvaluationProgress(((i + 1) / selectedCandidateIds.length) * 100)
-      // } catch (error) {
-      //   console.error(`Failed to evaluate candidate ${candidateId}:`, error)
-      // }
+    const fromKSAs = ksaData?.KSAs || activePosition?.KSAs
+    if (fromKSAs) {
+      return {
+        Knowledge: fromKSAs.Knowledge?.weighting ?? 40,
+        Skills: fromKSAs.Skills?.weighting ?? 35,
+        Ability: fromKSAs.Ability?.weighting ?? 25
+      }
     }
 
-    setEvaluations(newEvaluations)
-    setIsEvaluating(false)
-    setEvaluationProgress(0)
+    return null
+  }, [ksaData, activePosition])
+
+  const ksaCategories = useMemo(() => {
+    const available: KSACategoryKey[] = []
+    ;(['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
+      if ((jobFitData as any)?.[key]) {
+        available.push(key)
+      }
+    })
+    return available
+  }, [jobFitData])
+
+  const createEmptyCandidateState = (): Record<KSACategoryKey, AttributeEvaluationState> => ({
+    Knowledge: { score: 5, notes: '', askedQuestions: [] },
+    Skills: { score: 5, notes: '', askedQuestions: [] },
+    Ability: { score: 5, notes: '', askedQuestions: [] }
+  })
+
+  useEffect(() => {
+    if (!selectedCandidateIds.length) {
+      setActiveCandidateId(null)
+      return
+    }
+
+    if (!activeCandidateId || !selectedCandidateIds.includes(activeCandidateId)) {
+      setActiveCandidateId(selectedCandidateIds[0])
+    }
+  }, [selectedCandidateIds, activeCandidateId])
+
+  useEffect(() => {
+    setCandidateStates((prev) => {
+      const next = { ...prev }
+      selectedCandidateIds.forEach((id) => {
+        if (!next[id]) {
+          next[id] = createEmptyCandidateState()
+        }
+      })
+      return next
+    })
+  }, [selectedCandidateIds])
+
+  useEffect(() => {
+    if (ksaCategories.length) {
+      setSelectedCategory((prev) => (prev && ksaCategories.includes(prev) ? prev : ksaCategories[0]))
+    } else {
+      setSelectedCategory(null)
+    }
+  }, [ksaCategories])
+
+  useEffect(() => {
+    if (!weightingDistribution) return
+
+    const clampRange = (value: number): [number, number] => [
+      Math.max(0, Math.round(value - 5)),
+      Math.min(100, Math.round(value + 5))
+    ]
+
+    setWeightRanges({
+      Knowledge: clampRange(weightingDistribution.Knowledge ?? 40),
+      Skills: clampRange(weightingDistribution.Skills ?? 35),
+      Ability: clampRange(weightingDistribution.Ability ?? 25)
+    })
+  }, [weightingDistribution])
+
+  const normalizedWeights = useMemo(() => {
+    const midpoints = {
+      Knowledge: (weightRanges.Knowledge[0] + weightRanges.Knowledge[1]) / 2,
+      Skills: (weightRanges.Skills[0] + weightRanges.Skills[1]) / 2,
+      Ability: (weightRanges.Ability[0] + weightRanges.Ability[1]) / 2
+    }
+    const total = midpoints.Knowledge + midpoints.Skills + midpoints.Ability
+    if (!total) {
+      return { Knowledge: 34, Skills: 33, Ability: 33 }
+    }
+
+    const knowledgeWeight = Math.round((midpoints.Knowledge / total) * 100)
+    const skillsWeight = Math.round((midpoints.Skills / total) * 100)
+    const abilityWeight = Math.max(100 - knowledgeWeight - skillsWeight, 0)
+
+    return {
+      Knowledge: knowledgeWeight,
+      Skills: skillsWeight,
+      Ability: abilityWeight
+    }
+  }, [weightRanges])
+
+  const handleKSAUpload = (ksa: KSAInterviewOutput | null) => {
+    setKSAData(ksa)
+    setEvaluations([])
+    setSelectedCandidateIds([])
+    setActiveCandidateId(null)
+    setCandidateStates({})
+    setCompletedAttributes({})
+  }
+
+  const activeCandidate = useMemo(
+    () => candidates.find((candidate) => candidate.id === activeCandidateId),
+    [activeCandidateId, candidates]
+  )
+
+  const activeCandidateState = activeCandidateId ? candidateStates[activeCandidateId] : undefined
+
+  const selectedCategoryData = selectedCategory ? (jobFitData as any)?.[selectedCategory] : null
+
+  const questionsForCategory = selectedCategoryData?.questions || []
+
+  const toggleQuestionAsked = (category: KSACategoryKey, questionId: number) => {
+    if (!activeCandidateId) return
+
+    setCandidateStates((prev) => {
+      const next = { ...prev }
+      const candidateState = next[activeCandidateId] || createEmptyCandidateState()
+      const asked = new Set(candidateState[category].askedQuestions)
+      if (asked.has(questionId)) {
+        asked.delete(questionId)
+      } else {
+        asked.add(questionId)
+      }
+      candidateState[category] = { ...candidateState[category], askedQuestions: Array.from(asked) }
+      next[activeCandidateId] = candidateState
+      return next
+    })
+  }
+
+  const handleScoreChange = (category: KSACategoryKey, value: number[]) => {
+    if (!activeCandidateId) return
+
+    setCandidateStates((prev) => {
+      const next = { ...prev }
+      const candidateState = next[activeCandidateId] || createEmptyCandidateState()
+      candidateState[category] = { ...candidateState[category], score: value[0] }
+      next[activeCandidateId] = candidateState
+      return next
+    })
+  }
+
+  const handleNotesChange = (category: KSACategoryKey, value: string) => {
+    if (!activeCandidateId) return
+
+    setCandidateStates((prev) => {
+      const next = { ...prev }
+      const candidateState = next[activeCandidateId] || createEmptyCandidateState()
+      candidateState[category] = { ...candidateState[category], notes: value }
+      next[activeCandidateId] = candidateState
+      return next
+    })
+  }
+
+  const handleSaveAttribute = (category: KSACategoryKey) => {
+    if (!activeCandidateId) return
+
+    setCompletedAttributes((prev) => {
+      const existing = new Set(prev[activeCandidateId] || [])
+      existing.add(category)
+      return { ...prev, [activeCandidateId]: Array.from(existing) }
+    })
+  }
+
+  const computeConfidence = (category: KSACategoryKey) => {
+    const totalQuestions = ((jobFitData as any)?.[category]?.questions || []).length
+    const asked = activeCandidateState?.[category]?.askedQuestions.length || 0
+    if (!totalQuestions) return 6
+    return Math.min(10, Math.max(4, Math.round((asked / totalQuestions) * 10)))
+  }
+
+  const buildEvaluation = (candidateId: string): CandidateEvaluation | null => {
+    const candidateState = candidateStates[candidateId]
+    const candidate = candidates.find((c) => c.id === candidateId)
+    if (!candidateState || !candidate) return null
+
+    const knowledgeScore = candidateState.Knowledge.score
+    const skillsScore = candidateState.Skills.score
+    const abilityScore = candidateState.Ability.score
+
+    const weightedScore = Number(
+      (
+        (knowledgeScore * normalizedWeights.Knowledge +
+          skillsScore * normalizedWeights.Skills +
+          abilityScore * normalizedWeights.Ability) / 100
+      ).toFixed(1)
+    )
+
+    const recommendation: CandidateEvaluation['overallCompatibility']['recommendation'] =
+      weightedScore >= 8
+        ? 'strong-recommend'
+        : weightedScore >= 6
+          ? 'recommend'
+          : weightedScore >= 4
+            ? 'consider'
+            : 'reject'
+
+    const strengths: string[] = []
+    const concerns: string[] = []
+    const interviewFocus: string[] = []
+
+    ;(['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).forEach((key) => {
+      const score = candidateState[key].score
+      const weight = normalizedWeights[key]
+      if (score >= 8) strengths.push(`${key} is a standout (${score}/10, weight ${weight}%)`)
+      if (score <= 5) concerns.push(`${key} needs attention (${score}/10)`)
+      if (score < 7 && weight >= 30) interviewFocus.push(`${key} deep dive`)
+    })
+
+    const jobTitle = activePosition?.title || activePosition?.position || 'KSA Job Fit'
+
+    return {
+      candidateId,
+      evaluationContext: {
+        jobTitle,
+        ksaFramework: ksaData || undefined,
+        evaluationDate: new Date().toISOString(),
+        evaluator: 'KSA Evaluation Center'
+      },
+      scores: {
+        knowledge: {
+          overall: knowledgeScore,
+          breakdown: { weighting: normalizedWeights.Knowledge },
+          confidence: computeConfidence('Knowledge'),
+          notes: candidateState.Knowledge.notes
+        },
+        skills: {
+          overall: skillsScore,
+          breakdown: { weighting: normalizedWeights.Skills },
+          confidence: computeConfidence('Skills'),
+          notes: candidateState.Skills.notes
+        },
+        abilities: {
+          overall: abilityScore,
+          breakdown: { weighting: normalizedWeights.Ability },
+          confidence: computeConfidence('Ability'),
+          notes: candidateState.Ability.notes
+        }
+      },
+      overallCompatibility: {
+        score: weightedScore,
+        recommendation,
+        strengths,
+        concerns,
+        interviewFocus
+      },
+      predictedPerformance: {
+        behavioral: Math.max(3, Math.round((abilityScore + skillsScore) / 2)),
+        technical: Math.max(3, Math.round((skillsScore + knowledgeScore) / 2)),
+        cultural: Math.max(3, Math.round((abilityScore + knowledgeScore) / 2)),
+        overall: Math.max(3, Math.round(weightedScore))
+      }
+    }
+  }
+
+  const handleSaveCandidateEvaluation = () => {
+    if (!activeCandidateId) return
+    const evaluation = buildEvaluation(activeCandidateId)
+    if (!evaluation) return
+
+    setEvaluations((prev) => {
+      const filtered = prev.filter((ev) => ev.candidateId !== activeCandidateId)
+      return [...filtered, evaluation]
+    })
+
+    addEvaluation({ candidateId: activeCandidateId, evaluation })
+    const jobTitle = evaluation.evaluationContext.jobTitle || 'KSA Job Fit'
+    trackJobEvaluation({ candidateId: activeCandidateId, jobTitle })
   }
 
   const handleExportEvaluations = () => {
     const exportData = {
       evaluations,
       ksaFramework: ksaData,
+      weightRanges,
+      normalizedWeights,
       evaluationDate: new Date().toISOString(),
       totalCandidates: selectedCandidateIds.length
     }
@@ -766,103 +1021,295 @@ export default function EvaluationCenterPage() {
     URL.revokeObjectURL(url)
   }
 
-
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold">KSA Evaluation Center</h1>
           <p className="text-muted-foreground">
-            Evaluate candidates against your KSA interview framework
+            Load a KSA, pick your acceptable weighting ranges, choose candidates, and grade them like the Candidate Evaluation System.
           </p>
         </div>
-        <div className="flex gap-2">
-          {evaluations.length > 0 && (
-            <Button variant="outline" onClick={handleExportEvaluations}>
-              <Download className="h-4 w-4 mr-2" />
-              Export Results
-            </Button>
+        <div className="flex items-center gap-2">
+          {ksaData && (
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              KSA Loaded
+            </Badge>
           )}
+          <Badge variant="secondary">
+            {selectedCandidateIds.length > 0 ? `${selectedCandidateIds.length} candidate(s) selected` : 'Pick candidates to start grading'}
+          </Badge>
         </div>
       </div>
 
-      <Tabs defaultValue="ksa-framework" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="ksa-framework" className="flex items-center gap-2">
-            <FileJson className="h-4 w-4" />
-            KSA Framework
-          </TabsTrigger>
-          <TabsTrigger value="candidates" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Candidates
-            <Badge variant="secondary">{selectedCandidateIds.length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="results" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Results
-            {evaluations.length > 0 && <Badge variant="secondary">{evaluations.length}</Badge>}
-          </TabsTrigger>
-        </TabsList>
-
-        {/* KSA Framework Tab */}
-        <TabsContent value="ksa-framework">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Badge variant="secondary" className="w-fit">Step 1 · Load KSA JSON</Badge>
           <KSAInput onKSAUpload={handleKSAUpload} ksaData={ksaData} />
-        </TabsContent>
+        </div>
 
-        {/* Candidate Selection Tab */}
-        <TabsContent value="candidates">
+        {ksaData && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5" />
+                Step 2 · Choose weight acceptance ranges
+              </CardTitle>
+              <CardDescription>
+                Set the acceptable range for each KSA weighting. We normalize the midpoint to 100% when scoring candidates.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {( ['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).map((category) => {
+                  const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
+                  const [minWeight, maxWeight] = weightRanges[category]
+                  const inRange = distributionValue >= minWeight && distributionValue <= maxWeight
+                  return (
+                    <Card
+                      key={category}
+                      className={cn(
+                        "border-dashed",
+                        !inRange && "border-amber-300 bg-amber-50/50"
+                      )}
+                    >
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">{category}</CardTitle>
+                        <CardDescription>
+                          Framework weight: {distributionValue || 0}% • Scoring weight: {normalizedWeights[category]}%
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <Slider
+                          value={weightRanges[category]}
+                          min={0}
+                          max={100}
+                          step={1}
+                          onValueChange={(value) => setWeightRanges((prev) => ({ ...prev, [category]: value as [number, number] }))}
+                          className="pt-2"
+                        >
+                          <SliderThumb />
+                          <SliderThumb />
+                        </Slider>
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <span>{minWeight}%</span>
+                          <span>{maxWeight}%</span>
+                        </div>
+                        <Badge variant={inRange ? "outline" : "destructive"} className="w-full justify-center">
+                          {inRange ? 'Within preferred range' : 'Outside preferred range'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Info className="h-4 w-4" />
+                Normalized weights applied to scoring: {normalizedWeights.Knowledge}% / {normalizedWeights.Skills}% / {normalizedWeights.Ability}% (K/S/A).
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {ksaData && (
+          <div className="space-y-2">
+            <Badge variant="secondary" className="w-fit">Step 3 · Choose candidates</Badge>
+            <CandidateSelection candidates={candidates} selectedIds={selectedCandidateIds} onSelectionChange={setSelectedCandidateIds} />
+            {selectedCandidateIds.length > 0 && (
+              <div className="flex flex-wrap gap-2 text-sm">
+                <span className="text-muted-foreground">Active candidate:</span>
+                {selectedCandidateIds.map((id) => {
+                  const candidate = candidates.find((c) => c.id === id)
+                  return (
+                    <Button
+                      key={id}
+                      size="sm"
+                      variant={activeCandidateId === id ? "default" : "outline"}
+                      onClick={() => setActiveCandidateId(id)}
+                    >
+                      {candidate?.firstName} {candidate?.lastName}
+                    </Button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {ksaData && activeCandidateId && selectedCategory && (
           <div className="space-y-4">
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl">Step 4 · Grade against the KSA</CardTitle>
+                    <CardDescription>
+                      Borrowed from the Candidate Evaluation System: pick an attribute, ask the KSA questions, then score it 1-10.
+                    </CardDescription>
+                    {activeCandidate && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Evaluating {activeCandidate.firstName} {activeCandidate.lastName}
+                      </p>
+                    )}
+                  </div>
+                  <Badge variant="outline">
+                    {completedAttributes[activeCandidateId]?.length || 0} / {ksaCategories.length} attributes saved
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {ksaCategories.map((category) => {
+                    const categoryData = (jobFitData as any)?.[category]
+                    const questionCount = (categoryData?.questions || []).length
+                    const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
+                    const isCompleted = completedAttributes[activeCandidateId]?.includes(category)
+                    return (
+                      <Card
+                        key={category}
+                        className={cn(
+                          "cursor-pointer transition-all hover:shadow-sm",
+                          selectedCategory === category && "ring-2 ring-primary",
+                          isCompleted && "bg-muted/60"
+                        )}
+                        onClick={() => setSelectedCategory(category)}
+                      >
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            {category}
+                            {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                          </CardTitle>
+                          <CardDescription className="space-y-1">
+                            <span>{questionCount} {questionCount === 1 ? 'question' : 'questions'}</span>
+                            <div className="text-xs text-muted-foreground">Weight {distributionValue || 0}%</div>
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    )
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <Card className="lg:col-span-2">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Questions for {selectedCategory}</CardTitle>
+                      <CardDescription>Mark what you asked so we can track confidence.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {questionsForCategory.length === 0 && (
+                        <div className="text-muted-foreground text-sm">No questions in this KSA bucket.</div>
+                      )}
+                      <div className="space-y-3">
+                        {questionsForCategory.map((question: any, idx: number) => {
+                          const qId = question.id || idx
+                          const label = question.questionText || question.question_text
+                          const description = question.evaluationCriteria || question.evaluation_criteria
+                          const expected = question.expectedAnswers || question.expected_answers
+                          const followUps = question.followUpProbes || question.follow_up_probes
+                          const isAsked = activeCandidateState?.[selectedCategory]?.askedQuestions.includes(qId)
+                          return (
+                            <div
+                              key={qId}
+                              className={cn(
+                                "p-3 rounded-md border",
+                                isAsked && "border-primary/40 bg-primary/5"
+                              )}
+                            >
+                              <div className="flex items-start gap-3">
+                                <input
+                                  type="checkbox"
+                                  className="mt-1 h-4 w-4"
+                                  checked={!!isAsked}
+                                  onChange={() => toggleQuestionAsked(selectedCategory, qId)}
+                                />
+                                <div className="space-y-1">
+                                  <div className="font-medium">Question {idx + 1}: {label}</div>
+                                  {description && (
+                                    <div className="text-sm text-muted-foreground">Criteria: {description}</div>
+                                  )}
+                                  {expected && (
+                                    <div className="text-xs text-muted-foreground">Expected: {expected}</div>
+                                  )}
+                                  {followUps && (
+                                    <div className="text-xs text-muted-foreground">Follow-ups: {followUps.join('; ')}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">Score {selectedCategory}</CardTitle>
+                      <CardDescription>Set the 1-10 score and add notes.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-lg">{activeCandidateState?.[selectedCategory]?.score || 5}/10</span>
+                          <span className="text-muted-foreground">Weight {normalizedWeights[selectedCategory]}%</span>
+                        </div>
+                        <Badge variant="outline">Confidence {computeConfidence(selectedCategory)}/10</Badge>
+                      </div>
+                      <Slider
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={[activeCandidateState?.[selectedCategory]?.score || 5]}
+                        onValueChange={(value) => handleScoreChange(selectedCategory, value)}
+                      >
+                        <SliderThumb />
+                      </Slider>
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>1-3 Needs improvement</span>
+                        <span>4-6 Acceptable</span>
+                        <span>7-10 Excellent</span>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Notes</label>
+                        <Textarea
+                          value={activeCandidateState?.[selectedCategory]?.notes || ''}
+                          onChange={(e) => handleNotesChange(selectedCategory, e.target.value)}
+                          placeholder="Observations, examples, or red flags..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-between">
+                        <Button variant="outline" onClick={() => handleSaveAttribute(selectedCategory)}>
+                          Save attribute progress
+                        </Button>
+                        <Button onClick={handleSaveCandidateEvaluation}>
+                          Save candidate evaluation
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {evaluations.length > 0 && (
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Select Candidates for Evaluation</h2>
-              <Button
-                onClick={handleRunEvaluation}
-                disabled={!ksaData || selectedCandidateIds.length === 0 || isEvaluating}
-              >
-                <Play className="h-4 w-4 mr-2" />
-                {isEvaluating ? 'Evaluating...' : 'Run Evaluation'}
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">Results</Badge>
+                <span className="text-sm text-muted-foreground">Saved evaluations for graded candidates</span>
+              </div>
+              <Button variant="outline" onClick={handleExportEvaluations}>
+                <Download className="h-4 w-4 mr-2" />
+                Export Results
               </Button>
             </div>
-
-            {isEvaluating && (
-              <Card>
-                <CardContent className="py-6">
-                  <div className="text-center space-y-3">
-                    <div className="text-sm font-medium">
-                      Evaluating candidates... {Math.round(evaluationProgress)}%
-                    </div>
-                    <Progress value={evaluationProgress} className="w-full" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <CandidateSelection
-              candidates={candidates}
-              selectedIds={selectedCandidateIds}
-              onSelectionChange={setSelectedCandidateIds}
-            />
-          </div>
-        </TabsContent>
-
-        {/* Results Tab */}
-        <TabsContent value="results">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Evaluation Results</h2>
-              {evaluations.length > 0 && (
-                <div className="text-sm text-muted-foreground">
-                  {evaluations.filter(e => e.overallCompatibility.score >= 7).length} strong recommendations,
-                  {evaluations.filter(e => e.overallCompatibility.score >= 5 && e.overallCompatibility.score < 7).length} consider,
-                  {evaluations.filter(e => e.overallCompatibility.score < 5).length} concerns
-                </div>
-              )}
-            </div>
-
             <EvaluationResults evaluations={evaluations} />
           </div>
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
     </div>
   )
 }
