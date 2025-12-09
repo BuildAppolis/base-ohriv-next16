@@ -51,6 +51,24 @@
  */
 
 /**
+ * Supported question types (broad enough for most companies)
+ */
+export type QuestionType =
+  | "behavioral"
+  | "situational"
+  | "technical"
+  | "practical"
+  | "screening"
+  | "values"
+  | "process"
+  | "other";
+
+/**
+ * Difficulty levels (expanded for flexibility)
+ */
+export type QuestionDifficulty = "basic" | "intermediate" | "advanced" | "expert";
+
+/**
  * Base interface for all interview questions
  * Contains common properties shared across all question types
  */
@@ -58,17 +76,20 @@ export interface BaseQuestion {
   /** Unique identifier for the question */
   id: number;
 
-  /** Question category (e.g., "Knowledge", "Innovation", "Skills") */
-  category: string;
+  /** Question category (e.g., "Knowledge", "Innovation", "Skills"). Optional when derived from the parent key */
+  category?: string;
 
-  /** Type of question - currently only behavioral is supported */
-  type: "behavioral";
+  /** Type of question */
+  type: QuestionType;
 
   /** The main question text to ask the candidate */
-  questionText: string;
+  questionText?: string;
+  /** Snake-case alternative supported by some generators */
+  question_text?: string;
 
   /** Array of follow-up probe questions to dig deeper */
-  followUpProbes: string[];
+  followUpProbes?: string[];
+  follow_up_probes?: string[];
 }
 
 /**
@@ -117,16 +138,20 @@ export interface CompanyFitQuestion extends BaseQuestion {
  */
 export interface JobFitQuestion extends BaseQuestion {
   /** Difficulty level of the question for candidate assessment */
-  difficulty: "intermediate" | "advanced";
+  difficulty: QuestionDifficulty;
+  difficultyLevel?: QuestionDifficulty;
 
   /** Criteria used to evaluate the quality of the candidate's response */
-  evaluationCriteria: string;
+  evaluationCriteria?: string;
+  evaluation_criteria?: string;
 
   /** Expected elements that should be included in a good response */
-  expectedAnswers: string;
+  expectedAnswers?: string;
+  expected_answers?: string;
 
   /** Warning signs that indicate a weak response or candidate mismatch */
-  redFlagIndicators: string[];
+  redFlagIndicators?: string[];
+  red_flag_indicators?: string[];
 }
 
 /**
@@ -154,7 +179,8 @@ export interface KSAAttribute {
   definition: string;
 
   /** 1-10 scale describing performance levels for this KSA area */
-  evaluationScale: Record<string, string>;
+  evaluationScale?: Record<string, string>;
+  evaluation_scale?: Record<string, string>;
 
   /** Percentage weight this KSA area carries in overall evaluation */
   weighting: number;
@@ -657,13 +683,7 @@ export type JobFitCategory = "Knowledge" | "Skills" | "Ability";
 /**
  * Question difficulty levels for job fit assessment
  */
-export type QuestionDifficulty = "intermediate" | "advanced";
-
-/**
- * Supported question types
- * Currently only behavioral questions are supported, but this allows for future expansion
- */
-export type QuestionType = "behavioral";
+// (Moved above) See QuestionDifficulty union near the top
 
 /**
  * Dynamic key type for KSA job fit categories
@@ -698,7 +718,12 @@ export type QuestionWithCategory<T extends BaseQuestion = BaseQuestion> = T & {
  * }
  */
 export function isJobFitQuestion(question: BaseQuestion): question is JobFitQuestion {
-  return 'evaluation_criteria' in question && 'expected_answers' in question;
+  return (
+    'evaluationCriteria' in question ||
+    'evaluation_criteria' in question ||
+    'expectedAnswers' in question ||
+    'expected_answers' in question
+  );
 }
 
 /**

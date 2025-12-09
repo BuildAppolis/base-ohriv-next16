@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Slider, SliderThumb } from '@/components/ui/slider'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetBody, SheetTrigger } from '@/components/ui/sheet'
 import { useAtom, useAtomValue } from 'jotai'
 import {
   candidatesAtom,
@@ -123,18 +124,18 @@ function KSAInput({ onKSAUpload, ksaData }: {
             {
               "id": 2,
               "category": "Knowledge",
-              "type": "behavioral",
-              "difficulty": "intermediate",
-              "question_text": "Describe how you ensure that you stay updated with evolving technologies in software development.",
-              "evaluation_criteria": "Engagement in continuous learning and knowledge application.",
-              "expected_answers": "Mentorship, courses attended, resources used (e.g., industry blogs, webinars).",
+              "type": "technical",
+              "difficulty": "advanced",
+              "question_text": "How would you design a migration from a monolith to services with minimal downtime?",
+              "evaluation_criteria": "Understands domain boundaries, data strategy, rollout/rollback.",
+              "expected_answers": "Strangler pattern, data migration, canary/blue-green, observability.",
               "follow_up_probes": [
-                "How often do you engage with these resources?",
-                "Give an example of how learning improved your work performance."
+                "How would you handle shared data models?",
+                "What rollback signals would you watch?"
               ],
               "red_flag_indicators": [
-                "No specific examples of learning or engagement",
-                "Lack of motivation for professional development"
+                "Ignores rollback",
+                "No plan for data migration"
               ]
             }
           ]
@@ -165,35 +166,35 @@ function KSAInput({ onKSAUpload, ksaData }: {
             {
               "id": 3,
               "category": "Skills",
-              "type": "behavioral",
+              "type": "practical",
               "difficulty": "advanced",
-              "question_text": "Provide an example of a complex problem you solved using programming skills. What was your approach?",
-              "evaluation_criteria": "Ability to articulate technical problem-solving processes.",
-              "expected_answers": "Clear steps taken, technologies used, and the outcome achieved.",
+              "question_text": "Live refactor: improve this function for readability and performance.",
+              "evaluation_criteria": "Clean code, testing, clear rationale, avoids premature optimization.",
+              "expected_answers": "Adds tests, simplifies logic, explains choices.",
               "follow_up_probes": [
-                "What challenges did you face during implementation?",
-                "How did you ensure the solution met user needs?"
+                "Why that data structure?",
+                "How would you benchmark this?"
               ],
               "red_flag_indicators": [
-                "Inability to explain problem-solving processes clearly",
-                "Lack of technical depth or specificity"
+                "No tests",
+                "Focuses only on micro-optimizations"
               ]
             },
             {
               "id": 4,
               "category": "Skills",
-              "type": "behavioral",
+              "type": "situational",
               "difficulty": "intermediate",
-              "question_text": "Discuss how you have utilized collaboration tools (like Jira or Slack) in managing a project.",
-              "evaluation_criteria": "Experience and proficiency with tools for project management and team collaboration.",
-              "expected_answers": "Examples of managing tasks or communication via tools.",
+              "question_text": "You join a sprint mid-cycle and discover major scope risk. What do you do first?",
+              "evaluation_criteria": "Stakeholder comms, risk reduction, reprioritization.",
+              "expected_answers": "Surface risk, propose options, replan with team/stakeholders.",
               "follow_up_probes": [
-                "How did those tools improve project outcomes?",
-                "What features did you find most beneficial, and why?"
+                "How do you keep the team aligned?",
+                "When do you push back on scope?"
               ],
               "red_flag_indicators": [
-                "Negative or vague responses about tool effectiveness",
-                "Limited exposure to collaboration tools"
+                "Silent escalation",
+                "Ignores stakeholders"
               ]
             }
           ]
@@ -278,8 +279,8 @@ function KSAInput({ onKSAUpload, ksaData }: {
             {
               "id": 2,
               "category": "Innovation",
-              "type": "behavioral",
-              "question_text": "Can you provide an example when you took a calculated risk that led to a successful outcome?",
+              "type": "screening",
+              "question_text": "Can you provide an example when you took a calculated risk that led to a successful outcome? What did you learn if it failed?",
               "sample_indicators": {
                 "strong_response": "Clearly explains the rationale for risk-taking and the successful result.",
                 "weak_response": "Fails to provide a concrete example or avoid responsibility."
@@ -296,7 +297,7 @@ function KSAInput({ onKSAUpload, ksaData }: {
             {
               "id": 3,
               "category": "Excellence",
-              "type": "behavioral",
+              "type": "process",
               "question_text": "How do you ensure that your work consistently meets or exceeds quality standards?",
               "sample_indicators": {
                 "strong_response": "Describes specific quality assurance processes employed.",
@@ -328,7 +329,7 @@ function KSAInput({ onKSAUpload, ksaData }: {
             {
               "id": 5,
               "category": "Collaboration",
-              "type": "behavioral",
+              "type": "situational",
               "question_text": "Describe a time when you had to work with a difficult team member. How did you handle that situation?",
               "sample_indicators": {
                 "strong_response": "Illustrates effective conflict resolution strategies.",
@@ -721,6 +722,7 @@ export default function EvaluationCenterPage() {
   const [valueWeightRanges, setValueWeightRanges] = useState<ValueWeightRangeState>({})
   const [fixedValueWeights, setFixedValueWeights] = useState<Record<string, number>>({})
   const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null)
+  const [isGradeSheetOpen, setIsGradeSheetOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<KSACategoryKey | null>(null)
   const [candidateStates, setCandidateStates] = useState<Record<string, Record<KSACategoryKey, AttributeEvaluationState>>>({})
   const [completedAttributes, setCompletedAttributes] = useState<Record<string, KSACategoryKey[]>>({})
@@ -1318,12 +1320,12 @@ export default function EvaluationCenterPage() {
         {ksaData && activeCandidateId && selectedCategory && (
           <div className="space-y-4">
             <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-              <CardHeader>
-                <div className="flex items-center justify-between">
+              <CardHeader className='py-4'>
+                <div className="flex items-center justify-between w-full">
                   <div>
                     <CardTitle className="text-xl">Step 4 · Grade against the KSA</CardTitle>
                     <CardDescription>
-                      Borrowed from the Candidate Evaluation System: pick an attribute, ask the KSA questions, then score it 1-10.
+                      Pick an attribute, ask the KSA questions, then score it 1-10.
                     </CardDescription>
                     {activeCandidate && (
                       <p className="text-sm text-muted-foreground mt-1">
