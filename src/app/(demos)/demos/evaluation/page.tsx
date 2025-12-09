@@ -40,15 +40,17 @@ type AttributeEvaluationState = {
   notes: string
   askedQuestions: number[]
 }
+type ValueEvaluationState = {
+  score: number
+  notes: string
+  askedQuestions: number[]
+}
 import {
   FileText,
   Users,
-  TrendingUp,
-  AlertTriangle,
   CheckCircle2,
   Info,
   BarChart3,
-  Download,
   SlidersHorizontal,
   FileJson,
   Trash2
@@ -591,105 +593,29 @@ function EvaluationResults({ evaluations }: {
               </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Score Breakdown */}
-            <div>
-              <h4 className="text-sm font-medium mb-3">KSA Score Breakdown</h4>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">Knowledge</span>
-                    <span className="font-semibold">{evaluation.scores.knowledge.overall}/10</span>
-                  </div>
-                  <Progress value={evaluation.scores.knowledge.overall * 10} className="h-2" />
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-3 border rounded-md">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Job Fit (KSA)</span>
+                  <Badge variant="secondary">{evaluation.overallCompatibility.score}/10</Badge>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">Skills</span>
-                    <span className="font-semibold">{evaluation.scores.skills.overall}/10</span>
-                  </div>
-                  <Progress value={evaluation.scores.skills.overall * 10} className="h-2" />
+                <p className="text-xs text-muted-foreground">
+                  Weighted across Knowledge, Skills, and Ability.
+                </p>
+              </div>
+              <div className="p-3 border rounded-md">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Company Fit (Values)</span>
+                  <Badge variant="outline">
+                    {typeof evaluation.companyFitScore === 'number' ? `${evaluation.companyFitScore}/10` : 'Pending'}
+                  </Badge>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">Abilities</span>
-                    <span className="font-semibold">{evaluation.scores.abilities.overall}/10</span>
-                  </div>
-                  <Progress value={evaluation.scores.abilities.overall * 10} className="h-2" />
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Aggregate of value/sub-value scores using weighting.
+                </p>
               </div>
             </div>
-
-            {/* Predicted Performance */}
-            <div>
-              <h4 className="text-sm font-medium mb-3">Predicted Interview Performance</h4>
-              <div className="grid grid-cols-4 gap-3 text-center">
-                <div>
-                  <div className="text-lg font-semibold text-green-600">
-                    {evaluation.predictedPerformance.behavioral}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Behavioral</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-blue-600">
-                    {evaluation.predictedPerformance.technical}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Technical</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-purple-600">
-                    {evaluation.predictedPerformance.cultural}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Cultural</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-orange-600">
-                    {evaluation.predictedPerformance.overall}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Overall</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Strengths and Concerns */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2 text-green-600">Key Strengths</h4>
-                <ul className="text-sm space-y-1">
-                  {evaluation.overallCompatibility.strengths.slice(0, 3).map((strength, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <TrendingUp className="h-3 w-3 text-green-500 mr-1 mt-0.5 flex-shrink-0" />
-                      {strength}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-2 text-red-600">Potential Concerns</h4>
-                <ul className="text-sm space-y-1">
-                  {evaluation.overallCompatibility.concerns.slice(0, 3).map((concern, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <AlertTriangle className="h-3 w-3 text-red-500 mr-1 mt-0.5 flex-shrink-0" />
-                      {concern}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Interview Focus */}
-            {evaluation.overallCompatibility.interviewFocus.length > 0 && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">Recommended Interview Focus</h4>
-                <div className="flex flex-wrap gap-1">
-                  {evaluation.overallCompatibility.interviewFocus.map((focus, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {focus}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
       ))}
@@ -723,7 +649,9 @@ export default function EvaluationCenterPage() {
   const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null)
   const [isGradeSheetOpen, setIsGradeSheetOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<KSACategoryKey | null>(null)
+  const [selectedValueKey, setSelectedValueKey] = useState<string | null>(null)
   const [candidateStates, setCandidateStates] = useState<Record<string, Record<KSACategoryKey, AttributeEvaluationState>>>({})
+  const [valueCandidateStates, setValueCandidateStates] = useState<Record<string, Record<string, ValueEvaluationState>>>({})
   const [completedAttributes, setCompletedAttributes] = useState<Record<string, KSACategoryKey[]>>({})
   const [addEvaluation] = useAtom(addCandidateEvaluationAtom) as unknown as [(args: { candidateId: string; evaluation: CandidateEvaluation }) => void, any]
   const [trackJobEvaluation] = useAtom(trackCandidateJobEvaluationAtom) as unknown as [(args: { candidateId: string; jobTitle: string }) => void, any]
@@ -772,6 +700,14 @@ export default function EvaluationCenterPage() {
     Ability: { score: 5, notes: '', askedQuestions: [] }
   })
 
+  const createEmptyValueState = (): Record<string, ValueEvaluationState> => {
+    const next: Record<string, ValueEvaluationState> = {}
+    coreValueKeys.forEach((key) => {
+      next[key] = { score: 5, notes: '', askedQuestions: [] }
+    })
+    return next
+  }
+
   useEffect(() => {
     if (!selectedCandidateIds.length) {
       setActiveCandidateId(null)
@@ -789,6 +725,15 @@ export default function EvaluationCenterPage() {
       selectedCandidateIds.forEach((id) => {
         if (!next[id]) {
           next[id] = createEmptyCandidateState()
+        }
+      })
+      return next
+    })
+    setValueCandidateStates((prev) => {
+      const next = { ...prev }
+      selectedCandidateIds.forEach((id) => {
+        if (!next[id]) {
+          next[id] = createEmptyValueState()
         }
       })
       return next
@@ -822,6 +767,7 @@ export default function EvaluationCenterPage() {
     if (!coreValueKeys.length) {
       setValueWeightRanges({})
       setFixedValueWeights({})
+      setSelectedValueKey(null)
       return
     }
     const equalShare = Math.round(100 / coreValueKeys.length)
@@ -841,6 +787,22 @@ export default function EvaluationCenterPage() {
       const existingTotal = coreValueKeys.reduce((acc, key) => acc + (prev[key] ?? 0), 0)
       coreValueKeys.forEach((key) => {
         next[key] = prev[key] ?? (existingTotal ? Math.round(100 / coreValueKeys.length) : equalShare)
+      })
+      return next
+    })
+    setSelectedValueKey((prev) => (prev && coreValueKeys.includes(prev) ? prev : coreValueKeys[0]))
+  }, [coreValueKeys])
+
+  useEffect(() => {
+    if (!coreValueKeys.length) return
+    setValueCandidateStates((prev) => {
+      const next: Record<string, Record<string, ValueEvaluationState>> = {}
+      Object.entries(prev).forEach(([candidateId, state]) => {
+        const updated: Record<string, ValueEvaluationState> = {}
+        coreValueKeys.forEach((key) => {
+          updated[key] = state[key] || { score: 5, notes: '', askedQuestions: [] }
+        })
+        next[candidateId] = updated
       })
       return next
     })
@@ -908,6 +870,9 @@ export default function EvaluationCenterPage() {
   const selectedCategoryData = selectedCategory ? (jobFitData as any)?.[selectedCategory] : null
 
   const questionsForCategory = selectedCategoryData?.questions || []
+
+  const selectedValueData = selectedValueKey ? (coreValuesData as any)?.[selectedValueKey] : null
+  const questionsForValue = selectedValueData?.questions || []
 
   const renderGradeContent = (isSheetView = false) => (
     <div className={cn("space-y-4", isSheetView && "pb-4")}>
@@ -1073,6 +1038,50 @@ export default function EvaluationCenterPage() {
     })
   }
 
+  const toggleValueQuestionAsked = (valueKey: string, questionId: number) => {
+    if (!activeCandidateId) return
+    setValueCandidateStates((prev) => {
+      const next = { ...prev }
+      const state = next[activeCandidateId] || createEmptyValueState()
+      const asked = new Set(state[valueKey]?.askedQuestions || [])
+      if (asked.has(questionId)) {
+        asked.delete(questionId)
+      } else {
+        asked.add(questionId)
+      }
+      state[valueKey] = { ...(state[valueKey] || { score: 5, notes: '', askedQuestions: [] }), askedQuestions: Array.from(asked) }
+      next[activeCandidateId] = state
+      return next
+    })
+  }
+
+  const handleValueScoreChange = (valueKey: string, value: number[]) => {
+    if (!activeCandidateId) return
+    setValueCandidateStates((prev) => {
+      const next = { ...prev }
+      const state = next[activeCandidateId] || createEmptyValueState()
+      state[valueKey] = { ...(state[valueKey] || { score: 5, notes: '', askedQuestions: [] }), score: value[0] }
+      next[activeCandidateId] = state
+      return next
+    })
+  }
+
+  const handleValueNotesChange = (valueKey: string, text: string) => {
+    if (!activeCandidateId) return
+    setValueCandidateStates((prev) => {
+      const next = { ...prev }
+      const state = next[activeCandidateId] || createEmptyValueState()
+      state[valueKey] = { ...(state[valueKey] || { score: 5, notes: '', askedQuestions: [] }), notes: text }
+      next[activeCandidateId] = state
+      return next
+    })
+  }
+
+  const handleSaveValueAttribute = (valueKey: string) => {
+    // placeholder for future persistence; currently local state already holds the score
+    return
+  }
+
   const handleSaveAttribute = (category: KSACategoryKey) => {
     if (!activeCandidateId) return
 
@@ -1090,8 +1099,16 @@ export default function EvaluationCenterPage() {
     return Math.min(10, Math.max(4, Math.round((asked / totalQuestions) * 10)))
   }
 
+  const computeValueConfidence = (valueKey: string) => {
+    const totalQuestions = ((coreValuesData as any)?.[valueKey]?.questions || []).length
+    const asked = activeCandidateId ? (valueCandidateStates[activeCandidateId]?.[valueKey]?.askedQuestions.length || 0) : 0
+    if (!totalQuestions) return 6
+    return Math.min(10, Math.max(4, Math.round((asked / totalQuestions) * 10)))
+  }
+
   const buildEvaluation = (candidateId: string): CandidateEvaluation | null => {
     const candidateState = candidateStates[candidateId]
+    const valueState = valueCandidateStates[candidateId] || {}
     const candidate = candidates.find((c) => c.id === candidateId)
     if (!candidateState || !candidate) return null
 
@@ -1106,6 +1123,14 @@ export default function EvaluationCenterPage() {
           abilityScore * normalizedWeights.Ability) / 100
       ).toFixed(1)
     )
+
+    const companyFitScore = (() => {
+      if (!coreValueKeys.length) return undefined
+      const total = coreValueKeys.reduce((acc, key) => acc + (valueState[key]?.score ?? 5) * (normalizedValueWeights[key] ?? 0), 0)
+      const divisor = coreValueKeys.reduce((acc, key) => acc + (normalizedValueWeights[key] ?? 0), 0)
+      if (!divisor) return undefined
+      return Number((total / divisor).toFixed(1))
+    })()
 
     const recommendation: CandidateEvaluation['overallCompatibility']['recommendation'] =
       weightedScore >= 8
@@ -1170,7 +1195,9 @@ export default function EvaluationCenterPage() {
         technical: Math.max(3, Math.round((skillsScore + knowledgeScore) / 2)),
         cultural: Math.max(3, Math.round((abilityScore + knowledgeScore) / 2)),
         overall: Math.max(3, Math.round(weightedScore))
-      }
+      },
+      companyFitScore,
+      valueScores: Object.fromEntries(coreValueKeys.map((key) => [key, valueState[key]?.score ?? 5]))
     }
   }
 
@@ -1506,10 +1533,12 @@ export default function EvaluationCenterPage() {
                         >
                           <SliderThumb />
                         </Slider>
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>1-3 Needs improvement</span>
-                          <span>4-6 Acceptable</span>
-                          <span>7-10 Excellent</span>
+                        <div className="grid grid-cols-5 text-[11px] text-muted-foreground">
+                          <span>1-2</span>
+                          <span className="text-center">3-4</span>
+                          <span className="text-center">5-6</span>
+                          <span className="text-center">7-8</span>
+                          <span className="text-end">9-10</span>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Notes</label>
@@ -1537,17 +1566,154 @@ export default function EvaluationCenterPage() {
           </div>
         )}
 
+        {ksaData && coreValueKeys.length > 0 && activeCandidateId && selectedValueKey && (
+          <div className="space-y-2">
+            <Badge variant="secondary" className="w-fit">Step 5 · Grade Company Values</Badge>
+            <Card>
+              <CardHeader className="py-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <CardTitle className="text-xl">Company Values Fit</CardTitle>
+                  <CardDescription>Score each value question (5 buckets of 2 points). Two aggregates: Job Fit (KSA) and Company Fit (values).</CardDescription>
+                </div>
+                <Badge variant="outline">
+                  Weight {normalizedValueWeights[selectedValueKey] || Math.round(100 / coreValueKeys.length)}%
+                </Badge>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {coreValueKeys.map((valueKey) => {
+                    const questionsCount = ((coreValuesData as any)?.[valueKey]?.questions || []).length
+                    const isSelected = selectedValueKey === valueKey
+                    const valueWeight = normalizedValueWeights[valueKey] || Math.round(100 / coreValueKeys.length)
+                    return (
+                      <Card
+                        key={valueKey}
+                        className={cn("cursor-pointer transition-all hover:shadow-sm", isSelected && "ring-2 ring-primary")}
+                        onClick={() => setSelectedValueKey(valueKey)}
+                      >
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base">{valueKey}</CardTitle>
+                          <CardDescription className="space-y-1">
+                            <span>{questionsCount} {questionsCount === 1 ? 'question' : 'questions'}</span>
+                            <div className="text-xs text-muted-foreground">Weight {valueWeight}%</div>
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    )
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)] gap-4">
+                  <Card className="min-w-0">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Questions for {selectedValueKey}</CardTitle>
+                      <CardDescription>Mark what you asked and score each value.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {questionsForValue.length === 0 && (
+                        <div className="text-muted-foreground text-sm">No questions for this value.</div>
+                      )}
+                      <div className="space-y-3">
+                        {questionsForValue.map((question: any, idx: number) => {
+                          const qId = question.id || idx
+                          const label = question.questionText || question.question_text
+                          const sampleIndicators = question.sampleIndicators || question.sample_indicators
+                          const followUps = question.followUpProbes || question.follow_up_probes
+                          const isAsked = !!valueCandidateStates[activeCandidateId]?.[selectedValueKey]?.askedQuestions.includes(qId)
+                          return (
+                            <div
+                              key={qId}
+                              className={cn(
+                                "p-3 rounded-md border",
+                                isAsked && "border-primary/40 bg-primary/5"
+                              )}
+                            >
+                              <div className="flex items-start gap-3">
+                                <input
+                                  type="checkbox"
+                                  className="mt-1 h-4 w-4"
+                                  checked={!!isAsked}
+                                  onChange={() => toggleValueQuestionAsked(selectedValueKey, qId)}
+                                />
+                                <div className="space-y-1">
+                                  <div className="font-medium">Question {idx + 1}: {label}</div>
+                                  {sampleIndicators?.strongResponse && (
+                                    <div className="text-xs text-muted-foreground">Strong: {sampleIndicators.strongResponse}</div>
+                                  )}
+                                  {sampleIndicators?.weakResponse && (
+                                    <div className="text-xs text-muted-foreground">Weak: {sampleIndicators.weakResponse}</div>
+                                  )}
+                                  {followUps && (
+                                    <div className="text-xs text-muted-foreground">Follow-ups: {followUps.join('; ')}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="min-w-0 xl:max-w-[420px] w-full">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">Score {selectedValueKey}</CardTitle>
+                      <CardDescription>5 buckets of 2 points (1-10).</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-lg">{valueCandidateStates[activeCandidateId]?.[selectedValueKey]?.score ?? 5}/10</span>
+                          <span className="text-muted-foreground">Weight {normalizedValueWeights[selectedValueKey] || Math.round(100 / coreValueKeys.length)}%</span>
+                        </div>
+                        <Badge variant="outline">Confidence {computeValueConfidence(selectedValueKey)} /10</Badge>
+                      </div>
+                      <Slider
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={[valueCandidateStates[activeCandidateId]?.[selectedValueKey]?.score ?? 5]}
+                        onValueChange={(value) => handleValueScoreChange(selectedValueKey, value)}
+                      >
+                        <SliderThumb />
+                      </Slider>
+                      <div className="grid grid-cols-5 text-[11px] text-muted-foreground">
+                        <span>1-2</span>
+                        <span className="text-center">3-4</span>
+                        <span className="text-center">5-6</span>
+                        <span className="text-center">7-8</span>
+                        <span className="text-end">9-10</span>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Notes</label>
+                        <Textarea
+                          value={valueCandidateStates[activeCandidateId]?.[selectedValueKey]?.notes || ''}
+                          onChange={(e) => handleValueNotesChange(selectedValueKey, e.target.value)}
+                          placeholder="Observations, examples, or red flags..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-between">
+                        <Button variant="outline" onClick={() => handleSaveValueAttribute(selectedValueKey)}>
+                          Save value progress
+                        </Button>
+                        <Button onClick={handleSaveCandidateEvaluation}>
+                          Save candidate evaluation
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {evaluations.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">Results</Badge>
-                <span className="text-sm text-muted-foreground">Saved evaluations for graded candidates</span>
-              </div>
-              {/* <Button variant="outline" onClick={handleExportEvaluations}>
-                <Download className="h-4 w-4 mr-2" />
-                Export Results
-              </Button> */}
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">Results</Badge>
+              <span className="text-sm text-muted-foreground">Saved evaluations for graded candidates</span>
             </div>
             <EvaluationResults evaluations={evaluations} />
           </div>

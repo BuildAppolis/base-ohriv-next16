@@ -371,6 +371,12 @@ export interface CandidateEvaluation {
     cultural: number // 1-10
     overall: number // 1-10
   }
+
+  /** Optional company values fit score (0-10), aggregate across values */
+  companyFitScore?: number
+
+  /** Optional map of value scores (0-10) keyed by value name */
+  valueScores?: Record<string, number>
 }
 
 /**
