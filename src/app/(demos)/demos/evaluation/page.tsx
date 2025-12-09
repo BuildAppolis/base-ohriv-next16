@@ -32,6 +32,7 @@ function getRecommendationBadgeVariant(recommendation: string): "primary" | "sec
 type KSACategoryKey = 'Knowledge' | 'Skills' | 'Ability'
 
 type WeightRangeState = Record<KSACategoryKey, [number, number]>
+type ValueWeightRangeState = Record<string, [number, number]>
 
 type AttributeEvaluationState = {
   score: number
@@ -709,6 +710,7 @@ export default function EvaluationCenterPage() {
     Skills: [30, 40],
     Ability: [20, 35]
   })
+  const [valueWeightRanges, setValueWeightRanges] = useState<ValueWeightRangeState>({})
   const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<KSACategoryKey | null>(null)
   const [candidateStates, setCandidateStates] = useState<Record<string, Record<KSACategoryKey, AttributeEvaluationState>>>({})
@@ -720,6 +722,10 @@ export default function EvaluationCenterPage() {
 
   const jobFitData = useMemo(() => {
     return ksaData?.KSA_JobFit || activePosition?.KSA_JobFit || null
+  }, [ksaData, activePosition])
+
+  const coreValuesData = useMemo(() => {
+    return ksaData?.CoreValues_CompanyFit || activePosition?.CoreValues_CompanyFit || null
   }, [ksaData, activePosition])
 
   const weightingDistribution = useMemo(() => {
@@ -747,6 +753,8 @@ export default function EvaluationCenterPage() {
     })
     return available
   }, [jobFitData])
+
+  const coreValueKeys = useMemo(() => coreValuesData ? Object.keys(coreValuesData) : [], [coreValuesData])
 
   const createEmptyCandidateState = (): Record<KSACategoryKey, AttributeEvaluationState> => ({
     Knowledge: { score: 5, notes: '', askedQuestions: [] },
@@ -800,6 +808,25 @@ export default function EvaluationCenterPage() {
     })
   }, [weightingDistribution])
 
+  useEffect(() => {
+    if (!coreValueKeys.length) {
+      setValueWeightRanges({})
+      return
+    }
+    const equalShare = Math.round(100 / coreValueKeys.length)
+    const makeRange = (base: number): [number, number] => [
+      Math.max(0, base - 5),
+      Math.min(100, base + 5)
+    ]
+    setValueWeightRanges((prev) => {
+      const next: ValueWeightRangeState = {}
+      coreValueKeys.forEach((key) => {
+        next[key] = prev[key] || makeRange(equalShare)
+      })
+      return next
+    })
+  }, [coreValueKeys])
+
   const normalizedWeights = useMemo(() => {
     const midpoints = {
       Knowledge: (weightRanges.Knowledge[0] + weightRanges.Knowledge[1]) / 2,
@@ -822,6 +849,21 @@ export default function EvaluationCenterPage() {
     }
   }, [weightRanges])
 
+  const normalizedValueWeights = useMemo(() => {
+    if (!coreValueKeys.length) return {}
+    const midpointEntries = coreValueKeys.map((key) => {
+      const range = valueWeightRanges[key] || [30, 40]
+      return [key, (range[0] + range[1]) / 2] as const
+    })
+    const total = midpointEntries.reduce((acc, [, mid]) => acc + mid, 0)
+    if (!total) {
+      const even = Math.round(100 / coreValueKeys.length)
+      return Object.fromEntries(coreValueKeys.map((k) => [k, even]))
+    }
+    const weights = midpointEntries.map(([key, mid]) => [key, Math.round((mid / total) * 100)] as const)
+    return Object.fromEntries(weights)
+  }, [coreValueKeys, valueWeightRanges])
+
   const handleKSAUpload = (ksa: KSAInterviewOutput | null) => {
     setKSAData(ksa)
     setEvaluations([])
@@ -829,6 +871,7 @@ export default function EvaluationCenterPage() {
     setActiveCandidateId(null)
     setCandidateStates({})
     setCompletedAttributes({})
+    setValueWeightRanges({})
   }
 
   const activeCandidate = useMemo(
@@ -1005,6 +1048,8 @@ export default function EvaluationCenterPage() {
       evaluations,
       ksaFramework: ksaData,
       weightRanges,
+      valueWeightRanges,
+      normalizedValueWeights,
       normalizedWeights,
       evaluationDate: new Date().toISOString(),
       totalCandidates: selectedCandidateIds.length
@@ -1056,10 +1101,10 @@ export default function EvaluationCenterPage() {
                 Step 2 · Choose weight acceptance ranges
               </CardTitle>
               <CardDescription>
-                Set the acceptable range for each KSA weighting. We normalize the midpoint to 100% when scoring candidates.
+                Set the acceptable range for each KSA weighting and company value weighting. We normalize midpoints to 100% when scoring.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {( ['Knowledge', 'Skills', 'Ability'] as KSACategoryKey[]).map((category) => {
                   const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
@@ -1105,8 +1150,52 @@ export default function EvaluationCenterPage() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Info className="h-4 w-4" />
-                Normalized weights applied to scoring: {normalizedWeights.Knowledge}% / {normalizedWeights.Skills}% / {normalizedWeights.Ability}% (K/S/A).
+                Normalized KSA weights: {normalizedWeights.Knowledge}% / {normalizedWeights.Skills}% / {normalizedWeights.Ability}% (K/S/A).
               </div>
+
+              {coreValueKeys.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold">Company Values Weighting</h4>
+                    <Badge variant="secondary">{coreValueKeys.length} values</Badge>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {coreValueKeys.map((valueKey) => {
+                      const [minWeight, maxWeight] = valueWeightRanges[valueKey] || [25, 35]
+                      const scoringWeight = normalizedValueWeights[valueKey] || Math.round(100 / coreValueKeys.length)
+                      return (
+                        <Card key={valueKey} className="border-dashed">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-base">{valueKey}</CardTitle>
+                            <CardDescription>Scoring weight: {scoringWeight}%</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <Slider
+                              value={valueWeightRanges[valueKey] || [25, 35]}
+                              min={0}
+                              max={100}
+                              step={1}
+                              onValueChange={(value) => setValueWeightRanges((prev) => ({ ...prev, [valueKey]: value as [number, number] }))}
+                              className="pt-2"
+                            >
+                              <SliderThumb />
+                              <SliderThumb />
+                            </Slider>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                              <span>{minWeight}%</span>
+                              <span>{maxWeight}%</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Info className="h-4 w-4" />
+                    Normalized company values weights: {coreValueKeys.map((key, idx) => `${key} ${normalizedValueWeights[key] || Math.round(100 / coreValueKeys.length)}%`).join(' • ')}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
