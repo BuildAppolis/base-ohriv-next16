@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Slider, SliderThumb } from '@/components/ui/slider'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetBody, SheetTrigger } from '@/components/ui/sheet'
 import { useAtom, useAtomValue } from 'jotai'
 import {
   candidatesAtom,
@@ -572,8 +571,8 @@ function EvaluationResults({ evaluations }: {
     <div className="space-y-4">
       {evaluations.map((evaluation, index) => (
         <Card key={evaluation.candidateId || index}>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+          <CardHeader className='py-4'>
+            <CardTitle className="flex items-center justify-between w-full">
               <div>
                 <div className="font-medium">
                   Evaluation for {evaluation.evaluationContext.jobTitle}
@@ -909,6 +908,128 @@ export default function EvaluationCenterPage() {
   const selectedCategoryData = selectedCategory ? (jobFitData as any)?.[selectedCategory] : null
 
   const questionsForCategory = selectedCategoryData?.questions || []
+
+  const renderGradeContent = (isSheetView = false) => (
+    <div className={cn("space-y-4", isSheetView && "pb-4")}>
+      <div
+        className={cn(
+          "grid gap-3",
+          isSheetView
+            ? "grid-flow-col auto-cols-[200px] overflow-x-auto pb-2"
+            : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+        )}
+      >
+        {ksaCategories.map((category) => {
+          const categoryData = (jobFitData as any)?.[category]
+          const questionCount = (categoryData?.questions || []).length
+          const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
+          const isCompleted = completedAttributes[activeCandidateId!]?.includes(category)
+          return (
+            <Card
+              key={category}
+              className={cn(
+                "cursor-pointer transition-all hover:shadow-sm",
+                selectedCategory === category && "ring-2 ring-primary",
+                isCompleted && "bg-muted/60"
+              )}
+              onClick={() => {
+                setSelectedCategory(category)
+                if (isSheetView) setIsGradeSheetOpen(true)
+              }}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      {category}
+                      {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                    </CardTitle>
+                    <CardDescription className="space-y-1">
+                      <span>{questionCount} {questionCount === 1 ? 'question' : 'questions'}</span>
+                      <div className="text-xs text-muted-foreground">Weight {distributionValue || 0}%</div>
+                    </CardDescription>
+                  </div>
+                  {!isSheetView && (
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedCategory(category)
+                        setIsGradeSheetOpen(true)
+                      }}
+                    >
+                      Open
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+            </Card>
+          )
+        })}
+      </div>
+
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="text-sm text-muted-foreground">
+          Scoring {selectedCategory} • Weight {normalizedWeights[selectedCategory!]}% • Confidence {computeConfidence(selectedCategory!)} /10
+        </div>
+      </div>
+
+      <div className={cn("grid gap-4", "grid-cols-1")}>
+        <Card className={cn(isSheetView ? "" : "overflow-hidden min-w-0")}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Questions for {selectedCategory}</CardTitle>
+            <CardDescription>Mark what you asked so we can track confidence.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {questionsForCategory.length === 0 && (
+              <div className="text-muted-foreground text-sm">No questions in this KSA bucket.</div>
+            )}
+            <div className="space-y-3">
+              {questionsForCategory.map((question: any, idx: number) => {
+                const qId = question.id || idx
+                const label = question.questionText || question.question_text
+                const description = question.evaluationCriteria || question.evaluation_criteria
+                const expected = question.expectedAnswers || question.expected_answers
+                const followUps = question.followUpProbes || question.follow_up_probes
+                const isAsked = activeCandidateState?.[selectedCategory!]?.askedQuestions.includes(qId)
+                return (
+                  <div
+                    key={qId}
+                    className={cn(
+                      "p-3 rounded-md border",
+                      isAsked && "border-primary/40 bg-primary/5"
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4"
+                        checked={!!isAsked}
+                        onChange={() => toggleQuestionAsked(selectedCategory!, qId)}
+                      />
+                      <div className="space-y-1">
+                        <div className="font-medium">Question {idx + 1}: {label}</div>
+                        {description && (
+                          <div className="text-sm text-muted-foreground">Criteria: {description}</div>
+                        )}
+                        {expected && (
+                          <div className="text-xs text-muted-foreground">Expected: {expected}</div>
+                        )}
+                        {followUps && (
+                          <div className="text-xs text-muted-foreground">Follow-ups: {followUps.join('; ')}</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
 
   const toggleQuestionAsked = (category: KSACategoryKey, questionId: number) => {
     if (!activeCandidateId) return
@@ -1319,7 +1440,9 @@ export default function EvaluationCenterPage() {
 
         {ksaData && activeCandidateId && selectedCategory && (
           <div className="space-y-4">
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
+
+
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 hidden lg:block w-full max-w-full relative overflow-hidden">
               <CardHeader className='py-4'>
                 <div className="flex items-center justify-between w-full">
                   <div>
@@ -1333,143 +1456,82 @@ export default function EvaluationCenterPage() {
                       </p>
                     )}
                   </div>
-                  <Badge variant="outline">
-                    {completedAttributes[activeCandidateId]?.length || 0} / {ksaCategories.length} attributes saved
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">
+                      {completedAttributes[activeCandidateId]?.length || 0} / {ksaCategories.length} attributes saved
+                    </Badge>
+                    <Button size="sm" variant="outline" onClick={() => setIsGradeSheetOpen(true)}>
+                      Open scoring drawer
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {ksaCategories.map((category) => {
-                    const categoryData = (jobFitData as any)?.[category]
-                    const questionCount = (categoryData?.questions || []).length
-                    const distributionValue = weightingDistribution?.[category] ?? normalizedWeights[category]
-                    const isCompleted = completedAttributes[activeCandidateId]?.includes(category)
-                    return (
-                      <Card
-                        key={category}
-                        className={cn(
-                          "cursor-pointer transition-all hover:shadow-sm",
-                          selectedCategory === category && "ring-2 ring-primary",
-                          isCompleted && "bg-muted/60"
-                        )}
-                        onClick={() => setSelectedCategory(category)}
-                      >
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-base flex items-center gap-2">
-                            {category}
-                            {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-                          </CardTitle>
-                          <CardDescription className="space-y-1">
-                            <span>{questionCount} {questionCount === 1 ? 'question' : 'questions'}</span>
-                            <div className="text-xs text-muted-foreground">Weight {distributionValue || 0}%</div>
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )
-                  })}
+              <CardContent className="relative overflow-hidden p-0">
+                <div className="p-4 space-y-4 transition-all">
+                  {renderGradeContent(false)}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <Card className="lg:col-span-2">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">Questions for {selectedCategory}</CardTitle>
-                      <CardDescription>Mark what you asked so we can track confidence.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {questionsForCategory.length === 0 && (
-                        <div className="text-muted-foreground text-sm">No questions in this KSA bucket.</div>
-                      )}
-                      <div className="space-y-3">
-                        {questionsForCategory.map((question: any, idx: number) => {
-                          const qId = question.id || idx
-                          const label = question.questionText || question.question_text
-                          const description = question.evaluationCriteria || question.evaluation_criteria
-                          const expected = question.expectedAnswers || question.expected_answers
-                          const followUps = question.followUpProbes || question.follow_up_probes
-                          const isAsked = activeCandidateState?.[selectedCategory]?.askedQuestions.includes(qId)
-                          return (
-                            <div
-                              key={qId}
-                              className={cn(
-                                "p-3 rounded-md border",
-                                isAsked && "border-primary/40 bg-primary/5"
-                              )}
-                            >
-                              <div className="flex items-start gap-3">
-                                <input
-                                  type="checkbox"
-                                  className="mt-1 h-4 w-4"
-                                  checked={!!isAsked}
-                                  onChange={() => toggleQuestionAsked(selectedCategory, qId)}
-                                />
-                                <div className="space-y-1">
-                                  <div className="font-medium">Question {idx + 1}: {label}</div>
-                                  {description && (
-                                    <div className="text-sm text-muted-foreground">Criteria: {description}</div>
-                                  )}
-                                  {expected && (
-                                    <div className="text-xs text-muted-foreground">Expected: {expected}</div>
-                                  )}
-                                  {followUps && (
-                                    <div className="text-xs text-muted-foreground">Follow-ups: {followUps.join('; ')}</div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">Score {selectedCategory}</CardTitle>
-                      <CardDescription>Set the 1-10 score and add notes.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-lg">{activeCandidateState?.[selectedCategory]?.score || 5}/10</span>
-                          <span className="text-muted-foreground">Weight {normalizedWeights[selectedCategory]}%</span>
+                {isGradeSheetOpen && (
+                  <>
+                    <div
+                      className="absolute inset-0 bg-black/10"
+                      onClick={() => setIsGradeSheetOpen(false)}
+                    />
+                    <div className="absolute inset-y-0 right-0 w-[360px] bg-background border-l shadow-xl z-20 flex flex-col">
+                      <div className="flex items-center justify-between px-4 py-3 border-b">
+                        <div>
+                          <p className="text-sm font-semibold">Score {selectedCategory}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Weight {normalizedWeights[selectedCategory!]}% • Confidence {computeConfidence(selectedCategory!)} /10
+                          </p>
                         </div>
-                        <Badge variant="outline">Confidence {computeConfidence(selectedCategory)}/10</Badge>
-                      </div>
-                      <Slider
-                        min={1}
-                        max={10}
-                        step={1}
-                        value={[activeCandidateState?.[selectedCategory]?.score || 5]}
-                        onValueChange={(value) => handleScoreChange(selectedCategory, value)}
-                      >
-                        <SliderThumb />
-                      </Slider>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>1-3 Needs improvement</span>
-                        <span>4-6 Acceptable</span>
-                        <span>7-10 Excellent</span>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Notes</label>
-                        <Textarea
-                          value={activeCandidateState?.[selectedCategory]?.notes || ''}
-                          onChange={(e) => handleNotesChange(selectedCategory, e.target.value)}
-                          placeholder="Observations, examples, or red flags..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="flex gap-2 justify-between">
-                        <Button variant="outline" onClick={() => handleSaveAttribute(selectedCategory)}>
-                          Save attribute progress
-                        </Button>
-                        <Button onClick={handleSaveCandidateEvaluation}>
-                          Save candidate evaluation
+                        <Button size="sm" variant="ghost" onClick={() => setIsGradeSheetOpen(false)}>
+                          Close
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      <div className="p-4 space-y-4 overflow-y-auto">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-lg">{activeCandidateState?.[selectedCategory!]?.score || 5}/10</span>
+                            <span className="text-muted-foreground">Weight {normalizedWeights[selectedCategory!]}%</span>
+                          </div>
+                          <Badge variant="outline">Confidence {computeConfidence(selectedCategory!)} /10</Badge>
+                        </div>
+                        <Slider
+                          min={1}
+                          max={10}
+                          step={1}
+                          value={[activeCandidateState?.[selectedCategory!]?.score || 5]}
+                          onValueChange={(value) => handleScoreChange(selectedCategory!, value)}
+                        >
+                          <SliderThumb />
+                        </Slider>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>1-3 Needs improvement</span>
+                          <span>4-6 Acceptable</span>
+                          <span>7-10 Excellent</span>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Notes</label>
+                          <Textarea
+                            value={activeCandidateState?.[selectedCategory!]?.notes || ''}
+                            onChange={(e) => handleNotesChange(selectedCategory!, e.target.value)}
+                            placeholder="Observations, examples, or red flags..."
+                            rows={4}
+                          />
+                        </div>
+                        <div className="flex gap-2 justify-between">
+                          <Button variant="outline" onClick={() => handleSaveAttribute(selectedCategory!)}>
+                            Save attribute progress
+                          </Button>
+                          <Button onClick={handleSaveCandidateEvaluation}>
+                            Save candidate evaluation
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -1482,10 +1544,10 @@ export default function EvaluationCenterPage() {
                 <Badge variant="secondary">Results</Badge>
                 <span className="text-sm text-muted-foreground">Saved evaluations for graded candidates</span>
               </div>
-              <Button variant="outline" onClick={handleExportEvaluations}>
+              {/* <Button variant="outline" onClick={handleExportEvaluations}>
                 <Download className="h-4 w-4 mr-2" />
                 Export Results
-              </Button>
+              </Button> */}
             </div>
             <EvaluationResults evaluations={evaluations} />
           </div>
