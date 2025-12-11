@@ -71,8 +71,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 );
                 const newLeftPoints = center - clampedValue;
 
-                setLeftPoints(newLeftPoints);
-                onChange?.({ center, leftPoints: newLeftPoints, rightPoints });
+                // Enforce minimum 2-point leniency: newLeftPoints + rightPoints >= 2
+                const minLeftPoints = Math.max(0, 3 - rightPoints);
+                const finalLeftPoints = Math.max(minLeftPoints, newLeftPoints);
+
+                setLeftPoints(finalLeftPoints);
+                onChange?.({ center, leftPoints: finalLeftPoints, rightPoints });
             } else {
                 const minAllowedValue = center;
                 const maxAllowedValue = Math.min(max, center + maxDeviation);
@@ -82,8 +86,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 );
                 const newRightPoints = clampedValue - center;
 
-                setRightPoints(newRightPoints);
-                onChange?.({ center, leftPoints, rightPoints: newRightPoints });
+                // Enforce minimum 2-point leniency: leftPoints + newRightPoints >= 2
+                const minRightPoints = Math.max(0, 3 - leftPoints);
+                const finalRightPoints = Math.max(minRightPoints, newRightPoints);
+
+                setRightPoints(finalRightPoints);
+                onChange?.({ center, leftPoints, rightPoints: finalRightPoints });
             }
         },
         [center, leftPoints, rightPoints, min, max, maxDeviation, onChange]
@@ -119,13 +127,13 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     const styles = {
         trackBg: `relative h-2 bg-primary rounded-full `,
         headerText: `text-base font-semibold text-gray-700 mb-3`,
-        labelCenter: `absolute -top-12 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
-        labelBg: `bg-green-500 text-sm font-bold px-4 py-1.5 rounded-lg shadow-md`,
+        labelCenter: `absolute -top-8 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
+        labelBg: `bg-green-500 text-sm font-bold p-0.5 px-2 rounded-lg shadow-md`,
         labelText: `text-sm font-medium text-primary-foreground select-none`,
-        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-background rounded-full border-2 border-primary cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none`,
+        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-4 bg-background rounded border-2 border-primary cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none`,
         thumbText: `absolute top-4 -translate-x-1/2 text-xs font-medium text-muted-foreground select-none`,
         centerLine: `w-1 h-4 bg-green-500 z-20 pointer-events-none`,
-        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-sm font-medium text-primary-foreground select-none bg-primary min-w-8 text-center rounded`,
+        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-xs text-primary-foreground select-none bg-primary min-w-8 text-center rounded border-1`,
         activeRange: `absolute h-full bg-green-500 rounded-full`,
     };
 
@@ -193,7 +201,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                     {/* Thumb value labels */}
                     <div
                         className={cn(styles.thumbText)}
-                        style={{ left: `${leftPercent}%` }}
+                        style={{
+                            left: `${leftPercent}%`
+                        }}
                     >
                         {leftValue}
                     </div>
