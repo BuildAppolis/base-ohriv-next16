@@ -30,8 +30,14 @@ const questionDifficulties = [
 const WEIGHT_MIN = 1;
 const WEIGHT_MAX = 100;
 const MAX_SIDE_POINTS = 10;
+export const MIN_TOTAL_RANGE = 2; // Minimum total leniency points
+export const MAX_TOTAL_RANGE = 20; // Maximum total leniency points
 
-export function computeWeightRange(center: number, leftPoints: number, rightPoints: number) {
+export function computeWeightRange(
+  center: number,
+  leftPoints: number,
+  rightPoints: number
+) {
   return {
     min: Math.max(WEIGHT_MIN, center - leftPoints),
     max: Math.min(WEIGHT_MAX, center + rightPoints),
@@ -52,7 +58,8 @@ const weightingBandSchema = z
     rationale: z.string().optional(),
   })
   .superRefine((value, ctx) => {
-    const total = value.Knowledge.center + value.Skills.center + value.Ability.center;
+    const total =
+      value.Knowledge.center + value.Skills.center + value.Ability.center;
     if (Math.round(total) !== 100) {
       ctx.addIssue({
         code: "custom",
@@ -69,10 +76,30 @@ const weightingBandSchema = z
           path: [key],
         });
       }
-      if (center - leftPoints < WEIGHT_MIN || center + rightPoints > WEIGHT_MAX) {
+      if (
+        center - leftPoints < WEIGHT_MIN ||
+        center + rightPoints > WEIGHT_MAX
+      ) {
         ctx.addIssue({
           code: "custom",
           message: `${key} range must stay within ${WEIGHT_MIN}-${WEIGHT_MAX} (center ± side points)`,
+          path: [key],
+        });
+      }
+
+      // Validate total range constraints
+      const totalLeniency = leftPoints + rightPoints;
+      if (totalLeniency < MIN_TOTAL_RANGE) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${key} total leniency must be at least ${MIN_TOTAL_RANGE} points (current: ${totalLeniency})`,
+          path: [key],
+        });
+      }
+      if (totalLeniency > MAX_TOTAL_RANGE) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${key} total leniency cannot exceed ${MAX_TOTAL_RANGE} points (current: ${totalLeniency})`,
           path: [key],
         });
       }

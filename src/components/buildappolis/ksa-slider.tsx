@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, useCallback, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Badge } from "../ui/badge";
+import { MIN_TOTAL_RANGE, MAX_TOTAL_RANGE } from "@/types/company/ksa-new";
 
 // Type definitions
 interface SliderConfig {
@@ -11,7 +12,12 @@ interface SliderConfig {
 }
 
 interface SliderData {
-    [key: string]: SliderConfig;
+    ksa: {
+        [key: string]: SliderConfig;
+    };
+    values: {
+        [key: string]: SliderConfig;
+    };
 }
 
 interface RangeSliderProps {
@@ -49,6 +55,10 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
     const { center } = config;
 
+    // Constants for constraints
+    const LENIENCY = MIN_TOTAL_RANGE; // Minimum total points allowed
+    const MAX_RANGE = MAX_TOTAL_RANGE; // Maximum total points allowed
+
     // Calculate actual values on the scale
     const leftValue = center - leftPoints;
     const rightValue = center + rightPoints;
@@ -78,9 +88,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 );
                 const newLeftPoints = center - clampedValue;
 
-                // Enforce minimum 2-point leniency: newLeftPoints + rightPoints >= 2
+                // Enforce range constraints: LENIENCY <= newLeftPoints + rightPoints <= MAX_RANGE
                 const minLeftPoints = Math.max(0, LENIENCY - rightPoints);
-                const finalLeftPoints = Math.max(minLeftPoints, newLeftPoints);
+                const maxLeftPoints = Math.max(0, MAX_RANGE - rightPoints);
+                const clampedLeftPoints = Math.max(minLeftPoints, Math.min(maxLeftPoints, newLeftPoints));
+                const finalLeftPoints = clampedLeftPoints;
 
                 flushSync(() => {
                     setLeftPoints(finalLeftPoints);
@@ -95,9 +107,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 );
                 const newRightPoints = clampedValue - center;
 
-                // Enforce minimum 2-point leniency: leftPoints + newRightPoints >= 2
+                // Enforce range constraints: LENIENCY <= leftPoints + newRightPoints <= MAX_RANGE
                 const minRightPoints = Math.max(0, LENIENCY - leftPoints);
-                const finalRightPoints = Math.max(minRightPoints, newRightPoints);
+                const maxRightPoints = Math.max(0, MAX_RANGE - leftPoints);
+                const clampedRightPoints = Math.max(minRightPoints, Math.min(maxRightPoints, newRightPoints));
+                const finalRightPoints = clampedRightPoints;
 
                 flushSync(() => {
                     setRightPoints(finalRightPoints);
@@ -105,7 +119,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 onChange?.({ center, leftPoints, rightPoints: finalRightPoints });
             }
         },
-        [center, leftPoints, rightPoints, min, max, maxDeviation, onChange]
+        [center, leftPoints, rightPoints, min, max, maxDeviation, onChange, LENIENCY, MAX_RANGE]
     );
 
     const handleMouseDown =
@@ -150,7 +164,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             );
             const newLeftPoints = center - clampedValue;
             const minLeftPoints = Math.max(0, LENIENCY - rightPoints);
-            const finalLeftPoints = Math.max(minLeftPoints, newLeftPoints);
+            const maxLeftPoints = Math.max(0, MAX_RANGE - rightPoints);
+            const clampedLeftPoints = Math.max(minLeftPoints, Math.min(maxLeftPoints, newLeftPoints));
+            const finalLeftPoints = clampedLeftPoints;
             displayLeftValue = center - finalLeftPoints;
         } else {
             const minAllowedValue = center;
@@ -161,7 +177,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             );
             const newRightPoints = clampedValue - center;
             const minRightPoints = Math.max(0, LENIENCY - leftPoints);
-            const finalRightPoints = Math.max(minRightPoints, newRightPoints);
+            const maxRightPoints = Math.max(0, MAX_RANGE - leftPoints);
+            const clampedRightPoints = Math.max(minRightPoints, Math.min(maxRightPoints, newRightPoints));
+            const finalRightPoints = clampedRightPoints;
             displayRightValue = center + finalRightPoints;
         }
     }
@@ -171,7 +189,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
     const styles = {
         trackBg: `relative h-2 bg-primary from-red-500 to-green-500 rounded-full `,
-        headerText: `text-base font-semibold text-gray-700 mb-3`,
+        headerText: `text-base font-semibold text-gray-700`,
         labelCenter: `absolute -top-9 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
         labelBg: ` border-2 border-green-500 bg-green-100 p-0.5 px-2 rounded-md shadow-md`,
         labelText: `text-xs font-medium text-green-700 select-none`,
@@ -183,14 +201,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     };
 
     return (
-        <div className="">
+        <div className="grid grid-cols-10 relative my-4 gap-2 items-end">
             {/* Header */}
-            <div className="flex justify-between items-center mb-3">
-                <span className={cn(styles.headerText)}>{label} ({Math.round(((rightValue - leftValue) / (max - min)) * 100)}% Leniency)</span>
+            <div className="flex justify-between items-center mb-3 bg-muted rounded items-center justify-center p-2 h-8">
+                <span className={cn(styles.headerText)}>{label.charAt(0)}</span>
             </div>
 
             {/* Slider Container - with padding for min/max labels */}
-            <div className="relative px-4 py-6">
+            <div className="relative px-4 py-6 col-span-9">
                 {/* Track Container - this is the reference for all positioning */}
                 <div className="relative">
                     {/* Center Label - positioned relative to track */}
@@ -204,6 +222,15 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                         {/* Center line marker on track */}
                         <div className={cn(styles.centerLine)} />
                     </div>
+
+                    {/* Cennter text */}
+                    <div
+                        className={cn("absolute w-max top-10 left-1/2 -translate-x-1/2 -translate-y-6 text-sm font-medium text-gray-600")}
+                        style={{ left: `${centerPercent}%` }}
+                    >
+                        Acceptance Range: {leftPoints + rightPoints}%
+                    </div>
+
 
                     {/* Track Background */}
                     <div
@@ -260,6 +287,24 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     );
 };
 
+// Empty state component
+const EmptyState: React.FC<{ hasValidData: boolean }> = ({ hasValidData }) => (
+    <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No Slider Data Available</h3>
+        <p className="text-gray-500 max-w-md">
+            {hasValidData
+                ? "No KSA values or company values have been configured yet."
+                : "Invalid data format provided. Please check your data structure."
+            }
+        </p>
+    </div>
+);
+
 // Main Group Component
 const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
     data,
@@ -270,25 +315,81 @@ const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
 }) => {
     const [sliderData, setSliderData] = useState<SliderData>(data);
 
-    const handleSliderChange = (key: string) => (config: SliderConfig) => {
-        const newData = { ...sliderData, [key]: config };
+    const handleSliderChange = (category: 'ksa' | 'values', key: string) => (config: SliderConfig) => {
+        const newData = {
+            ...sliderData,
+            [category]: {
+                ...sliderData[category],
+                [key]: config
+            }
+        };
         setSliderData(newData);
         onChange?.(newData);
     };
 
+    // Validate data structure and format
+    const isValidSliderData = (data: unknown): data is SliderData => {
+        if (!data || typeof data !== "object") return false;
+
+        const obj = data as { ksa?: unknown; values?: unknown };
+        return (
+            "ksa" in obj &&
+            "values" in obj &&
+            typeof obj.ksa === "object" &&
+            obj.ksa !== null &&
+            typeof obj.values === "object" &&
+            obj.values !== null
+        );
+    };
+
+    // Check if data exists and is valid
+    const hasValidData = isValidSliderData(sliderData);
+    const hasKsaData = hasValidData && Object.keys(sliderData.ksa).length > 0;
+    const hasValuesData = hasValidData && Object.keys(sliderData.values).length > 0;
+    const hasAnyData = hasKsaData || hasValuesData;
+
+    // Return empty state if no data or invalid data
+    if (!hasAnyData) {
+        return <EmptyState hasValidData={hasValidData} />;
+    }
+
     return (
         <>
-            {Object.entries(sliderData).map(([key, config]) => (
-                <RangeSlider
-                    key={key}
-                    label={key}
-                    config={config}
-                    maxDeviation={maxDeviation}
-                    min={min}
-                    max={max}
-                    onChange={handleSliderChange(key)}
-                />
-            ))}
+            {/* KSA JobFit Section */}
+            {hasKsaData && (
+                <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">KSA Job Fit</h3>
+                    {Object.entries(sliderData.ksa).map(([key, config]) => (
+                        <RangeSlider
+                            key={`ksa-${key}`}
+                            label={key}
+                            config={config}
+                            maxDeviation={maxDeviation}
+                            min={min}
+                            max={max}
+                            onChange={handleSliderChange('ksa', key)}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* Values CompanyFit Section */}
+            {hasValuesData && (
+                <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Values</h3>
+                    {Object.entries(sliderData.values).map(([key, config]) => (
+                        <RangeSlider
+                            key={`values-${key}`}
+                            label={key}
+                            config={config}
+                            maxDeviation={maxDeviation}
+                            min={min}
+                            max={max}
+                            onChange={handleSliderChange('values', key)}
+                        />
+                    ))}
+                </div>
+            )}
         </>
     );
 };
@@ -306,9 +407,15 @@ export type {
 // Example usage component
 export const ExampleUsage: React.FC = () => {
     const initialData: SliderData = {
-        Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
-        Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
-        Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
+        ksa: {
+            Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
+            Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
+            Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
+        },
+        values: {
+            "Company Value 1": { center: 30, leftPoints: 3, rightPoints: 4 },
+            "Company Value 2": { center: 40, leftPoints: 5, rightPoints: 3 },
+        },
     };
 
     const handleChange = (data: SliderData) => {
