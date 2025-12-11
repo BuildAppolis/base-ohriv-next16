@@ -719,7 +719,81 @@ const candidateAnswers: CandidateAnswer[] = [
     }
 ]
 
-type ScoringLevel = 'poor' | 'average' | 'great'
+type ScoringBucket = 'bucket1' | 'bucket2' | 'bucket3' | 'bucket4' | 'bucket5'
+
+const scoringBuckets: {
+    id: ScoringBucket
+    range: [number, number]
+    label: string
+    shortLabel: string
+    helper: string
+    color: string
+    bg: string
+    border: string
+    icon: typeof AlertCircle
+    emoji: string
+}[] = [
+    {
+        id: 'bucket1',
+        range: [1, 2],
+        label: 'Unable to perform job duties',
+        shortLabel: 'Unable',
+        helper: 'Requires step-by-step guidance; cannot execute independently.',
+        color: 'text-red-600',
+        bg: 'bg-red-50 dark:bg-red-950/20',
+        border: 'border-red-600',
+        icon: AlertCircle,
+        emoji: '⚠️'
+    },
+    {
+        id: 'bucket2',
+        range: [3, 4],
+        label: 'Needs heavy coaching',
+        shortLabel: 'Coaching',
+        helper: 'Can contribute but needs training, oversight, and pairing.',
+        color: 'text-amber-600',
+        bg: 'bg-amber-50 dark:bg-amber-950/20',
+        border: 'border-amber-600',
+        icon: AlertCircle,
+        emoji: '⚡'
+    },
+    {
+        id: 'bucket3',
+        range: [5, 6],
+        label: 'Performs with minimal guidance',
+        shortLabel: 'Guided',
+        helper: 'Operates independently on standard work; occasional feedback.',
+        color: 'text-blue-600',
+        bg: 'bg-blue-50 dark:bg-blue-950/20',
+        border: 'border-blue-600',
+        icon: Zap,
+        emoji: '⏺'
+    },
+    {
+        id: 'bucket4',
+        range: [7, 8],
+        label: 'Elevates peers',
+        shortLabel: 'Elevates',
+        helper: 'Executes well and positively impacts team delivery.',
+        color: 'text-green-600',
+        bg: 'bg-green-50 dark:bg-green-950/20',
+        border: 'border-green-600',
+        icon: CheckCircle2,
+        emoji: '✓'
+    },
+    {
+        id: 'bucket5',
+        range: [9, 10],
+        label: 'Transforms team delivery',
+        shortLabel: 'Transforms',
+        helper: 'Redefines expectations; sets new standards across the team.',
+        color: 'text-emerald-700',
+        bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+        border: 'border-emerald-700',
+        icon: CheckCircle2,
+        emoji: '🌟'
+    }
+]
 
 function UIDemoPage() {
     const [currentStage, setCurrentStage] = useState<string>('stage-1') // Start with Phone Screen
@@ -757,12 +831,13 @@ function UIDemoPage() {
         return demoAttributes.filter(attr => attributeIds.has(attr.id))
     }, [currentStage])
 
-    // Determine scoring level based on slider value
-    const scoringLevel = useMemo((): ScoringLevel => {
+    const scoringBucket = useMemo((): ScoringBucket => {
         const value = score[0]
-        if (value <= 3) return 'poor'
-        if (value <= 6) return 'average'
-        return 'great'
+        if (value <= 2) return 'bucket1'
+        if (value <= 4) return 'bucket2'
+        if (value <= 6) return 'bucket3'
+        if (value <= 8) return 'bucket4'
+        return 'bucket5'
     }, [score])
 
     // Update popover position when dragging
@@ -785,40 +860,7 @@ function UIDemoPage() {
         return () => window.removeEventListener('resize', updatePopoverPosition)
     }, [score, isDragging])
 
-    // Get color and icon based on level
-    const getLevelStyles = (level: ScoringLevel) => {
-        switch (level) {
-            case 'poor':
-                return {
-                    color: 'text-red-600',
-                    bg: 'bg-red-50 dark:bg-red-950/20',
-                    border: 'border-red-600',
-                    icon: AlertCircle,
-                    label: 'Poor',
-                    emoji: '⚠️'
-                }
-            case 'average':
-                return {
-                    color: 'text-amber-600',
-                    bg: 'bg-amber-50 dark:bg-amber-950/20',
-                    border: 'border-amber-600',
-                    icon: Zap,
-                    label: 'Average',
-                    emoji: '⚡'
-                }
-            case 'great':
-                return {
-                    color: 'text-green-600',
-                    bg: 'bg-green-50 dark:bg-green-950/20',
-                    border: 'border-green-600',
-                    icon: CheckCircle2,
-                    label: 'Great',
-                    emoji: '✓'
-                }
-        }
-    }
-
-    const levelStyles = getLevelStyles(scoringLevel)
+    const levelStyles = scoringBuckets.find(b => b.id === scoringBucket) || scoringBuckets[2]
     const LevelIcon = levelStyles.icon
 
     // Get all characteristics for all questions in this attribute
@@ -839,7 +881,10 @@ function UIDemoPage() {
         return chars
     }, [relevantQuestions])
 
-    const currentCharacteristics = allCharacteristics[scoringLevel]
+    const characteristicKey =
+        scoringBucket === 'bucket1' ? 'poor' :
+            (scoringBucket === 'bucket2' || scoringBucket === 'bucket3') ? 'average' : 'great'
+    const currentCharacteristics = allCharacteristics[characteristicKey]
 
     // Toggle question as asked/not asked
     const toggleQuestionAsked = (questionId: string) => {
@@ -1153,9 +1198,7 @@ function UIDemoPage() {
                                         </div>
                                     </div>
                                     <Badge variant="outline" className={cn(levelStyles.color, "text-sm")}>
-                                        {scoringLevel === 'poor' && 'Needs Improvement'}
-                                        {scoringLevel === 'average' && 'Acceptable'}
-                                        {scoringLevel === 'great' && 'Excellent'}
+                                        {levelStyles.shortLabel} · {levelStyles.range[0]}-{levelStyles.range[1]}
                                     </Badge>
                                 </div>
 
@@ -1206,10 +1249,18 @@ function UIDemoPage() {
                                                 <div className="relative p-4">
                                                     <div className="flex items-center gap-2 mb-3">
                                                         <LevelIcon className={cn("h-5 w-5", levelStyles.color)} />
-                                                        <h4 className={cn("font-semibold text-sm", levelStyles.color)}>
-                                                            {levelStyles.label} ({score[0]}/10)
-                                                        </h4>
+                                                        <div>
+                                                            <h4 className={cn("font-semibold text-sm", levelStyles.color)}>
+                                                                {levelStyles.label} ({score[0]}/10)
+                                                            </h4>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                Scores {levelStyles.range[0]}-{levelStyles.range[1]}
+                                                            </p>
+                                                        </div>
                                                     </div>
+                                                    <p className="text-xs text-muted-foreground mb-2">
+                                                        {levelStyles.helper}
+                                                    </p>
                                                     <ul className="space-y-1.5">
                                                         {currentCharacteristics.slice(0, 4).map((trait: string, idx: number) => (
                                                             <li key={idx} className="text-xs flex items-start gap-2">
@@ -1231,19 +1282,24 @@ function UIDemoPage() {
                                     )}
 
                                     {/* Range Labels */}
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span className="flex items-center gap-1">
-                                            <span className="text-red-600">⚠️</span>
-                                            Poor (1-3)
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <span className="text-amber-600">⚡</span>
-                                            Average (4-6)
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <span className="text-green-600">✓</span>
-                                            Great (7-10)
-                                        </span>
+                                    <div className="grid grid-cols-5 gap-2 text-[11px] text-muted-foreground">
+                                        {scoringBuckets.map((bucket) => (
+                                            <div
+                                                key={bucket.id}
+                                                className={cn(
+                                                    "flex items-center justify-center gap-1 rounded border p-1",
+                                                    scoringBucket === bucket.id
+                                                        ? `${bucket.bg} ${bucket.border} ${bucket.color}`
+                                                        : "border-dashed"
+                                                )}
+                                            >
+                                                <span className={bucket.color}>{bucket.emoji}</span>
+                                                <div className="leading-tight text-center">
+                                                    <span className="block font-medium">{bucket.range[0]}-{bucket.range[1]}</span>
+                                                    <span className="block text-[10px] text-muted-foreground">{bucket.shortLabel}</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -1346,7 +1402,7 @@ function UIDemoPage() {
 
                         <div className="pt-3 border-t border-blue-200 dark:border-blue-800 space-y-2">
                             <p>
-                                <strong>Scoring Ranges:</strong> Poor (1-3), Average (4-6), Great (7-10)
+                                <strong>Scoring Anchors:</strong> 1-2 Unable to perform · 3-4 Needs heavy coaching · 5-6 Minimal guidance · 7-8 Elevates peers · 9-10 Transforms delivery
                             </p>
                             <p>
                                 <strong>Demo Data:</strong> 3 stages • 5 attributes • 20 questions

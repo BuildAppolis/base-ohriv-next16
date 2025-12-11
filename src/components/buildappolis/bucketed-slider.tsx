@@ -23,27 +23,27 @@ const defaultBuckets: Bucket[] = [
   {
     label: 'Unable to perform job duties',
     helper: 'Needs step-by-step guidance; cannot complete tasks independently.',
-    example: 'Requires pairing to ship any work.'
+    example: 'Needs detailed walkthroughs or shadowing before attempting tasks.'
   },
   {
     label: 'Able to perform with heavy coaching',
     helper: 'Can contribute with significant training and oversight.',
-    example: 'Delivers portions of a task when closely guided.'
+    example: 'Delivers parts of a task when paired or given checklists.'
   },
   {
     label: 'Performs with minimal guidance',
     helper: 'Operates independently on standard work.',
-    example: 'Completes stories with light feedback loops.'
+    example: 'Completes typical assignments with occasional feedback.'
   },
   {
     label: 'Performs and improves performance of peers',
     helper: 'Executes well and raises the bar for others.',
-    example: 'Shares patterns, unblocks teammates, improves team output.'
+    example: 'Shares patterns, unblocks teammates, and improves team output.'
   },
   {
     label: 'Transforms how the team delivers',
     helper: 'Redefines expectations and delivery quality.',
-    example: 'Introduces scalable practices adopted org-wide.'
+    example: 'Introduces practices that others adopt across teams.'
   }
 ]
 
