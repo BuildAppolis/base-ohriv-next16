@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback, useRef } from "react";
+import { flushSync } from "react-dom";
 import { Badge } from "../ui/badge";
 
 // Type definitions
@@ -30,6 +31,8 @@ interface RangeSliderGroupProps {
     onChange?: (data: SliderData) => void;
 }
 
+const LENIENCY = 2; // Minimum total leniency between both sides
+
 // Individual Slider Component
 const RangeSlider: React.FC<RangeSliderProps> = ({
     label,
@@ -41,6 +44,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 }) => {
     const [leftPoints, setLeftPoints] = useState(config.leftPoints);
     const [rightPoints, setRightPoints] = useState(config.rightPoints);
+    const [dragPreview, setDragPreview] = useState<{ thumb: "left" | "right"; value: number } | null>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
     const { center } = config;
@@ -62,6 +66,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
             const value = Math.round(min + (percent / 100) * (max - min));
 
+            // Set drag preview for immediate visual feedback
+            setDragPreview({ thumb, value });
+
             if (thumb === "left") {
                 const minAllowedValue = Math.max(min, center - maxDeviation);
                 const maxAllowedValue = center;
@@ -72,10 +79,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 const newLeftPoints = center - clampedValue;
 
                 // Enforce minimum 2-point leniency: newLeftPoints + rightPoints >= 2
-                const minLeftPoints = Math.max(0, 3 - rightPoints);
+                const minLeftPoints = Math.max(0, LENIENCY - rightPoints);
                 const finalLeftPoints = Math.max(minLeftPoints, newLeftPoints);
 
-                setLeftPoints(finalLeftPoints);
+                flushSync(() => {
+                    setLeftPoints(finalLeftPoints);
+                });
                 onChange?.({ center, leftPoints: finalLeftPoints, rightPoints });
             } else {
                 const minAllowedValue = center;
@@ -87,10 +96,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 const newRightPoints = clampedValue - center;
 
                 // Enforce minimum 2-point leniency: leftPoints + newRightPoints >= 2
-                const minRightPoints = Math.max(0, 3 - leftPoints);
+                const minRightPoints = Math.max(0, LENIENCY - leftPoints);
                 const finalRightPoints = Math.max(minRightPoints, newRightPoints);
 
-                setRightPoints(finalRightPoints);
+                flushSync(() => {
+                    setRightPoints(finalRightPoints);
+                });
                 onChange?.({ center, leftPoints, rightPoints: finalRightPoints });
             }
         },
@@ -102,26 +113,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             e.preventDefault();
             e.stopPropagation();
 
-            // Throttle drag events for better performance
-            let rafId: number | null = null;
-
+            // Optimized drag handling with reduced throttling
             const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
                 moveEvent.preventDefault();
-
-                if (rafId) return;
-
-                rafId = requestAnimationFrame(() => {
-                    handleDrag(moveEvent, thumb);
-                    rafId = null;
-                });
+                handleDrag(moveEvent, thumb);
             };
 
             const handleUp = () => {
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
-
+                setDragPreview(null);
                 document.removeEventListener("mousemove", handleMove);
                 document.removeEventListener("mouseup", handleUp);
                 document.removeEventListener("touchmove", handleMove);
@@ -134,34 +133,60 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             document.addEventListener("touchend", handleUp);
         };
 
-    // Memoize position calculations to prevent unnecessary re-renders
-    const { centerPercent, leftPercent, rightPercent } = useMemo(() => ({
-        centerPercent: getPositionPercent(center),
-        leftPercent: getPositionPercent(leftValue),
-        rightPercent: getPositionPercent(rightValue),
-    }), [center, leftValue, rightValue, getPositionPercent]);
+    // Calculate positions with real-time drag preview for perfect synchronization
+    const centerPercent = getPositionPercent(center);
+
+    // Use drag preview values for immediate visual feedback during drag
+    let displayLeftValue = leftValue;
+    let displayRightValue = rightValue;
+
+    if (dragPreview) {
+        if (dragPreview.thumb === "left") {
+            const minAllowedValue = Math.max(min, center - maxDeviation);
+            const maxAllowedValue = center;
+            const clampedValue = Math.max(
+                minAllowedValue,
+                Math.min(maxAllowedValue, dragPreview.value)
+            );
+            const newLeftPoints = center - clampedValue;
+            const minLeftPoints = Math.max(0, LENIENCY - rightPoints);
+            const finalLeftPoints = Math.max(minLeftPoints, newLeftPoints);
+            displayLeftValue = center - finalLeftPoints;
+        } else {
+            const minAllowedValue = center;
+            const maxAllowedValue = Math.min(max, center + maxDeviation);
+            const clampedValue = Math.max(
+                minAllowedValue,
+                Math.min(maxAllowedValue, dragPreview.value)
+            );
+            const newRightPoints = clampedValue - center;
+            const minRightPoints = Math.max(0, LENIENCY - leftPoints);
+            const finalRightPoints = Math.max(minRightPoints, newRightPoints);
+            displayRightValue = center + finalRightPoints;
+        }
+    }
+
+    const leftPercent = getPositionPercent(displayLeftValue);
+    const rightPercent = getPositionPercent(displayRightValue);
 
     const styles = {
-        trackBg: `relative h-2 bg-primary rounded-full `,
+        trackBg: `relative h-2 bg-primary from-red-500 to-green-500 rounded-full `,
         headerText: `text-base font-semibold text-gray-700 mb-3`,
-        labelCenter: `absolute -top-8 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
-        labelBg: `bg-green-500 text-sm font-bold p-0.5 px-2 rounded-lg shadow-md`,
-        labelText: `text-sm font-medium text-primary-foreground select-none`,
-        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-4 bg-background rounded border-2 border-primary cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none`,
+        labelCenter: `absolute -top-9 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
+        labelBg: ` border-2 border-green-500 bg-green-100 p-0.5 px-2 rounded-md shadow-md`,
+        labelText: `text-xs font-medium text-green-700 select-none`,
+        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-4 bg-background rounded border-2 border-primary cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none rounded-lg`,
         thumbText: `absolute top-4 -translate-x-1/2 text-xs font-medium text-muted-foreground select-none`,
         centerLine: `w-1 h-4 bg-green-500 z-20 pointer-events-none`,
-        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-xs text-primary-foreground select-none bg-primary min-w-8 text-center rounded border-1`,
-        activeRange: `absolute h-full bg-green-500 rounded-full`,
+        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-xs   select-none  min-w-8 text-center rounded-full border-2 border-primary bg-background p-0.5 px-2 shadow-md`,
+        activeRange: `absolute h-full bg-green-500 rounded-full will-change-transform`,
     };
 
     return (
         <div className="">
             {/* Header */}
             <div className="flex justify-between items-center mb-3">
-                <span className={cn(styles.headerText)}>{label}</span>
-                <Badge variant="outline" size={'sm'}>
-                    {Math.round(((rightValue - leftValue) / (max - min)) * 100)}% Leniency /
-                </Badge>
+                <span className={cn(styles.headerText)}>{label} ({Math.round(((rightValue - leftValue) / (max - min)) * 100)}% Leniency)</span>
             </div>
 
             {/* Slider Container - with padding for min/max labels */}
@@ -190,45 +215,36 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                             className={cn(styles.activeRange)}
                             style={{
                                 left: `${leftPercent}%`,
-                                width: `${rightPercent - leftPercent}%`,
+                                width: '100%',
+                                transform: `scaleX(${(rightPercent - leftPercent) / 100})`,
+                                transformOrigin: 'left center',
                             }}
                         />
                     </div>
 
                     {/* Left Thumb */}
                     <div
-                        className={cn(styles.thumb)}
+                        className={cn(styles.thumb, ' bg-background items-center flex justify-center h-6')}
+
                         style={{
                             left: `${leftPercent}%`,
                         }}
                         onMouseDown={handleMouseDown("left")}
                         onTouchStart={handleMouseDown("left")}
-                    />
+                    >
+                        <span className="text-xs ">{displayLeftValue}</span>
+                    </div>
 
                     {/* Right Thumb */}
                     <div
-                        className={cn(styles.thumb)}
+                        className={cn(styles.thumb, ' bg-background items-center flex justify-center h-6')}
                         style={{
                             left: `${rightPercent}%`,
                         }}
                         onMouseDown={handleMouseDown("right")}
                         onTouchStart={handleMouseDown("right")}
-                    />
-
-                    {/* Thumb value labels */}
-                    <div
-                        className={cn(styles.thumbText)}
-                        style={{
-                            left: `${leftPercent}%`
-                        }}
                     >
-                        {leftValue}
-                    </div>
-                    <div
-                        className={cn(styles.thumbText)}
-                        style={{ left: `${rightPercent}%` }}
-                    >
-                        {rightValue}
+                        <span className="text-xs ">{displayRightValue}</span>
                     </div>
                 </div>
 
