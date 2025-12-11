@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import { Badge } from "../ui/badge";
 
 // Type definitions
@@ -102,12 +102,26 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             e.preventDefault();
             e.stopPropagation();
 
+            // Throttle drag events for better performance
+            let rafId: number | null = null;
+
             const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
                 moveEvent.preventDefault();
-                handleDrag(moveEvent, thumb);
+
+                if (rafId) return;
+
+                rafId = requestAnimationFrame(() => {
+                    handleDrag(moveEvent, thumb);
+                    rafId = null;
+                });
             };
 
             const handleUp = () => {
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+
                 document.removeEventListener("mousemove", handleMove);
                 document.removeEventListener("mouseup", handleUp);
                 document.removeEventListener("touchmove", handleMove);
@@ -120,9 +134,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
             document.addEventListener("touchend", handleUp);
         };
 
-    const centerPercent = getPositionPercent(center);
-    const leftPercent = getPositionPercent(leftValue);
-    const rightPercent = getPositionPercent(rightValue);
+    // Memoize position calculations to prevent unnecessary re-renders
+    const { centerPercent, leftPercent, rightPercent } = useMemo(() => ({
+        centerPercent: getPositionPercent(center),
+        leftPercent: getPositionPercent(leftValue),
+        rightPercent: getPositionPercent(rightValue),
+    }), [center, leftValue, rightValue, getPositionPercent]);
 
     const styles = {
         trackBg: `relative h-2 bg-primary rounded-full `,
