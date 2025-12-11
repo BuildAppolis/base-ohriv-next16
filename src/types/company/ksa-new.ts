@@ -27,27 +27,56 @@ const questionDifficulties = [
   "expert",
 ] as const;
 
+const WEIGHT_MIN = 1;
+const WEIGHT_MAX = 100;
+const MAX_SIDE_POINTS = 10;
+
+export function computeWeightRange(center: number, leftPoints: number, rightPoints: number) {
+  return {
+    min: Math.max(WEIGHT_MIN, center - leftPoints),
+    max: Math.min(WEIGHT_MAX, center + rightPoints),
+  };
+}
+
+const weightRangeSchema = z.object({
+  center: z.number().min(WEIGHT_MIN).max(WEIGHT_MAX),
+  leftPoints: z.number().min(0).max(MAX_SIDE_POINTS),
+  rightPoints: z.number().min(0).max(MAX_SIDE_POINTS),
+});
+
 const weightingBandSchema = z
   .object({
-    Knowledge: z.number(),
-    Skills: z.number(),
-    Ability: z.number(),
+    Knowledge: weightRangeSchema,
+    Skills: weightRangeSchema,
+    Ability: weightRangeSchema,
     rationale: z.string().optional(),
   })
   .superRefine((value, ctx) => {
-    const total = value.Knowledge + value.Skills + value.Ability;
+    const total = value.Knowledge.center + value.Skills.center + value.Ability.center;
     if (Math.round(total) !== 100) {
       ctx.addIssue({
         code: "custom",
-        message: "Knowledge + Skills + Ability weightings must sum to 100",
+        message: "Knowledge + Skills + Ability centers must sum to 100",
       });
     }
-    if (value.Knowledge < 0 || value.Skills < 0 || value.Ability < 0) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Weightings must be non-negative",
-      });
-    }
+
+    (["Knowledge", "Skills", "Ability"] as const).forEach((key) => {
+      const { center, leftPoints, rightPoints } = value[key];
+      if (leftPoints > MAX_SIDE_POINTS || rightPoints > MAX_SIDE_POINTS) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${key} side leniency cannot exceed ${MAX_SIDE_POINTS} points`,
+          path: [key],
+        });
+      }
+      if (center - leftPoints < WEIGHT_MIN || center + rightPoints > WEIGHT_MAX) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${key} range must stay within ${WEIGHT_MIN}-${WEIGHT_MAX} (center ± side points)`,
+          path: [key],
+        });
+      }
+    });
   });
 
 const baseQuestionSchema = z.object({
@@ -172,3 +201,4 @@ export type CompanyValueCategory = z.infer<typeof companyValueCategorySchema>;
 export type CompanyValuesFramework = z.infer<typeof companyFitSchema>;
 export type EvaluationGuideline = z.infer<typeof evaluationGuidelineSchema>;
 export type WeightingBand = z.infer<typeof weightingBandSchema>;
+export type WeightRange = z.infer<typeof weightRangeSchema>;

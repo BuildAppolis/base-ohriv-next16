@@ -4,9 +4,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { BucketedSlider } from '@/components/buildappolis/bucketed-slider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Slider, SliderThumb } from '@/components/ui/slider'
 import { jobTypeWeightingPresets } from '@/types/company/weighting-presets'
 import type { JobType, WeightingBand } from '@/types/company/ksa-new'
+import { computeWeightRange } from '@/types/company/ksa-new'
+import RangeSliderGroup, { SliderData } from '@/components/buildappolis/ksa-slider'
 
+const LENIENCY_DELTA = 10
 const tailoredBuckets = [
   { label: 'Unable to perform job duties', helper: '1-2' },
   { label: 'Able to perform with heavy coaching', helper: '3-4' },
@@ -36,18 +40,101 @@ export default function UIDemosPage() {
     [jobType]
   )
 
+  const normalizeKsa = (
+    updatedKey: keyof WeightingBand,
+    updatedValue: number,
+    current: WeightingBand
+  ): WeightingBand => {
+    const keys: (keyof WeightingBand)[] = ['Knowledge', 'Skills', 'Ability']
+    const next: WeightingBand = {
+      Knowledge: { ...current.Knowledge },
+      Skills: { ...current.Skills },
+      Ability: { ...current.Ability }
+    }
+    next[updatedKey] = { ...next[updatedKey], center: updatedValue }
+
+    const others = keys.filter((k) => k !== updatedKey)
+    const otherTotal = others.reduce((sum, k) => sum + next[k].center, 0)
+    const desiredOtherTotal = 100 - updatedValue
+
+    if (desiredOtherTotal <= 0 || otherTotal === 0) {
+      // Even split remaining across others at minimum 1%
+      const even = Math.max(1, Math.floor((100 - updatedValue) / others.length))
+      others.forEach((k) => (next[k].center = even))
+    } else {
+      const scale = desiredOtherTotal / otherTotal
+      others.forEach((k) => {
+        next[k].center = Math.max(1, Math.min(100, Math.round(next[k].center * scale)))
+      })
+    }
+
+    // final adjustment to fix rounding drift
+    const totalAfter =
+      next.Knowledge.center + next.Skills.center + next.Ability.center
+    const drift = 100 - totalAfter
+    if (drift !== 0) {
+      const adjustKey = others[0] ?? updatedKey
+      next[adjustKey].center = Math.max(1, Math.min(100, next[adjustKey].center + drift))
+    }
+
+    return next
+  }
+
+  const handleCenterChange = (key: keyof WeightingBand, value: number) => {
+    setKsaWeights((prev) => normalizeKsa(key, value, prev))
+  }
+
+  const handleRangeSlide = (key: keyof WeightingBand, values: number[]) => {
+    const [left, right] = values
+    let proposedCenter = (left + right) / 2
+    proposedCenter = Math.max(
+      1 + LENIENCY_DELTA,
+      Math.min(100 - LENIENCY_DELTA, proposedCenter)
+    )
+    const clampedLeft = Math.max(proposedCenter - LENIENCY_DELTA, Math.min(proposedCenter, left))
+    const clampedRight = Math.min(
+      proposedCenter + LENIENCY_DELTA,
+      Math.max(proposedCenter, right)
+    )
+    const leftOffset = Math.round(proposedCenter - clampedLeft)
+    const rightOffset = Math.round(clampedRight - proposedCenter)
+    const clampedCenter = Math.round(proposedCenter)
+
+    setKsaWeights((prev) => {
+      const normalized = normalizeKsa(key, clampedCenter, prev)
+      return {
+        ...normalized,
+        [key]: {
+          ...normalized[key],
+          leftPoints: Math.round(leftOffset),
+          rightPoints: Math.round(rightOffset)
+        }
+      }
+    })
+  }
+
+  const initialData: SliderData = {
+    Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
+    Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
+    Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
+  };
+
+  const handleChange = (data: SliderData) => {
+    console.log('Updated data:', data);
+  };
+
+
   useEffect(() => {
     const firstLevel = levelOptions[0]
     setJobLevel(firstLevel)
-    setKsaWeights(
-      (jobTypeWeightingPresets as Record<JobType, Record<string, WeightingBand>>)[jobType][
-      firstLevel
-      ]
-    )
+    const preset = (jobTypeWeightingPresets as Record<JobType, Record<string, WeightingBand>>)[jobType][firstLevel]
+    setKsaWeights(preset)
   }, [jobType, levelOptions])
 
   const ksaTotal =
-    Math.round((ksaWeights.Knowledge + ksaWeights.Skills + ksaWeights.Ability) * 10) / 10
+    Math.round(
+      (ksaWeights.Knowledge.center + ksaWeights.Skills.center + ksaWeights.Ability.center) * 10
+    ) / 10
   const valuesTotal = valueWeights.reduce((sum, v) => sum + v.weight, 0)
 
   return (
@@ -149,38 +236,9 @@ export default function UIDemosPage() {
           </div>
 
           <div className="rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <p className="font-medium">Knowledge / Skills / Ability</p>
-              <span
-                className={`text-sm ${ksaTotal === 100 ? 'text-muted-foreground' : 'text-destructive'}`}
-              >
-                Total: {ksaTotal} / 100
-              </span>
-            </div>
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              {(['Knowledge', 'Skills', 'Ability'] as const).map((key) => (
-                <div key={key} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm font-medium">
-                    <span>{key}</span>
-                    <span>{Math.round(ksaWeights[key])}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={ksaWeights[key]}
-                    onChange={(e) =>
-                      setKsaWeights((prev) => ({
-                        ...prev,
-                        [key]: Number(e.target.value)
-                      }))
-                    }
-                    className="w-full accent-primary"
-                  />
-                </div>
-              ))}
-            </div>
+            <RangeSliderGroup data={initialData} maxDeviation={10} onChange={handleChange} />
+
+
           </div>
 
           <div className="rounded-lg border p-4">

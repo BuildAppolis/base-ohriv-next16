@@ -296,5 +296,25 @@
         }
       ]
     }
+  },
+  "weightingPresets": {
+    "senior": {
+      "Knowledge": { "center": 22, "leftPoints": 6, "rightPoints": 5 },
+      "Skills": { "center": 50, "leftPoints": 4, "rightPoints": 6 },
+      "Ability": { "center": 28, "leftPoints": 7, "rightPoints": 8 },
+      "rationale": "Technical decisions plus mentoring; slight flexibility on Knowledge, moderate on Skills."
+    },
+    "manager": {
+      "Knowledge": { "center": 15, "leftPoints": 4, "rightPoints": 6 },
+      "Skills": { "center": 30, "leftPoints": 5, "rightPoints": 6 },
+      "Ability": { "center": 55, "leftPoints": 6, "rightPoints": 8 },
+      "rationale": "Leadership-heavy role; wider band on Ability to accommodate different management styles."
+    },
+    "director": {
+      "Knowledge": { "center": 12, "leftPoints": 3, "rightPoints": 5 },
+      "Skills": { "center": 28, "leftPoints": 4, "rightPoints": 6 },
+      "Ability": { "center": 60, "leftPoints": 6, "rightPoints": 7 },
+      "rationale": "Strategy and governance; tighter Knowledge band, moderate Skills, broader Ability."
+    }
   }
 }
