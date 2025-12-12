@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { jobTypeWeightingPresets } from '@/types/company/weighting-presets'
 import type { JobType, WeightingBand } from '@/types/company/ksa-new'
-import RangeSliderGroup, { SliderData } from '@/components/buildappolis/ksa-slider'
+import KSAV_SliderGroup, { SliderData } from '@/components/buildappolis/ksa-slider'
 
 const tailoredBuckets = [
   { label: 'Unable to perform job duties', helper: '1-2' },
@@ -159,7 +159,7 @@ export default function UIDemosPage() {
           </div>
 
           <div className="rounded-lg border p-4">
-            <RangeSliderGroup data={initialData} maxDeviation={10} onChange={handleChange} />
+            <KSAV_SliderGroup data={initialData} maxDeviation={10} onChange={handleChange} />
 
 
           </div>

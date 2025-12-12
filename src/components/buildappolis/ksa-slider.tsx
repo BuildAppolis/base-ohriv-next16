@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import React, { useState, useCallback, useRef } from "react";
 import { flushSync } from "react-dom";
-import { Badge } from "../ui/badge";
 import { MIN_TOTAL_RANGE, MAX_TOTAL_RANGE } from "@/types/company/ksa-new";
 
 // Type definitions
@@ -12,15 +11,11 @@ interface SliderConfig {
 }
 
 interface SliderData {
-    ksa: {
-        [key: string]: SliderConfig;
-    };
-    values: {
-        [key: string]: SliderConfig;
-    };
+    [key: string]: SliderConfig;
 }
 
-interface RangeSliderProps {
+interface KSAV_SliderProps {
+    disabled?: boolean;
     label: string;
     config: SliderConfig;
     maxDeviation?: number;
@@ -29,7 +24,7 @@ interface RangeSliderProps {
     onChange?: (config: SliderConfig) => void;
 }
 
-interface RangeSliderGroupProps {
+interface KSAV_SiderGroupProps {
     data: SliderData;
     maxDeviation?: number;
     min?: number;
@@ -37,10 +32,10 @@ interface RangeSliderGroupProps {
     onChange?: (data: SliderData) => void;
 }
 
-const LENIENCY = 2; // Minimum total leniency between both sides
+
 
 // Individual Slider Component
-const RangeSlider: React.FC<RangeSliderProps> = ({
+const KSAV_Slider: React.FC<KSAV_SliderProps> = ({
     label,
     config,
     maxDeviation = 10,
@@ -55,9 +50,39 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
     const { center } = config;
 
-    // Constants for constraints
+    // Auto-detect if this is a KSA slider based on label
+    const isKSA = ["knowledge", "skills", "ability"].includes(label.toLowerCase());
+
+    // Constants for constraints - can be customized by type
     const LENIENCY = MIN_TOTAL_RANGE; // Minimum total points allowed
     const MAX_RANGE = MAX_TOTAL_RANGE; // Maximum total points allowed
+
+    // Type-specific styling and behavior based on automatic detection
+    const getTypeStyling = () => {
+        if (isKSA) {
+            const boxColors = {
+                k: "bg-blue-100 border-blue-300",
+                s: "bg-green-100 border-green-300",
+                a: "bg-purple-100 border-purple-300",
+            };
+            return {
+                trackColor: "bg-accent",
+                activeColor: "bg-primary",
+                thumbColor: "border-primary",
+                badgeVariant: "default" as const,
+                boxColors
+            };
+        } else {
+            return {
+                trackColor: "bg-green-200",
+                activeColor: "bg-green-500",
+                thumbColor: "border-green-500",
+                badgeVariant: "secondary" as const,
+            };
+        }
+    };
+
+    const typeStyles = getTypeStyling();
 
     // Calculate actual values on the scale
     const leftValue = center - leftPoints;
@@ -186,24 +211,28 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 
     const leftPercent = getPositionPercent(displayLeftValue);
     const rightPercent = getPositionPercent(displayRightValue);
+    const boxColorClass =
+        typeStyles.boxColors?.[label.charAt(0).toLowerCase() as "k" | "s" | "a"] ??
+        "bg-gray-100 border-gray-300";
 
     const styles = {
-        trackBg: `relative h-2 bg-primary from-red-500 to-green-500 rounded-full `,
+        trackBg: `relative h-2 ${typeStyles.trackColor} rounded-full `,
+        valueBox: `flex justify-center items-center mb-3 border-2 rounded p-2 h-8 ${boxColorClass}`,
         headerText: `text-base font-semibold text-gray-700`,
         labelCenter: `absolute -top-9 transform -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none`,
-        labelBg: ` border-2 border-green-500 bg-green-100 p-0.5 px-2 rounded-md shadow-md`,
-        labelText: `text-xs font-medium text-green-700 select-none`,
-        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-4 bg-background rounded border-2 border-primary cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none rounded-lg`,
+        labelBg: `border-2 ${typeStyles.thumbColor} bg-opacity-10 p-0.5 px-2 rounded-md shadow-md`,
+        labelText: `text-xs font-medium select-none`,
+        thumb: `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-4 bg-background rounded border-2 ${typeStyles.thumbColor} cursor-grab active:cursor-grabbing shadow-lg hover:scale-110 transition-all z-50 select-none rounded-lg`,
         thumbText: `absolute top-4 -translate-x-1/2 text-xs font-medium text-muted-foreground select-none`,
-        centerLine: `w-1 h-4 bg-green-500 z-20 pointer-events-none`,
-        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-xs   select-none  min-w-8 text-center rounded-full border-2 border-primary bg-background p-0.5 px-2 shadow-md`,
-        activeRange: `absolute h-full bg-green-500 rounded-full will-change-transform`,
+        centerLine: `w-1 h-4 ${typeStyles.activeColor} z-20 pointer-events-none`,
+        minMaxLabel: `absolute top-1/2 -translate-y-1/2 text-xs select-none min-w-8 text-center rounded-full border-2 ${typeStyles.thumbColor} bg-background p-0.5 px-2 shadow-md`,
+        activeRange: `absolute h-full ${typeStyles.activeColor} rounded-full will-change-transform`,
     };
 
     return (
         <div className="grid grid-cols-10 relative my-4 gap-2 items-end">
             {/* Header */}
-            <div className="flex justify-between items-center mb-3 bg-muted rounded items-center justify-center p-2 h-8">
+            <div className={cn(styles.valueBox)}>
                 <span className={cn(styles.headerText)}>{label.charAt(0)}</span>
             </div>
 
@@ -306,7 +335,7 @@ const EmptyState: React.FC<{ hasValidData: boolean }> = ({ hasValidData }) => (
 );
 
 // Main Group Component
-const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
+const KSAV_SliderGroup: React.FC<KSAV_SiderGroupProps> = ({
     data,
     maxDeviation = 10,
     min = 1,
@@ -315,13 +344,10 @@ const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
 }) => {
     const [sliderData, setSliderData] = useState<SliderData>(data);
 
-    const handleSliderChange = (category: 'ksa' | 'values', key: string) => (config: SliderConfig) => {
+    const handleSliderChange = (key: string) => (config: SliderConfig) => {
         const newData = {
             ...sliderData,
-            [category]: {
-                ...sliderData[category],
-                [key]: config
-            }
+            [key]: config
         };
         setSliderData(newData);
         onChange?.(newData);
@@ -331,22 +357,28 @@ const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
     const isValidSliderData = (data: unknown): data is SliderData => {
         if (!data || typeof data !== "object") return false;
 
-        const obj = data as { ksa?: unknown; values?: unknown };
-        return (
-            "ksa" in obj &&
-            "values" in obj &&
-            typeof obj.ksa === "object" &&
-            obj.ksa !== null &&
-            typeof obj.values === "object" &&
-            obj.values !== null
-        );
+        const obj = data as SliderData;
+        for (const key in obj) {
+            const config = obj[key];
+            if (!config || typeof config !== "object") return false;
+            if (!("center" in config) || !("leftPoints" in config) || !("rightPoints" in config)) {
+                return false;
+            }
+        }
+        return true;
     };
 
     // Check if data exists and is valid
     const hasValidData = isValidSliderData(sliderData);
-    const hasKsaData = hasValidData && Object.keys(sliderData.ksa).length > 0;
-    const hasValuesData = hasValidData && Object.keys(sliderData.values).length > 0;
-    const hasAnyData = hasKsaData || hasValuesData;
+    const hasAnyData = hasValidData && Object.keys(sliderData).length > 0;
+
+    // Group sliders by key name
+    const ksaSliders = hasValidData
+        ? Object.entries(sliderData).filter(([key]) => ["knowledge", "skills", "ability"].includes(key.toLowerCase()))
+        : [];
+    const valueSliders = hasValidData
+        ? Object.entries(sliderData).filter(([key]) => !["knowledge", "skills", "ability"].includes(key.toLowerCase()))
+        : [];
 
     // Return empty state if no data or invalid data
     if (!hasAnyData) {
@@ -356,36 +388,36 @@ const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
     return (
         <>
             {/* KSA JobFit Section */}
-            {hasKsaData && (
+            {ksaSliders.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">KSA Job Fit</h3>
-                    {Object.entries(sliderData.ksa).map(([key, config]) => (
-                        <RangeSlider
+                    <h3 className="text-lg font-semibold text-foreground mb-4">KSA Job Fit</h3>
+                    {ksaSliders.map(([key, config]) => (
+                        <KSAV_Slider
                             key={`ksa-${key}`}
                             label={key}
                             config={config}
                             maxDeviation={maxDeviation}
                             min={min}
                             max={max}
-                            onChange={handleSliderChange('ksa', key)}
+                            onChange={handleSliderChange(key)}
                         />
                     ))}
                 </div>
             )}
 
-            {/* Values CompanyFit Section */}
-            {hasValuesData && (
+            {/* Company Values Section */}
+            {valueSliders.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Values</h3>
-                    {Object.entries(sliderData.values).map(([key, config]) => (
-                        <RangeSlider
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Company Values</h3>
+                    {valueSliders.map(([key, config]) => (
+                        <KSAV_Slider
                             key={`values-${key}`}
                             label={key}
                             config={config}
                             maxDeviation={maxDeviation}
                             min={min}
                             max={max}
-                            onChange={handleSliderChange('values', key)}
+                            onChange={handleSliderChange(key)}
                         />
                     ))}
                 </div>
@@ -394,28 +426,24 @@ const RangeSliderGroup: React.FC<RangeSliderGroupProps> = ({
     );
 };
 
-export default RangeSliderGroup;
+export default KSAV_SliderGroup;
 
 // Export types for external use
 export type {
     SliderConfig,
     SliderData,
-    RangeSliderProps,
-    RangeSliderGroupProps,
+    KSAV_SliderProps,
+    KSAV_SiderGroupProps,
 };
 
 // Example usage component
 export const ExampleUsage: React.FC = () => {
     const initialData: SliderData = {
-        ksa: {
-            Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
-            Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
-            Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
-        },
-        values: {
-            "Company Value 1": { center: 30, leftPoints: 3, rightPoints: 4 },
-            "Company Value 2": { center: 40, leftPoints: 5, rightPoints: 3 },
-        },
+        Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
+        Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
+        Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
+        "Company Value 1": { center: 30, leftPoints: 3, rightPoints: 4 },
+        "Company Value 2": { center: 40, leftPoints: 5, rightPoints: 3 },
     };
 
     const handleChange = (data: SliderData) => {
@@ -424,7 +452,7 @@ export const ExampleUsage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 py-12">
-            <RangeSliderGroup
+            <KSAV_SliderGroup
                 data={initialData}
                 maxDeviation={10}
                 onChange={handleChange}
