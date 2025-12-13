@@ -19,6 +19,8 @@ export const tenantSchema = z.object({
   plan: z.enum(tenantPlans),
   status: z.enum(tenantStatuses),
   ownerUserId: z.string(),
+  companyLimit: z.number().int().positive().default(1),
+  defaultCompanyId: z.string().optional(),
   settings: z
     .object({
       branding: z.object({ logoUrl: z.string().url().optional() }).optional(),
@@ -57,6 +59,19 @@ export const tenantMembershipSchema = z.object({
   invitedAt: z.string().optional(),
 });
 
+export const partnerInviteSchema = z.object({
+  id: z.string(),
+  token: z.string(),
+  tenantId: z.string(),
+  invitedEmail: z.string().email(),
+  role: z.literal("partner_manager"),
+  createdBy: z.string(), // userId of admin/owner
+  expiresAt: z.string().optional(),
+  acceptedAt: z.string().optional(),
+  acceptedByUserId: z.string().optional(),
+  partnerId: z.string().optional(), // set after partner is created/linked
+});
+
 export type TenantPlan = (typeof tenantPlans)[number];
 export type TenantStatus = (typeof tenantStatuses)[number];
 export type PartnerStatus = (typeof partnerStatuses)[number];
@@ -66,3 +81,4 @@ export type Tenant = z.infer<typeof tenantSchema>;
 export type Partner = z.infer<typeof partnerSchema>;
 export type User = z.infer<typeof userSchema>;
 export type TenantMembership = z.infer<typeof tenantMembershipSchema>;
+export type PartnerInvite = z.infer<typeof partnerInviteSchema>;

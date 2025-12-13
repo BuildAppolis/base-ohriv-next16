@@ -8,6 +8,7 @@ export const companySchema = z.object({
   tenantId: z.string().optional(), // owning tenant/reseller
   partnerId: z.string().optional(),
   ownerUserId: z.string().optional(),
+  isDefault: z.boolean().default(false), // for single-company tenants
   name: z.string().optional(),
   website: z.string().url().optional(),
   industry: z.enum(Industries),
