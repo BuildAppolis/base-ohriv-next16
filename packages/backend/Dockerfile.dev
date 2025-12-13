@@ -1,0 +1,18 @@
+# Development Dockerfile with source mounting support
+FROM motiadev/motia:latest
+
+# Set working directory
+WORKDIR /app
+
+# Install Dependencies (this will be cached)
+COPY package*.json ./
+RUN npm install
+
+# Create source directory (will be mounted from host)
+RUN mkdir -p src
+
+# Expose outside access to the motia project
+EXPOSE 3000
+
+# Default command for development (can be overridden by docker-compose)
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  ohriv-motia-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ohriv-motia-backend-dev
+    ports:
+      - "3999:3999"
+    volumes:
+      # Mount source code for development
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./motia.config.ts:/app/motia.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      # Mount node_modules to avoid container/local conflicts
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3999
+    restart: unless-stopped
+    # Enable hot reloading if Motia supports it
+    command: npm run dev
+
+volumes:
+  node_modules:

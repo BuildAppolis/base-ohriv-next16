@@ -1,0 +1,36 @@
+import type { Stage } from "../stage";
+export const defaultStages: Stage[] = [
+  {
+    id: "recruiter_screen",
+    name: "Recruiter Screen",
+    description: "Initial screening by a recruiter.",
+    color: "#A0AEC0",
+    icon: "📞",
+    order: 1,
+    isSystem: true,
+    canReorder: false,
+    questionsEnabled: true,
+  },
+  {
+    id: "hiring_manager_interview",
+    name: "Hiring Manager Interview",
+    description: "Interview with the hiring manager.",
+    color: "#F6E05E",
+    icon: "👩‍💼",
+    order: 2,
+    isSystem: true,
+    canReorder: true,
+    questionsEnabled: true,
+  },
+  {
+    id: "final_interview",
+    name: "Final Interview",
+    description: "Final round interview with the team.",
+    color: "#68D391",
+    icon: "🏁",
+    order: 3,
+    isSystem: true,
+    canReorder: true,
+    questionsEnabled: true,
+  },
+];
