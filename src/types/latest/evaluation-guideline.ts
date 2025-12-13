@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { JobLevel, jobLevels } from "./to-refactor/enums";
+import { JobLevel, jobLevels } from "./enums";
+import { stagePlanSchema } from "./evaluation";
 
 const jobTypes = ["technical", "non-technical"] as const;
 
@@ -200,7 +201,9 @@ export const evaluationGuidelineSchema = z.object({
           });
         }
       });
-    }),
+    })
+    .optional(),
+  stagePlan: z.array(stagePlanSchema).optional(),
 });
 
 export type QuestionDifficulty = (typeof questionDifficulties)[number];

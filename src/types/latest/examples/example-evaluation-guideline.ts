@@ -338,5 +338,36 @@ export const exampleGuideline: EvaluationGuideline = {
       ],
     },
   },
+  stagePlan: [
+    {
+      stageId: "screen",
+      evaluatorRole: "recruiter",
+      questionRefs: [
+        { section: "jobFit", category: "Knowledge", questionId: 2, weight: 50 },
+        { section: "jobFit", category: "Skills", questionId: 4, weight: 50 },
+      ],
+      passScore: 60,
+    },
+    {
+      stageId: "technical",
+      evaluatorRole: "technical_interviewer",
+      questionRefs: [
+        { section: "jobFit", category: "Knowledge", questionId: 1, weight: 40 },
+        { section: "jobFit", category: "Skills", questionId: 3, weight: 30 },
+        { section: "jobFit", category: "Skills", questionId: 4, weight: 30 },
+      ],
+      passScore: 70,
+    },
+    {
+      stageId: "values",
+      evaluatorRole: "values_interviewer",
+      questionRefs: [
+        { section: "valuesFit", category: "Innovation", questionId: 1, weight: 50 },
+        { section: "valuesFit", category: "Collaboration", questionId: 2, weight: 50 },
+      ],
+      passScore: 65,
+      autoAdvanceOnPass: true,
+    },
+  ],
   weightingPresets: jobTypeWeightingPresets["technical"],
 };

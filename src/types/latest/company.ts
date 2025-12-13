@@ -5,8 +5,11 @@ import { jobSchema } from "./job";
 
 export const companySchema = z.object({
   id: z.string(),
+  tenantId: z.string().optional(), // owning tenant/reseller
+  partnerId: z.string().optional(),
+  ownerUserId: z.string().optional(),
   name: z.string().optional(),
-  website: z.url().optional(),
+  website: z.string().url().optional(),
   industry: z.enum(Industries),
   subIndustry: z.string().optional(),
   size: z.enum(CompanySize),
