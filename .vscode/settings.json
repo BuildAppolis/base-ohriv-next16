@@ -45,5 +45,13 @@
     "**/node_modules/**",
     "**/.hg/**",
     "**/.svn/**"
-  ]
+  ],
+  "typescript.preferences.exclude": [
+    "**/types.d.ts",
+    "**/node_modules/**/types.d.ts"
+  ],
+  "files.exclude": {
+    "**/types.d.ts": false
+  },
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false
 }

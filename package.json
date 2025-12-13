@@ -21,10 +21,7 @@
     "check": "pnpm type-check && pnpm lint",
     "clean": "pnpm -r clean && rm -rf node_modules",
     "test": "pnpm -r test",
-    "watch": "pnpm -r watch",
-    "autowatch": "./.claude/autowatch.sh start",
-    "autowatch:stop": "./.claude/autowatch.sh stop",
-    "autowatch:status": "./.claude/autowatch.sh status"
+    "watch": "pnpm -r watch"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

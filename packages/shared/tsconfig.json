@@ -6,7 +6,9 @@
     "declaration": true,
     "declarationMap": true,
     "composite": true,
-    "incremental": true
+    "incremental": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true
   },
   "include": [
     "src/**/*"

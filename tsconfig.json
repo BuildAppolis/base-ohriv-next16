@@ -26,14 +26,15 @@
   },
   "references": [
     { "path": "./packages/shared" },
-    { "path": "./packages/frontend" }
+    { "path": "./packages/frontend" },
+    { "path": "./packages/backend" }
   ],
-  "include": [
-    "packages/*/src/**/*"
-  ],
+  "include": ["packages/*/src/**/*"],
   "exclude": [
     "node_modules",
     "packages/*/dist",
-    "packages/*/node_modules"
+    "packages/*/node_modules",
+    "packages/backend/types.d.ts",
+    "packages/*/types.d.ts"
   ]
 }
