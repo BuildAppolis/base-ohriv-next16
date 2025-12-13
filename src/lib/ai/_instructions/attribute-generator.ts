@@ -9,7 +9,7 @@ import {
   RoleDetails,
   GeneratedAttribute,
   GenerationResult,
-} from "@/types/company_old";
+} from "@/types/old/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 
 export async function generateAttributes(

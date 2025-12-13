@@ -29,8 +29,8 @@ import {
   // type KSAJobFit,
   // type KSACoreValuesCompanyFit,
   // type KSAFramework
-} from '@/types/company_old/ksa'
-import { CompanyContextInput } from '@/types/ai/company'
+} from '@/types/old/company_old/ksa'
+import { CompanyContextInput } from '@/types/old/ai/company'
 import { GPT5_FAMILY_OPTIONS, type AIModelOption } from '@/lib/ai/ai-models'
 
 // Type guard functions

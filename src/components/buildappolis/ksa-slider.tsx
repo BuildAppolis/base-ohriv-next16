@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
 import React, { useState, useCallback, useRef } from "react";
 import { flushSync } from "react-dom";
-import { MIN_TOTAL_RANGE, MAX_TOTAL_RANGE } from "@/types/company/ksa-new";
+import { MIN_TOTAL_RANGE, MAX_TOTAL_RANGE } from "@/types/latest/evaluation-guideline";
 
 // Type definitions
 interface SliderConfig {
     center: number;
-    leftPoints: number;
-    rightPoints: number;
+    left: number;
+    right: number;
 }
 
 interface SliderData {
@@ -43,8 +43,8 @@ const KSAV_Slider: React.FC<KSAV_SliderProps> = ({
     max = 100,
     onChange,
 }) => {
-    const [leftPoints, setLeftPoints] = useState(config.leftPoints);
-    const [rightPoints, setRightPoints] = useState(config.rightPoints);
+    const [leftPoints, setLeftPoints] = useState(config.left);
+    const [rightPoints, setRightPoints] = useState(config.right);
     const [dragPreview, setDragPreview] = useState<{ thumb: "left" | "right"; value: number } | null>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
@@ -122,7 +122,7 @@ const KSAV_Slider: React.FC<KSAV_SliderProps> = ({
                 flushSync(() => {
                     setLeftPoints(finalLeftPoints);
                 });
-                onChange?.({ center, leftPoints: finalLeftPoints, rightPoints });
+                onChange?.({ center, left: finalLeftPoints, right: rightPoints });
             } else {
                 const minAllowedValue = center;
                 const maxAllowedValue = Math.min(max, center + maxDeviation);
@@ -141,7 +141,7 @@ const KSAV_Slider: React.FC<KSAV_SliderProps> = ({
                 flushSync(() => {
                     setRightPoints(finalRightPoints);
                 });
-                onChange?.({ center, leftPoints, rightPoints: finalRightPoints });
+                onChange?.({ center, left: leftPoints, right: finalRightPoints });
             }
         },
         [center, leftPoints, rightPoints, min, max, maxDeviation, onChange, LENIENCY, MAX_RANGE]
@@ -439,11 +439,11 @@ export type {
 // Example usage component
 export const ExampleUsage: React.FC = () => {
     const initialData: SliderData = {
-        Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
-        Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
-        Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
-        "Company Value 1": { center: 30, leftPoints: 3, rightPoints: 4 },
-        "Company Value 2": { center: 40, leftPoints: 5, rightPoints: 3 },
+        Knowledge: { center: 25, left: 4, right: 6 },
+        Skills: { center: 50, left: 6, right: 8 },
+        Ability: { center: 25, left: 5, right: 5 },
+        "Company Value 1": { center: 30, left: 3, right: 4 },
+        "Company Value 2": { center: 40, left: 5, right: 3 },
     };
 
     const handleChange = (data: SliderData) => {

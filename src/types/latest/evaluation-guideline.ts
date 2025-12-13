@@ -1,24 +1,9 @@
 import { z } from "zod";
+import { JobLevel, jobLevels } from "./to-refactor/enums";
 
 const jobTypes = ["technical", "non-technical"] as const;
 
 export type JobType = (typeof jobTypes)[number];
-
-const jobLevels = [
-  "intern",
-  "entry",
-  "junior",
-  "mid",
-  "senior",
-  "principal",
-  "teamLead",
-  "manager",
-  "director",
-  "vp",
-  "cLevel",
-] as const;
-
-export type JobLevel = (typeof jobLevels)[number];
 
 const questionDifficulties = [
   "basic",
@@ -34,18 +19,18 @@ export const MIN_TOTAL_RANGE = 2; // Minimum total leniency points
 export const MAX_TOTAL_RANGE = 20; // Maximum total leniency points
 
 export function computeWeightRange(
-  center: number,
+  delta: number,
   leftPoints: number,
   rightPoints: number
 ) {
   return {
-    min: Math.max(WEIGHT_MIN, center - leftPoints),
-    max: Math.min(WEIGHT_MAX, center + rightPoints),
+    min: Math.max(WEIGHT_MIN, delta - leftPoints),
+    max: Math.min(WEIGHT_MAX, delta + rightPoints),
   };
 }
 
 const weightRangeSchema = z.object({
-  center: z.number().min(WEIGHT_MIN).max(WEIGHT_MAX),
+  delta: z.number().min(WEIGHT_MIN).max(WEIGHT_MAX),
   leftPoints: z.number().min(0).max(MAX_SIDE_POINTS),
   rightPoints: z.number().min(0).max(MAX_SIDE_POINTS),
 });
@@ -59,7 +44,7 @@ const weightingBandSchema = z
   })
   .superRefine((value, ctx) => {
     const total =
-      value.Knowledge.center + value.Skills.center + value.Ability.center;
+      value.Knowledge.delta + value.Skills.delta + value.Ability.delta;
     if (Math.round(total) !== 100) {
       ctx.addIssue({
         code: "custom",
@@ -68,7 +53,7 @@ const weightingBandSchema = z
     }
 
     (["Knowledge", "Skills", "Ability"] as const).forEach((key) => {
-      const { center, leftPoints, rightPoints } = value[key];
+      const { delta: center, leftPoints, rightPoints } = value[key];
       if (leftPoints > MAX_SIDE_POINTS || rightPoints > MAX_SIDE_POINTS) {
         ctx.addIssue({
           code: "custom",
@@ -205,7 +190,8 @@ export const evaluationGuidelineSchema = z.object({
             path: ["weightingPresets", level],
           });
         }
-        const total = band.Knowledge + band.Skills + band.Ability;
+        const total =
+          band.Knowledge.delta + band.Skills.delta + band.Ability.delta;
         if (Math.round(total) !== 100) {
           ctx.addIssue({
             code: "custom",

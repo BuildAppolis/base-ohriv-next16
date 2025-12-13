@@ -70,7 +70,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { CompanyContextInput } from "@/types/ai/company";
+import type { CompanyContextInput } from "@/types/old/ai/company";
 import { calculateCost, estimateTokens } from "@/lib/ai/cost-calculator";
 import { getCostLevel } from "@/lib/ai/cost-colors";
 

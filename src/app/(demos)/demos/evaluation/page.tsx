@@ -16,8 +16,8 @@ import {
   addCandidateEvaluationAtom,
   trackCandidateJobEvaluationAtom
 } from '@/lib/atoms/candidate-atoms'
-import { CandidateEvaluation } from '@/types/candidate'
-import { KSAInterviewOutput } from '@/types/company_old/ksa'
+import { CandidateEvaluation } from '@/types/latest/to-refactor/candidate'
+import { KSAInterviewOutput } from '@/types/old/company_old/ksa'
 import { SimpleCandidate } from '@/lib/candidate-data'
 
 /**

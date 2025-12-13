@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAtom, useAtomValue } from 'jotai'
 import { candidatesAtom, selectedCandidateIdsAtom } from '@/lib/atoms/candidate-atoms'
 import { evaluateCandidateKSA } from '@/lib/candidate-ksa-evaluator'
-import { KSAInterviewOutput } from '@/types/company_old/ksa'
+import { KSAInterviewOutput } from '@/types/old/company_old/ksa'
 import {
   Target,
   Play,

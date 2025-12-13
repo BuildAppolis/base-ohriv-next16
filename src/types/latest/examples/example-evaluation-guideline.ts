@@ -1,5 +1,5 @@
-import { EvaluationGuideline } from "./ksa-new";
-import { jobTypeWeightingPresets } from "./weighting-presets";
+import { EvaluationGuideline } from "../evaluation-guideline";
+import { jobTypeWeightingPresets } from "../presets/weighting";
 
 export const exampleGuideline: EvaluationGuideline = {
   jobType: "technical",

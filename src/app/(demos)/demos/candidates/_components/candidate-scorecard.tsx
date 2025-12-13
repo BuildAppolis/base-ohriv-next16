@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAtomValue } from 'jotai'
 import { currentCandidateAtom, currentCandidateEvaluationsAtom, currentCandidateJobEvaluationsAtom } from '@/lib/atoms/candidate-atoms'
-import { CandidateEvaluation } from '@/types/candidate'
+import { CandidateEvaluation } from '@/types/latest/to-refactor/candidate'
 import {
   Briefcase,
   TrendingUp,

@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { BucketedSlider } from '@/components/buildappolis/bucketed-slider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { jobTypeWeightingPresets } from '@/types/company/weighting-presets'
-import type { JobType, WeightingBand } from '@/types/company/ksa-new'
+import { jobTypeWeightingPresets } from '@/types/latest/presets/weighting'
+import type { JobType, WeightingBand } from '@/types/latest/evaluation-guideline'
 import KSAV_SliderGroup, { SliderData } from '@/components/buildappolis/ksa-slider'
 
 const tailoredBuckets = [
@@ -41,9 +41,9 @@ export default function UIDemosPage() {
 
 
   const initialData: SliderData = {
-    Knowledge: { center: 25, leftPoints: 4, rightPoints: 6 },
-    Skills: { center: 50, leftPoints: 6, rightPoints: 8 },
-    Ability: { center: 25, leftPoints: 5, rightPoints: 5 },
+    Knowledge: { center: 25, left: 4, right: 6 },
+    Skills: { center: 50, left: 6, right: 8 },
+    Ability: { center: 25, left: 5, right: 5 },
   };
 
   const handleChange = (data: SliderData) => {

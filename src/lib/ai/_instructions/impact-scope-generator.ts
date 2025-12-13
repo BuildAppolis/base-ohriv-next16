@@ -4,7 +4,7 @@
  */
 
 import { openai, AI_MODELS } from "@/lib/open_ai/client";
-import { CompanyContext } from "@/types/company_old";
+import { CompanyContext } from "@/types/old/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 
 export interface LevelImpactSuggestion {

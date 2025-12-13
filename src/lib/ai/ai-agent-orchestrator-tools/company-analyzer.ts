@@ -1,13 +1,17 @@
 import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { WebSearchSchema } from "./schema";
-import type { CompanyContextInput } from "@/types/ai/company";
+import type { CompanyContextInput } from "@/types/old/ai/company";
 
 const extractMeta = (html: string) => {
   const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
   const descMatch =
-    html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i) ||
-    html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i);
+    html.match(
+      /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i
+    ) ||
+    html.match(
+      /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i
+    );
 
   return {
     title: titleMatch?.[1]?.trim(),
@@ -35,15 +39,28 @@ export const companyAnalyzerTool = tool({
       }
     })();
 
-    const buildContextFrom = (name: string, industry: string, description: string): CompanyContextInput => {
+    const buildContextFrom = (
+      name: string,
+      industry: string,
+      description: string
+    ): CompanyContextInput => {
       const mission_statement =
         description || `Mission statement inferred from ${name}.`;
 
       const core_values = [
-        { name: "Innovation", description: "Embrace new ideas and continuous improvement." },
+        {
+          name: "Innovation",
+          description: "Embrace new ideas and continuous improvement.",
+        },
         { name: "Excellence", description: "Deliver high-quality outcomes." },
-        { name: "Collaboration", description: "Work together effectively across teams." },
-        { name: "Growth", description: "Invest in learning and scaling impact." },
+        {
+          name: "Collaboration",
+          description: "Work together effectively across teams.",
+        },
+        {
+          name: "Growth",
+          description: "Invest in learning and scaling impact.",
+        },
       ];
 
       const interview_steps = {
@@ -54,7 +71,8 @@ export const companyAnalyzerTool = tool({
             order: 1,
             type: "screening",
             generates_questions: true,
-            description: "Initial qualification based on profile and mission alignment.",
+            description:
+              "Initial qualification based on profile and mission alignment.",
           },
           {
             name: "Technical/Functional",

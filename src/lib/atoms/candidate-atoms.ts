@@ -9,7 +9,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { FIXED_CANDIDATES, SimpleCandidate } from "@/lib/candidate-data";
-import { CandidateEvaluation } from "@/types/candidate";
+import { CandidateEvaluation } from "@/types/latest/to-refactor/candidate";
 
 /**
  * Primary candidate storage atom

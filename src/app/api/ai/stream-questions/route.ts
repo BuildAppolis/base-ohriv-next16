@@ -9,7 +9,7 @@ import type {
   CompanyContext,
   RoleDetails,
   GeneratedAttribute,
-} from "@/types/company_old/generation-types";
+} from "@/types/old/company_old/generation-types";
 import { serverLogger as logger } from "@/lib/logger";
 
 export const runtime = "nodejs";

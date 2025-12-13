@@ -8,7 +8,7 @@ import {
   CompanyContext,
   RoleDetails,
   GeneratedAttribute,
-} from "@/types/company_old";
+} from "@/types/old/company_old";
 import { serverLogger as logger } from "@/lib/logger";
 
 export interface AttributeProgress {
