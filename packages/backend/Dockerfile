@@ -28,11 +28,11 @@ RUN chown -R motia:motia /app
 USER motia
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3001
 
 # Health check for production monitoring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+  CMD curl -f http://localhost:3001/health || exit 1
 
 # Run your application in production mode
 CMD ["npm", "run", "start"]

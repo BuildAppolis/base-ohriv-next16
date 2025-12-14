@@ -11,7 +11,8 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "date-fns": "^4.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.3"

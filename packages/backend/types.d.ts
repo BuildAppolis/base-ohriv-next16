@@ -12,11 +12,10 @@ declare module 'motia' {
   }
 
   interface Handlers {
-    'HealthMonitor': EventHandler<never, { topic: 'health.alert.email'; data: never }>
-    'HealthCheck': EventHandler<never, { topic: 'health.check.completed'; data: never }>
-    'HealthCheckApi': ApiRouteHandler<Record<string, unknown>, ApiResponse<200, { status: 'healthy' | 'degraded' | 'unhealthy'; timestamp: string; uptime: number; memory: { used: number; total: number; percentage: number; rss: number; heapTotal: number; heapUsed: number; external: number; arrayBuffers: number }; service: { name: string; version: string; environment: string; nodeVersion: string; platform: string; arch: string }; system: { loadAverage: Array<number>; cpuCount: number; freeMemory: number; totalMemory: number }; checks: { memory: { status: 'pass' | 'warn' | 'fail'; threshold: number; usage: number }; uptime: { status: 'pass' | 'warn' | 'fail'; threshold: number; current: number } } }> | ApiResponse<500, { error: string; timestamp: string; status: string }>, { topic: 'health.check.requested'; data: never } | { topic: 'health.check.completed'; data: never } | { topic: 'health.alert.triggered'; data: never }>
-    'HealthAlertEmail': EventHandler<never, never>
-    'APIHealthCheck': ApiRouteHandler<Record<string, unknown>, unknown, { topic: 'health.check.completed'; data: never }>
+    'HealthMonitor': EventHandler<never, never>
+    'HealthAlertEmail': EventHandler<{ severity: 'warning' | 'critical'; title: string; message: string; metadata?: { status?: string; issues?: Record<string, string>; metrics?: Record<string, unknown>; alertIssues?: Array<string> } }, never>
+    'HealthCheckDetailed': ApiRouteHandler<Record<string, unknown>, ApiResponse<200, { status: 'healthy' | 'degraded' | 'unhealthy'; timestamp: string; uptime: number; memory: { used: number; total: number; percentage: number; rss: number; heapTotal: number; heapUsed: number; external: number; arrayBuffers: number }; service: { name: string; version: string; environment: string; port: number; nodeVersion: string; platform: string; arch: string }; system: { loadAverage: Array<number>; cpuCount: number; freeMemory: number; totalMemory: number }; checks: { memory: { status: 'pass' | 'warn' | 'fail'; threshold: number; usage: number }; uptime: { status: 'pass' | 'warn' | 'fail'; threshold: number; current: number } } }> | ApiResponse<500, { error: string; timestamp: string; status: string }>, { topic: 'health.check.requested'; data: never } | { topic: 'health.check.completed'; data: never }>
+    'HealthCheck': ApiRouteHandler<Record<string, unknown>, ApiResponse<200, { status: 'healthy' | 'degraded' | 'unhealthy'; timestamp: string; service: string; port: number; environment: string; version: string; uptime: number; memory: Record<string, number> }> | ApiResponse<500, { error: string; timestamp: string; status: string }>, { topic: 'health.check.completed'; data: never }>
   }
     
 }

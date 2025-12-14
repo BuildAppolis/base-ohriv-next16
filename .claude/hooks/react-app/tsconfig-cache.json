@@ -1,0 +1,17 @@
+{
+  "hashes": {
+    "/home/cory-ubuntu/coding/buildappolis/clients/ohriv/ohriv-optimized/tsconfig.json": "4f3316ce41d382b9e1905ccf09a5985e20e3a98060eb67782252cbd40a64bb31"
+  },
+  "mappings": {
+    "packages/*/src/**/*": {
+      "configPath": "/home/cory-ubuntu/coding/buildappolis/clients/ohriv/ohriv-optimized/tsconfig.json",
+      "excludes": [
+        "node_modules",
+        "packages/*/dist",
+        "packages/*/node_modules",
+        "packages/backend/types.d.ts",
+        "packages/*/types.d.ts"
+      ]
+    }
+  }
+}

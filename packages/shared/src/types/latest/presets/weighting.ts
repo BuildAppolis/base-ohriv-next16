@@ -1,4 +1,5 @@
-import type { JobLevel, JobType, WeightingBand } from "../evaluation-guideline";
+import type { JobType, WeightingBand } from "../evaluation-guideline";
+import { JobLevel } from "../enums";
 
 /**
  * Preset weighting distributions by job type and level.

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "monitoring",
+    "config": {
+      "src/events/health/monitor.step.ts": {
+        "x": 724,
+        "y": -83
+      },
+      "src/api/health/check.step.ts": {
+        "x": 291,
+        "y": 207
+      },
+      "src/api/health/detailed.step.ts": {
+        "x": 155,
+        "y": -58
+      },
+      "src/events/health/alert-email.step.ts": {
+        "x": 1269,
+        "y": 114
+      }
+    }
+  }
+]

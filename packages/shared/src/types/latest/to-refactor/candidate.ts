@@ -5,7 +5,14 @@
  * with personality systems, evaluation capabilities, and AI generation support.
  */
 
-import { KSAInterviewOutput } from "@/types/old/company_old/ksa";
+// TODO: Fix import - this file doesn't exist in shared package
+// import { KSAInterviewOutput } from "../../old/company_old/ksa";
+
+// Temporary type definition to prevent compilation errors
+export interface KSAInterviewOutput {
+  // TODO: Define proper interface
+  [key: string]: any;
+}
 
 /**
  * Core personality traits that define a candidate's behavioral patterns

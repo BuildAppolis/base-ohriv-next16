@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["dom", "dom.iterable", "es6"],
@@ -8,7 +9,7 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "composite": true,
+    "composite": false,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -18,9 +19,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@ohriv/shared": ["../shared/src"],
-      "@ohriv/shared/*": ["../shared/src/*"]
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {

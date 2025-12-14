@@ -21,7 +21,11 @@
     "baseUrl": ".",
     "paths": {
       "@ohriv/shared": ["./packages/shared/src"],
-      "@ohriv/shared/*": ["./packages/shared/src/*"]
+      "@ohriv/shared/*": ["./packages/shared/src/*"],
+      "@ohriv/frontend": ["./packages/frontend/src"],
+      "@ohriv/frontend/*": ["./packages/frontend/src/*"],
+      "@ohriv/backend": ["./packages/backend/src"],
+      "@ohriv/backend/*": ["./packages/backend/src/*"]
     }
   },
   "references": [

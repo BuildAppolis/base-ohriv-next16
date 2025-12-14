@@ -1,4 +1,6 @@
-export const prettyPrintJobLevlel = ({ level }: { level: JobLevel }) => {
+import { JobLevel } from "./enums";
+
+export const prettyPrintJobLevel = ({ level }: { level: JobLevel }) => {
   switch (level) {
     case "intern":
       return "Internship";

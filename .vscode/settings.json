@@ -1,5 +1,13 @@
 {
   "npm.packageManager": "pnpm",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.workspaceSymbols.scope": "allOpenProjects",
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.implementationsCodeLens.enabled": true,
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
@@ -26,16 +34,7 @@
     "editor.formatOnSave": true
   },
   "editor.formatOnSaveMode": "file",
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "[javascript][typescript][typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
-  "css.customData": [
-    ".vscode/tailwind.json"
-  ],
+  "css.customData": [".vscode/tailwind.json"],
   "tailwindCSS.experimental.configFile": "./src/styles/globals.css",
   "tailwindCSS.includeLanguages": {
     "plaintext": "html"
@@ -53,5 +52,8 @@
   "files.exclude": {
     "**/types.d.ts": false
   },
-  "typescript.tsserver.experimental.enableProjectDiagnostics": false
+  "files.watcherExclude": {
+    "**/.motia/**": true,
+    "**/node_modules/**": true
+  }
 }
