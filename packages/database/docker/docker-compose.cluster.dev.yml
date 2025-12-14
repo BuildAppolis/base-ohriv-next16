@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # RavenDB Node 1 - Primary
+  raven-node-1:
+    image: ravendb/ravendb:latest
+    container_name: raven-node-1
+    ports:
+      - "8080:8080"   # Studio
+      - "38888:38888" # TCP
+    environment:
+      - RAVEN_Setup_Mode=Initial
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+      - RAVEN_RunInMemory=true
+      - RAVEN_License_Eula_Accepted=true
+    volumes:
+      - raven-data-1:/var/lib/ravendb/data
+    networks:
+      - raven-cluster
+
+  # RavenDB Node 2 - Replica
+  raven-node-2:
+    image: ravendb/ravendb:latest
+    container_name: raven-node-2
+    ports:
+      - "8081:8080"   # Studio
+      - "38889:38888" # TCP
+    environment:
+      - RAVEN_Setup_Mode=None
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+      - RAVEN_RunInMemory=true
+      - RAVEN_License_Eula_Accepted=true
+    volumes:
+      - raven-data-2:/var/lib/ravendb/data
+    networks:
+      - raven-cluster
+
+  # RavenDB Node 3 - Replica
+  raven-node-3:
+    image: ravendb/ravendb:latest
+    container_name: raven-node-3
+    ports:
+      - "8082:8080"   # Studio
+      - "38890:38888" # TCP
+    environment:
+      - RAVEN_Setup_Mode=None
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+      - RAVEN_RunInMemory=true
+      - RAVEN_License_Eula_Accepted=true
+    volumes:
+      - raven-data-3:/var/lib/ravendb/data
+    networks:
+      - raven-cluster
+
+volumes:
+  raven-data-1:
+  raven-data-2:
+  raven-data-3:
+
+networks:
+  raven-cluster:
+    driver: bridge

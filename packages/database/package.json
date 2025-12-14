@@ -8,7 +8,24 @@
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "docker:dev": "./scripts/docker-dev.sh",
+    "docker:dev:start": "./scripts/docker-dev.sh start",
+    "docker:dev:stop": "./scripts/docker-dev.sh stop",
+    "docker:dev:logs": "./scripts/docker-dev.sh logs",
+    "docker:dev:status": "./scripts/docker-dev.sh status",
+    "docker:cluster": "./scripts/docker-cluster.sh",
+    "docker:cluster:start": "./scripts/docker-cluster.sh start",
+    "docker:cluster:stop": "./scripts/docker-cluster.sh stop",
+    "docker:cluster:logs": "./scripts/docker-cluster.sh logs",
+    "docker:cluster:status": "./scripts/docker-cluster.sh status",
+    "docker:cluster:init": "./scripts/docker-cluster.sh init-cluster",
+    "docker:prod": "./scripts/docker-prod.sh",
+    "docker:prod:deploy": "./scripts/docker-prod.sh deploy",
+    "docker:prod:stop": "./scripts/docker-prod.sh stop",
+    "docker:prod:logs": "./scripts/docker-prod.sh logs",
+    "docker:prod:status": "./scripts/docker-prod.sh status",
+    "docker:prod:update": "./scripts/docker-prod.sh update"
   },
   "dependencies": {
     "ravendb": "^7.1.4"

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  raven-db-dev:
+    image: ravendb/ravendb:latest
+    container_name: ohriv-raven-db-dev
+    ports:
+      - "8080:8080"   # HTTP + Studio
+      - "38888:38888" # TCP for RavenDB clients
+    environment:
+      - RAVEN_Setup_Mode=None
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+      - RAVEN_License_Eula_Accepted=true
+    volumes:
+      - raven-dev-data:/var/lib/ravendb/data
+    networks:
+      - ohriv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  raven-dev-data:
+    driver: local
+
+networks:
+  ohriv-network:
+    driver: bridge

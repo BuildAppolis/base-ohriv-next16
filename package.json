@@ -23,7 +23,15 @@
     "check": "pnpm type-check && pnpm lint",
     "clean": "pnpm -r clean && rm -rf node_modules",
     "test": "pnpm -r test",
-    "watch": "pnpm -r watch"
+    "watch": "pnpm -r watch",
+    "docker:db:dev": "pnpm --filter @ohriv/database docker:dev",
+    "docker:db:dev:stop": "pnpm --filter @ohriv/database docker:dev:stop",
+    "docker:db:dev:logs": "pnpm --filter @ohriv/database docker:dev:logs",
+    "docker:db:cluster": "pnpm --filter @ohriv/database docker:cluster",
+    "docker:db:cluster:start": "pnpm --filter @ohriv/database docker:cluster:start",
+    "docker:db:cluster:stop": "pnpm --filter @ohriv/database docker:cluster:stop",
+    "docker:db:prod": "pnpm --filter @ohriv/database docker:prod",
+    "docker:db:prod:deploy": "pnpm --filter @ohriv/database docker:prod:deploy"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  raven-db:
+    image: ravendb/ravendb:latest
+    container_name: ohriv-raven-db
+    ports:
+      - "8080:8080"   # HTTP + Studio (consider removing in production)
+      - "443:443"     # HTTPS
+      - "38888:38888" # TCP for RavenDB clients
+    environment:
+      - RAVEN_Setup_Mode=None
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_PublicServerUrl=${RAVENDB_PUBLIC_URL:-http://localhost:8080}
+      - RAVEN_ServerUrl=${RAVENDB_SERVER_URL:-http://localhost:8080}
+    volumes:
+      - raven-data:/opt/RavenDB/Server/RavenData
+      - ./config/raven-db:/opt/RavenDB/Config
+    networks:
+      - ohriv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # Production considerations:
+    # - Add SSL certificates
+    # - Remove Studio port (8080) for security
+    # - Set up proper firewall rules
+    # - Configure backups
+    # - Set up monitoring
+
+volumes:
+  raven-data:
+    driver: local
+
+networks:
+  ohriv-network:
+    driver: bridge
