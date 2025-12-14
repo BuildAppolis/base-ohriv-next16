@@ -663,14 +663,36 @@ Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 │        💼 JOB-SPECIFIC QUESTION INTEGRATION               │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  Job: "Senior Software Engineer - Cloud Infrastructure" │
-│  Company: "Google - Mountain View"                       │
-│  Location: tenant-google/companies/google-mv/jobs/...   │
+│  Job Document:                                           │
+│  {                                                        │
+│    id: "job-senior-swe-001",                           │
+│    tenantId: "tenant-google",                          │
+│    companyId: "google-mountain-view",                  │
+│    title: "Senior Software Engineer",                  │
+│    level: "senior",                                    │
+│    workEnvironment: "onsite",                          │
+│    department: "Cloud Infrastructure",                  │
+│    location: "Mountain View, CA",                      │
+│    type: "full-time",                                  │
+│    guidelineId: "guid-senior-tech-001", // reusable in tenant DB for other companies
+│    evaluationGuideline: {                              │
+│      jobType: "technical",                             │
+│      jobFit: {                                         │
+│        Knowledge: { questions, definition, scale },    │
+│        Skills: { questions, definition, scale },       │
+│        Ability: { questions, definition, scale }       │
+│      },                                                │
+│      valuesFit: { tenant company values questions },   │
+│      weightingPresets: { senior: { K:22, S:50, A:28 } }│
+│    },                                                 │
+│    pipeline: [     /// this may change later                                    │
+│      { stageId: "screening", evaluatorRole: "recruiter", questionRefs },│
+│      { stageId: "technical", evaluatorRole: "technical_interviewer", questionRefs },│
+│      { stageId: "final", evaluatorRole: "hiring_manager", questionRefs }│
+│    ]                                                   │
+│  }                                                      │
 │                                                         │
-│  📋 Embedded KSA Guideline:                               │
-│  ├─ guidelineId: "guid-senior-tech-001"                 │
-│  ├─ jobType: "technical"                                │
-│  └─ Contains:                                          │
+│  📋 KSA Framework (in evaluationGuideline):             │
 │                                                             │
 │    🔬 KNOWLEDGE Category                                  │
 │    ├─ Definition: "Technical concepts, theories..."      │
@@ -958,8 +980,6 @@ if (stageEvaluation.stage.type === 'screening') {
 
 📋 Stage 3: Candidate Sourcing
 ├── 🔍 Active Sourcing: LinkedIn Recruiter, GitHub, AngelList
-├── 🤝 Passive Sourcing: Open source contributors, conference speakers
-├── 📢 Employee Referrals: $5,000 referral bonus program
 ├── 🏢 ATS Integration: Candidates synced from Greenhouse, Lever
 ├── 🔄 Migrate.dev: Bulk import from existing applicant databases
 ├── 🏢 Pipeline: 50-75 qualified candidates
@@ -1005,11 +1025,18 @@ if (stageEvaluation.stage.type === 'screening') {
 └── ⏱️ Timeline: 2-4 weeks
 ```
 
-### **Cross-Talent Mobility Flow:**
+### **Cross-Talent Mobility Flow (Future Enhancement):**
 ```
-🔄 Internal Talent Movement (Within Tenant)
+🔄 Future Feature: Internal Talent Movement
 
-📍 Scenario: Alex Rodriguez wants to move between teams/locations
+⚠️ NOTE: This functionality is not currently implemented
+Would require additional architecture components:
+- Employee profile detection system
+- Internal application flagging
+- Performance history integration
+- Manager approval workflows
+
+📍 Proposed Scenario: Alex Rodriguez wants to move between teams/locations
 
 🏢 Current Company: "Google - Mountain View"
 │   ├── Role: Senior Software Engineer - Ads Infrastructure
@@ -1023,14 +1050,22 @@ if (stageEvaluation.stage.type === 'screening') {
 │   ├── Manager: Jane Smith, Engineering Manager
 │   └── Benefits: Relocation package, new challenges, promotion track
 │
-🔄 Transfer Process
-├── 📝 Internal Application: Alex applies through internal mobility portal
-├── 👥 Current Manager Review: Positive performance review, strong technical recommendation
-├── 🎯 Target Team Interview: Technical interviews with Cloud Storage team
-├── 📋 System Design Assessment: Distributed storage architecture evaluation
-├── 🤝 Compensation Discussion: Base adjustment + Seattle location premium
-├── 📅 Transition Plan: 4-week notice period, knowledge transfer
-└── ✅ Transfer Approved: New role starts March 1, 2024
+🔄 Proposed Transfer Process (Future Implementation)
+├── 🔍 Employee Detection: System identifies current employee status
+├── 📝 Internal Application: Specialized internal mobility workflow
+├── 👥 Current Manager Review: Performance review & recommendation
+├── 🎯 Target Team Interview: Technical interviews with new team
+├── 📋 System Design Assessment: Role-specific evaluation
+├── 🤝 Compensation & Benefits: Transfer package discussion
+├── 📅 Transition Planning: Knowledge transfer timeline
+└── ✅ Transfer Approval: System updates employee records
+
+🚧 Implementation Requirements:
+- Employee profile system integration
+- Internal transfer workflow engine
+- Performance data access controls
+- Cross-departmental approval chains
+- Retention risk analysis tools
 ```
 
 ---
@@ -1342,10 +1377,9 @@ if (stageEvaluation.stage.type === 'screening') {
 │ ├── 📧 SendGrid: Email notifications                    │
 │ ├── 💬 Slack: Team communication                        │
 │ ├── 📹 Zoom/Google Meet: Video interviews               │
-│ ├── 📅 Calendly: Interview scheduling                  │
-│ └── 🔗 Discord: Community building                      │
+│ └── 📅 Calendly: Interview scheduling                  │
 │                                                         │
-│ 🔍 Background & Verification                              │
+│ 🔍 Background & Verification (future implementation)    │
 │ ├── 🔹 Checkr: Criminal background checks               │
 │ ├── 🎓 Sterling: Education & employment verification     │
 │ ├── 🏢 GitHub: Code portfolio verification               │
@@ -1696,34 +1730,6 @@ interface Location {
     email: string;            // General location email
   };
 
-  // Business Hours
-  businessHours: {
-    timezone: string;         // IANA timezone: "America/Los_Angeles"
-
-    // Standard weekly schedule
-    weeklySchedule: {
-      monday: DaySchedule;
-      tuesday: DaySchedule;
-      wednesday: DaySchedule;
-      thursday: DaySchedule;
-      friday: DaySchedule;
-      saturday: DaySchedule;
-      sunday: DaySchedule;
-    };
-
-    // Special hours (holidays, special events)
-    specialHours: Array<{
-      date: Date;
-      name: string;           // "Christmas Day", "Company Holiday"
-      isClosed: boolean;
-      openTime?: string;      // "09:00"
-      closeTime?: string;     // "17:00"
-    }>;
-
-    // Always-on departments
-    alwaysOpenDepartments: string[]; // ["Emergency Support", "On-call Engineering"]
-  };
-
   // Location Management
   contactManager: {
     type: 'user' | 'custom-contact';
@@ -1745,17 +1751,6 @@ interface Location {
   updatedAt: Date;
 }
 
-// Supporting Types
-interface DaySchedule {
-  isOpen: boolean;
-  openTime?: string;         // "09:00" format
-  closeTime?: string;        // "17:00" format
-  lunchBreak?: {
-    startTime: string;       // "12:00"
-    endTime: string;         // "13:00"
-  };
-  departmentsOpen: string[]; // ["Engineering", "HR", "Sales"]
-}
 ```
 
 ### **Contact Type (For Contact Manager References)**
@@ -1910,48 +1905,12 @@ const mountainViewLocation: Location = {
     email: "mountain-view@google.com"
   },
 
-  businessHours: {
-    timezone: "America/Los_Angeles",
-    weeklySchedule: {
-      monday: { isOpen: true, openTime: "09:00", closeTime: "18:00" },
-      tuesday: { isOpen: true, openTime: "09:00", closeTime: "18:00" },
-      wednesday: { isOpen: true, openTime: "09:00", closeTime: "18:00" },
-      thursday: { isOpen: true, openTime: "09:00", closeTime: "18:00" },
-      friday: { isOpen: true, openTime: "09:00", closeTime: "18:00" },
-      saturday: { isOpen: false },
-      sunday: { isOpen: false }
-    },
-    specialHours: [
-      {
-        date: new Date("2024-12-25"),
-        name: "Christmas Day",
-        isClosed: true
-      }
-    ],
-    alwaysOpenDepartments: ["Security Operations", "Data Center Support"]
-  },
-
   contactManager: {
     type: "user",
     reference: "user-jane-smith-001"
   },
 
   locationType: "headquarters",
-  capacity: {
-    employees: 2000,
-    meetingRooms: 50,
-    parkingSpaces: 1000
-  },
-
-  amenities: {
-    parking: true,
-    publicTransit: true,
-    wheelchairAccess: true,
-    security: true,
-    cafeteria: true,
-    gym: true,
-    elevator: true
-  },
 
   isActive: true,
   establishedAt: new Date("2004-01-01"),
@@ -1978,23 +1937,31 @@ This visualization covers every aspect of your multi-tenant tech recruitment pla
 - **🎯 Role-Based Access**: Different access levels for users, partners, contractors
 - **📊 Rich Analytics**: Comprehensive recruitment and performance metrics
 - **🤝 Easy Integration**: Connects with ATS systems and migrate.dev
-- **📱 Mobile-First**: Native mobile experience for recruiters and candidates
+- **📱 Mobile-First**: (future) Native mobile experience for managers and evaluators
 
 ### **🔧 Technical Benefits:**
-- **🗄️ RavenDB Power**: Document database perfect for complex recruitment data
+- **🗄️ RavenDB Tech**: Document database perfect for complex recruitment data
 - **🚀 On-Demand Scaling**: Create databases as new tenants sign up
 - **🔐 Robust Security**: Multiple layers of security protection
 - **📊 Real-Time Analytics**: Live performance monitoring
-- **🔌 API-First**: Rich integration capabilities with ATS and HR systems
+- **🔌 API-Intergrations**: (future) Rich integration capabilities with ATS and HR systems
 
 ---
 
-## 🎯 **Next Steps for Implementation:**
+### Next Steps
 
-1. **Review the architecture** - Confirm this meets your tech recruitment requirements
-2. **Refine the type definitions** - Implement the strict Location, Contact, and Tenant types
-3. **Plan implementation** - Decide on development phases
-4. **Start development** - Begin with core tenant service and location management
-5. **Test ATS integration** - Validate with real ATS systems and migrate.dev
+1. Validate core tenant and auth flows
+2. Finalize type definitions and schemas
+3. Implement tenant provisioning service (done, just need to test)
+4. Reimplement evaluation and workflow engine (just need to refactor the evaluation objects after our changes)
+    - Create steps on Motia backend to handle most of the workflows
+5. Configure UI
+6. Test before alpha/production
+    - Auth
+    - Company onboarding
+    - KSA Generation
+    - Stage Managment
+    - Values Management
+    - Jobs Management
+    - Candidates Management
 
-**Does this architecture visualization cover everything you need? What would you like to adjust or expand?** 🚀📊
