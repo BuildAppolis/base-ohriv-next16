@@ -642,45 +642,94 @@ Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 
 ### **Question Management System:**
 ```
-❓ Question Bank Architecture
+❓ Question Architecture within Job KSA Guidelines
 ┌─────────────────────────────────────────────────────────┐
-│                📚 QUESTION LIBRARY                        │
+│           🏢 MULTI-TENANT QUESTION STRUCTURE             │
 ├─────────────────────────────────────────────────────────┤
-│ 🔬 KSA Questions (Technical Role)                          │
-│ ├── Knowledge Questions: Theory, concepts, principles    │
-│ │   ├── Basic: Foundational understanding               │
-│ │   ├── Intermediate: Applied knowledge                 │
-│ │   ├── Advanced: Complex scenarios                    │
-│ │   └── Expert: Edge cases, research-level             │
-│ │                                                           │
-│ ├── Skills Questions: Practical abilities, tools          │
-│ │   ├── Coding: Programming challenges, algorithms      │
-│ │   ├── System Design: Architecture, scalability        │
-│ │   ├── Debugging: Problem identification, resolution   │
-│ │   └── Tools: Platform-specific expertise              │
-│ │                                                           │
-│ └── Ability Questions: Problem-solving, leadership       │
-│     ├── Communication: Clear articulation of ideas       │
-│     ├── Problem Solving: Systematic approach            │
-│     ├── Leadership: Team collaboration, influence       │
-│     └── Learning: Adaptability, growth mindset          │
 │                                                         │
-│ 🏢 Company Values Questions                                │
-│ ├── Innovation: Creative problem-solving examples         │
-│ ├── Excellence: Quality standards, improvement stories   │
-│ ├── Collaboration: Teamwork, conflict resolution         │
-│ └── Growth: Learning experiences, mentorship examples    │
+│  🏗️ Tenant Level: Framework Configuration               │
+│  ├─ Company Values: [Innovation, Excellence, Collab...]  │
+│  ├─ Evaluation Stages: [Screening, Technical, Final...]   │
+│  └─ KSA Framework: Knowledge/Skills/Ability definitions │
 │                                                         │
-│ 📋 Question Metadata                                       │
-│ ├── ID: Unique identifier                                │
-│ ├── Text: Question content                               │
-│ ├── Difficulty: basic/intermediate/advanced/expert      │
-│ ├── Category: KSA type or Company Value                 │
-│ ├── Tags: Technology, domain, skill keywords             │
-│ ├── Expected Answers: Ideal response guidelines         │
-│ ├── Red Flags: Warning signs in responses                │
-│ ├── Follow-up Probes: Deeper exploration questions      │
-│ └── Evaluation Criteria: Scoring guidelines             │
+│  🏢 Company Level: Job-Specific Questions                │
+│  └─ Each Job contains its own KSA Guidelines with        │
+│     embedded questions specific to that role/location    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────┐
+│        💼 JOB-SPECIFIC QUESTION INTEGRATION               │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Job: "Senior Software Engineer - Cloud Infrastructure" │
+│  Company: "Google - Mountain View"                       │
+│  Location: tenant-google/companies/google-mv/jobs/...   │
+│                                                         │
+│  📋 Embedded KSA Guideline:                               │
+│  ├─ guidelineId: "guid-senior-tech-001"                 │
+│  ├─ jobType: "technical"                                │
+│  └─ Contains:                                          │
+│                                                             │
+│    🔬 KNOWLEDGE Category                                  │
+│    ├─ Definition: "Technical concepts, theories..."      │
+│    ├─ Evaluation Scale: 1-10 scoring                    │
+│    └─ Questions:                                         │
+│       ├── Q1: "Explain CAP theorem"                      │
+│       ├── Q2: "How does Kubernetes networking work?"     │
+│       └─ ... (company-specific cloud questions)         │
+│                                                             │
+│    🛠️ SKILLS Category                                      │
+│    ├─ Definition: "Practical abilities, tools..."        │
+│    ├─ Evaluation Scale: 1-10 scoring                    │
+│    └─ Questions:                                         │
+│       ├── Q1: "Debug this Go code snippet"               │
+│       ├── Q2: "Design a scalable microservice"           │
+│       └─ ... (hands-on coding challenges)               │
+│                                                             │
+│    🧠 ABILITY Category                                     │
+│    ├─ Definition: "Problem-solving, leadership..."       │
+│    ├─ Evaluation Scale: 1-10 scoring                    │
+│    └─ Questions:                                         │
+│       ├── Q1: "Handle this production outage scenario"   │
+│       ├── Q2: "Explain your decision-making process"     │
+│       └─ ... (behavioral/situational questions)         │
+│                                                             │
+│    🏢 COMPANY VALUES (from tenant config)                │
+│    ├─ Innovation: Question about creative solutions      │
+│    ├─ Excellence: Quality standards examples             │
+│    ├─ Collaboration: Team conflict scenarios             │
+│    └─ Growth: Learning and mentorship experiences       │
+│                                                             │
+│  📊 Question Metadata (per question)                     │
+│  ├─ ID: Unique identifier within job                     │
+│  ├─ Text: Question content                               │
+│  ├─ Difficulty: basic/intermediate/advanced/expert      │
+│  ├─ Tags: [go, kubernetes, distributed-systems]         │
+│  ├─ Expected Answers: Ideal response guidelines         │
+│  ├─ Red Flags: Warning indicators in responses           │
+│  ├─ Follow-up Probes: Deeper exploration                │
+│  └─ Weight: Importance for scoring (1-100)              │
+│                                                             │
+└─────────────────────────────────────────────────────────┘
+
+🔄 Multi-Company Question Example:
+┌─────────────────────────────────────────────────────────┐
+│ Same Role, Different Companies (Same Tenant)              │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  "Senior SWE" at Google - Mountain View:                  │
+│  ├─ Knowledge: Questions about Google Cloud Platform      │
+│  ├─ Skills: Go, Borg, gRPC coding challenges             │
+│  └─ Values: Google-specific "10x innovation" examples    │
+│                                                         │
+│  "Senior SWE" at Google - Seattle:                        │
+│  ├─ Knowledge: Questions about Google Cloud Storage       │
+│  ├─ Skills: Go, Spanner, BigTable coding challenges      │
+│  └─ Values: Google-specific "customer obsession" examples│
+│                                                         │
+│  Framework shared, questions localized to company needs   │
 └─────────────────────────────────────────────────────────┘
 ```
 
