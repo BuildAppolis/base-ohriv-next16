@@ -221,6 +221,8 @@ export interface JobDocument extends RavenDocument {
       durationMinutes?: number;
     }>;
     guidelineId?: string; // Reference to evaluation guideline
+    ksaGuidelineId?: string; // Reference to KSA evaluation guideline
+    evaluationMappingId?: string; // Reference to job-specific KSA customizations
   };
 
   // Publishing and visibility
