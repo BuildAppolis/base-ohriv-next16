@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["dom", "dom.iterable", "es6"],
@@ -27,10 +27,7 @@
       }
     ]
   },
-  "include": [
-    "src/**/*",
-    "motia.config.ts"
-  ],
+  "include": ["src/**/*", "motia.config.ts"],
   "exclude": [
     "node_modules",
     "dist",

@@ -31,7 +31,9 @@
     "docker:db:cluster:start": "pnpm --filter @ohriv/database docker:cluster:start",
     "docker:db:cluster:stop": "pnpm --filter @ohriv/database docker:cluster:stop",
     "docker:db:prod": "pnpm --filter @ohriv/database docker:prod",
-    "docker:db:prod:deploy": "pnpm --filter @ohriv/database docker:prod:deploy"
+    "docker:db:prod:deploy": "pnpm --filter @ohriv/database docker:prod:deploy",
+    "docker:backend:dev": "pnpm --filter backend dev:docker",
+    "docker:backend:prod": "pnpm --filter backend prod:docker"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

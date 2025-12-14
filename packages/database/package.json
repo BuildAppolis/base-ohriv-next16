@@ -33,6 +33,7 @@
     "cluster:scale": "./scripts/cluster-manage.sh scale"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "ravendb": "^7.1.4"
   },
   "devDependencies": {

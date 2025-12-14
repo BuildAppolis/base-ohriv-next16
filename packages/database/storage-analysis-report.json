@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-12-14T04:29:57.312Z",
+  "testConfiguration": {
+    "ravendbUrl": "http://localhost:8080",
+    "databaseName": "ohriv-storage-test",
+    "testSizes": {
+      "small": {
+        "candidates": 50,
+        "applications": 100,
+        "evaluations": 200
+      },
+      "medium": {
+        "candidates": 500,
+        "applications": 1500,
+        "evaluations": 3000
+      },
+      "large": {
+        "candidates": 5000,
+        "applications": 20000,
+        "evaluations": 40000
+      }
+    }
+  },
+  "results": [
+    {
+      "size": "small",
+      "documents": {
+        "candidates": 50,
+        "applications": 100,
+        "evaluations": 200
+      },
+      "storage": {
+        "before": 14131200,
+        "after": 28360704,
+        "growth": 14229504
+      },
+      "generationTime": 537
+    },
+    {
+      "size": "medium",
+      "documents": {
+        "candidates": 500,
+        "applications": 1500,
+        "evaluations": 3000
+      },
+      "storage": {
+        "before": 28360704,
+        "after": 167903232,
+        "growth": 139542528
+      },
+      "generationTime": 5256
+    }
+  ],
+  "projections": {
+    "storagePerCandidate": 272.544,
+    "storagePerEvaluation": 45.424,
+    "monthlyGrowthPerActiveCandidate": 0.15969375
+  },
+  "costs": {
+    "storageCostPerGB": 0.023,
+    "monthlyCostPer500Candidates": 0.0029890594482421874,
+    "annualCostPer500Candidates": 0.03586871337890625
+  },
+  "insights": {
+    "avgEvalSize": 45.424,
+    "hasRecordings": false,
+    "costThreshold": "1000+ candidates"
+  }
+}

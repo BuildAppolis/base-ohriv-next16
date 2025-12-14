@@ -247,12 +247,40 @@ await withSession(async (session) => {
 });
 ```
 
-### Multi-Tenant Setup
+### Multi-Tenant Setup with TenantService
+
+```typescript
+import { TenantService } from '@ohriv/database';
+
+// Initialize the tenant service
+const tenantService = new TenantService();
+
+// Create a new tenant with isolated database
+const tenant = await tenantService.createTenant({
+  name: 'Healthcare Corp',
+  plan: 'standard',
+  ownerUserId: 'user-123',
+  ownerEmail: 'admin@healthcare.com',
+  ownerName: 'John Smith'
+});
+
+// Add users to tenant
+await tenantService.addUserToTenant(tenant.tenantId, {
+  userId: 'recruiter-456',
+  email: 'recruiter@healthcare.com',
+  name: 'Jane Doe'
+}, 'recruiter');
+
+// Get tenant's isolated database client
+const tenantClient = await tenantService.getTenantClient(tenant.tenantId);
+```
+
+### Advanced Multi-Tenant Setup
 
 ```typescript
 import { createDatabaseClient, clusterManager } from '@ohriv/database';
 
-class TenantService {
+class CustomTenantService {
   async createTenantDatabase(tenantId: string) {
     const config = clusterManager.getCurrentClusterConfig();
 

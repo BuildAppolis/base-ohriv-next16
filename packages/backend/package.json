@@ -4,12 +4,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "motia install",
-    "dev": "motia dev",
-    "dev:docker": "docker-compose -f docker-compose.dev.yml up --build",
-    "dev:docker:detached": "docker-compose -f docker-compose.dev.yml up --build -d",
-    "dev:docker:stop": "docker-compose -f docker-compose.dev.yml down",
-    "dev:docker:logs": "docker-compose -f docker-compose.dev.yml logs -f",
-    "start": "motia start",
+    "dev": "PORT=3001 motia dev --dev",
+    "dev:docker": "docker compose -f docker-compose.dev.yml up --build",
+    "dev:docker:detached": "docker compose -f docker-compose.dev.yml up --build -d",
+    "dev:docker:stop": "docker compose -f docker-compose.dev.yml down",
+    "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f",
+    "prod:docker": "docker compose -f docker-compose.prod.yml up --build",
+    "start": "PORT=3001 motia start",
     "generate-types": "motia generate-types",
     "build": "motia build",
     "clean": "rm -rf dist node_modules python_modules .motia .mermaid"
@@ -22,6 +23,7 @@
     "@motiadev/plugin-endpoint": "0.17.6-beta.187",
     "@motiadev/plugin-logs": "0.17.6-beta.187",
     "@motiadev/plugin-observability": "0.17.6-beta.187",
+    "@aws-sdk/client-lambda": "3.682.0",
     "motia": "0.17.6-beta.187",
     "zod": "4.1.12"
   },

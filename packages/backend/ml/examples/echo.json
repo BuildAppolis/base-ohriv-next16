@@ -1,0 +1,9 @@
+{
+  "description": "Smoke test: echoes the payload back from Lambda",
+  "code": "def execute(testData):\n    return {\n        \"success\": True,\n        \"message\": \"echo\",\n        \"input\": testData\n    }\n",
+  "testData": {
+    "features": [[1, 2], [3, 4]],
+    "labels": [0, 1],
+    "testFeatures": [[5, 6]]
+  }
+}
