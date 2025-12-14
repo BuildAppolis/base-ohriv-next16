@@ -1,0 +1,115 @@
+---
+- name: Manage RavenDB Cluster
+  hosts: prod-ravendb
+  become: yes
+
+  tasks:
+    - name: Get cluster status from all nodes
+      uri:
+        url: http://localhost:8080/admin/cluster/status
+        method: GET
+        timeout: 10
+      register: node_status
+      failed_when: false
+      changed_when: false
+
+    - name: Display cluster health
+      debug:
+        msg: |
+          Node {{ inventory_hostname }} Status:
+          - HTTP Status: {{ node_status.status }}
+          - Response: {{ node_status.json | default('No Response') }}
+
+- name: Update RavenDB cluster
+  hosts: prod-ravendb
+  serial: 1  # Update one node at a time
+  become: yes
+  vars:
+    update_strategy: rolling
+
+  tasks:
+    - name: Drain node before update
+      uri:
+        url: http://localhost:8080/admin/cluster/drain
+        method: POST
+        headers:
+          Content-Type: application/json
+        body_format: json
+        body:
+          nodeId: "{{ inventory_hostname }}"
+        status_code: 200
+      when: update_strategy == "rolling"
+      register: drain_result
+
+    - name: Wait for node to be drained
+      pause:
+        seconds: 30
+      when: update_strategy == "rolling" and drain_result.changed
+
+    - name: Pull latest RavenDB image
+      docker_image:
+        name: ravendb/ravendb:latest
+        source: pull
+
+    - name: Update RavenDB container
+      docker_service:
+        project_src: /opt/ravendb/config
+        state: present
+        restarted: yes
+
+    - name: Wait for node to be healthy
+      wait_for:
+        port: 8080
+        host: 127.0.0.1
+        delay: 30
+        timeout: 300
+
+    - name: Add node back to cluster
+      uri:
+        url: http://localhost:8080/admin/cluster/add-node
+        method: POST
+        headers:
+          Content-Type: application/json
+        body_format: json
+        body:
+          nodeId: "{{ inventory_hostname }}"
+          nodeUrl: "https://{{ ansible_host }}:8080"
+        status_code: 200
+      when: update_strategy == "rolling" and drain_result.changed
+
+- name: Backup all nodes
+  hosts: prod-ravendb
+  become: yes
+  vars:
+    backup_dir: "/backups/ravendb/{{ ansible_date_time.iso8601 }}"
+
+  tasks:
+    - name: Create backup directory
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create database backup
+      uri:
+        url: http://localhost:8080/admin/databases/{{ cluster_name }}/backup
+        method: POST
+        headers:
+          Content-Type: application/json
+        body_format: json
+        body:
+          BackupType: "Full"
+          DestinationPath: "{{ backup_dir }}"
+          IncrementalBackup: false
+        status_code: 202
+      register: backup_request
+
+    - name: Monitor backup progress
+      uri:
+        url: "http://localhost:8080/admin/operations/status/{{ backup_request.json.OperationId }}"
+        method: GET
+        timeout: 10
+      register: backup_status
+      until: backup_status.json.Status == "Completed" or backup_status.json.Status == "Faulted"
+      retries: 60
+      delay: 30

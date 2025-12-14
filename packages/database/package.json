@@ -25,7 +25,12 @@
     "docker:prod:stop": "./scripts/docker-prod.sh stop",
     "docker:prod:logs": "./scripts/docker-prod.sh logs",
     "docker:prod:status": "./scripts/docker-prod.sh status",
-    "docker:prod:update": "./scripts/docker-prod.sh update"
+    "docker:prod:update": "./scripts/docker-prod.sh update",
+    "cluster:deploy": "./scripts/cluster-manage.sh deploy",
+    "cluster:update": "./scripts/cluster-manage.sh update",
+    "cluster:backup": "./scripts/cluster-manage.sh backup",
+    "cluster:status": "./scripts/cluster-manage.sh status",
+    "cluster:scale": "./scripts/cluster-manage.sh scale"
   },
   "dependencies": {
     "ravendb": "^7.1.4"

@@ -1,0 +1,250 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ravendb
+  labels:
+    name: ravendb
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ravendb-setup
+  namespace: ravendb
+data:
+  setup.json: |
+    {
+      "License": {
+        "EulaAccepted": true
+      },
+      "Security": {
+        "UnsecuredAccessAllowed": "PrivateNetwork"
+      },
+      "Setup": {
+        "Mode": "Initial"
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-node-1
+  namespace: ravendb
+spec:
+  selector:
+    app: ravendb
+    node: "1"
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: tcp
+      port: 38888
+      targetPort: 38888
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-node-2
+  namespace: ravendb
+spec:
+  selector:
+    app: ravendb
+    node: "2"
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: tcp
+      port: 38888
+      targetPort: 38888
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-node-3
+  namespace: ravendb
+spec:
+  selector:
+    app: ravendb
+    node: "3"
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: tcp
+      port: 38888
+      targetPort: 38888
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-lb
+  namespace: ravendb
+spec:
+  selector:
+    app: ravendb
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+  loadBalancerIP: null  # Set your external IP here
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ravendb-cluster
+  namespace: ravendb
+spec:
+  serviceName: ravendb
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ravendb
+  template:
+    metadata:
+      labels:
+        app: ravendb
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - ravendb
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: ravendb
+        image: ravendb/ravendb:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 38888
+          name: tcp
+        env:
+        - name: RAVEN_Setup_Mode
+          value: "None"
+        - name: RAVEN_Security_UnsecuredAccessAllowed
+          value: "PrivateNetwork"
+        - name: RAVEN_License_Eula_Accepted
+          value: "true"
+        - name: RAVEN_DATA_DIR
+          value: "/opt/RavenDB/Server/RavenData"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: ravendb-data
+          mountPath: /opt/RavenDB/Server/RavenData
+        - name: ravendb-setup
+          mountPath: /opt/RavenDB/config/settings.json
+          subPath: settings.json
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+  volumeClaimTemplates:
+  - metadata:
+      name: ravendb-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "fast-ssd"  # Use encrypted storage class
+      resources:
+        requests:
+          storage: 50Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ravendb-setup-scripts
+  namespace: ravendb
+data:
+  setup-cluster.sh: |
+    #!/bin/bash
+    set -e
+
+    # Wait for all nodes to be ready
+    for i in {1..3}; do
+      echo "Waiting for ravendb-cluster-$i to be ready..."
+      kubectl wait --for=condition=ready pod ravendb-cluster-$i -n ravendb --timeout=300s
+    done
+
+    echo "Setting up RavenDB cluster..."
+
+    # Get node URLs
+    NODE_1_URL=$(kubectl get svc ravendb-node-1 -n ravendb -o jsonpath='{.spec.clusterIP}'):8080
+    NODE_2_URL=$(kubectl get svc ravendb-node-2 -n ravendb -o jsonpath='{.spec.clusterIP}'):8080
+    NODE_3_URL=$(kubectl get svc ravendb-node-3 -n ravendb -o jsonpath='{.spec.clusterIP}'):8080
+
+    echo "Node URLs:"
+    echo "Node 1: $NODE_1_URL"
+    echo "Node 2: $NODE_2_URL"
+    echo "Node 3: $NODE_3_URL"
+
+    # Configure cluster via first node
+    echo "Configuring cluster..."
+    curl -X POST http://$NODE_1_URL/admin/databases \
+      -H "Content-Type: application/json" \
+      -d '{
+        "DatabaseName": "ohriv-cluster",
+        "Settings": {
+          "Replication": {
+            "ReplicationFactor": 3,
+            "Nodes": [
+              "http://'$NODE_1_URL'",
+              "http://'$NODE_2_URL'",
+              "http://'$NODE_3_URL'"
+            ]
+          }
+        }
+      }'
+
+    echo "Cluster setup completed!"
+    echo "Access RavenDB Studio at: http://$NODE_1_URL"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ravendb-cluster-setup
+  namespace: ravendb
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: setup
+        image: curlimages/curl:latest
+        command:
+        - /bin/bash
+        - /scripts/setup-cluster.sh
+        volumeMounts:
+        - name: setup-scripts
+          mountPath: /scripts
+      volumes:
+      - name: setup-scripts
+        configMap:
+          name: ravendb-setup-scripts
+          defaultMode: 0755

@@ -1,0 +1,161 @@
+---
+- name: Deploy RavenDB Cluster
+  hosts: prod-ravendb
+  become: yes
+  vars:
+    raven_version: "7.1.4"
+    raven_data_dir: "/opt/ravendb/data"
+    raven_config_dir: "/opt/ravendb/config"
+    raven_logs_dir: "/opt/ravendb/logs"
+
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker
+      shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+        systemctl enable docker
+        systemctl start docker
+      args:
+        creates: /usr/bin/docker
+
+    - name: Install Docker Compose
+      shell: |
+        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+      args:
+        creates: /usr/local/bin/docker-compose
+
+    - name: Create RavenDB directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ raven_data_dir }}"
+        - "{{ raven_config_dir }}"
+        - "{{ raven_logs_dir }}"
+
+    - name: Setup encrypted data directory
+      block:
+        - name: Check if encryption is already set up
+          shell: "cryptsetup status {{ raven_data_dir }}_crypt"
+          register: encryption_status
+          failed_when: false
+          changed_when: false
+
+        - name: Create encrypted volume (if not encrypted)
+          shell: |
+            dd if=/dev/zero of={{ raven_data_dir }}.img bs=1M count=1024
+            echo "RAVENDB_ENCRYPTION_PASSWORD" | cryptsetup luksFormat {{ raven_data_dir }}.img -
+            echo "RAVENDB_ENCRYPTION_PASSWORD" | cryptsetup luksOpen {{ raven_data_dir }}.img {{ raven_data_dir }}_crypt
+            mkfs.ext4 /dev/mapper/{{ raven_data_dir }}_crypt
+            mount /dev/mapper/{{ raven_data_dir }}_crypt {{ raven_data_dir }}
+            echo '/dev/mapper/{{ raven_data_dir }}_crypt {{ raven_data_dir }} ext4 defaults 0 2' >> /etc/fstab
+          when: encryption_status.rc != 0
+      vars:
+        ansible_become_password: "{{ vault_raven_encryption_password }}"
+
+    - name: Install SSL certificates
+      copy:
+        content: "{{ vault_ssl_cert_content }}"
+        dest: "{{ raven_ssl_cert_path }}"
+        mode: '0644'
+      when: raven_ssl_cert_path is defined
+
+    - name: Install SSL private key
+      copy:
+        content: "{{ vault_ssl_key_content }}"
+        dest: "{{ raven_ssl_key_path }}"
+        mode: '0600'
+      when: raven_ssl_key_path is defined
+
+    - name: Create RavenDB environment file
+      template:
+        src: .env.prod.j2
+        dest: "{{ raven_config_dir }}/.env.prod"
+        mode: '0600'
+
+    - name: Create Docker Compose file
+      template:
+        src: docker-compose.prod.yml.j2
+        dest: "{{ raven_config_dir }}/docker-compose.yml"
+
+    - name: Start RavenDB container
+      docker_service:
+        project_src: "{{ raven_config_dir }}"
+        state: present
+        restarted: yes
+
+    - name: Wait for RavenDB to be healthy
+      wait_for:
+        port: 8080
+        host: 127.0.0.1
+        delay: 30
+        timeout: 300
+
+    - name: Setup monitoring
+      include_tasks: monitoring.yml
+      when: enable_monitoring | default(false)
+
+    - name: Setup backups
+      include_tasks: backup.yml
+      when: enable_backups | default(false)
+
+    - name: Setup log rotation
+      copy:
+        content: |
+          {{ raven_logs_dir }}/*.log {
+              daily
+              rotate 30
+              compress
+              delaycompress
+              missingok
+              notifempty
+              create 0644 ravendb ravendb
+              postrotate
+                  docker restart ravendb
+              endscript
+          }
+        dest: /etc/logrotate.d/ravendb
+
+- name: Configure RavenDB Cluster
+  hosts: prod-ravendb[0]
+  become: yes
+  tasks:
+    - name: Wait for primary node to be ready
+      uri:
+        url: http://localhost:8080
+        method: GET
+        timeout: 30
+      register: primary_ready
+      until: primary_ready.status == 200
+      retries: 10
+      delay: 10
+
+    - name: Get node URLs for cluster configuration
+      set_fact:
+        node_urls: "{{ groups['prod-ravendb'] | map('extract', hostvars) | map(attribute='ansible_host') | map('regex_replace', '^(.*)$', 'https://\\1:8080') | list }}"
+
+    - name: Configure cluster via RavenDB Studio API
+      uri:
+        url: http://localhost:8080/admin/databases
+        method: POST
+        headers:
+          Content-Type: application/json
+        body_format: json
+        body:
+          DatabaseName: "{{ raven_cluster_name }}"
+          Settings:
+            Replication:
+              ReplicationFactor: 3
+              Nodes: "{{ node_urls }}"
+        status_code: 201
+      register: cluster_config
+      retries: 5
+      delay: 10
