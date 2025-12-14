@@ -91,5 +91,31 @@
         }
       ]
     }
+  ],
+  "properties": [
+    {
+      "name": "container",
+      "description": "Custom container utility defined in globals.css"
+    },
+    {
+      "name": "animate-blob",
+      "description": "Blob animation utility"
+    },
+    {
+      "name": "animate-gradient-shift",
+      "description": "Gradient shifting animation"
+    },
+    {
+      "name": "animation-delay-2000",
+      "description": "Animation delay utility (2s)"
+    },
+    {
+      "name": "animation-delay-4000",
+      "description": "Animation delay utility (4s)"
+    },
+    {
+      "name": "no-visible-scrollbar",
+      "description": "Hide scrollbar utility"
+    }
   ]
 }

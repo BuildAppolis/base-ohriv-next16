@@ -1,7 +1,7 @@
 {
-  "name": "@ohriv/shared",
+  "name": "@ohriv/database",
   "version": "1.0.0",
-  "description": "Shared types, schemas, and utilities for Ohriv platform",
+  "description": "RavenDB database layer for Ohriv platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -11,8 +11,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "zod": "^4.1.13",
-    "date-fns": "^4.1.0"
+    "ravendb": "^7.1.4"
   },
   "devDependencies": {
     "typescript": "^5.5.3"
@@ -22,17 +21,13 @@
       "types": "./src/index.ts",
       "import": "./dist/index.js"
     },
+    "./client": {
+      "types": "./src/client.ts",
+      "import": "./dist/client.js"
+    },
     "./types": {
       "types": "./src/types/index.ts",
       "import": "./dist/types/index.js"
-    },
-    "./schemas": {
-      "types": "./src/schemas/index.ts",
-      "import": "./dist/schemas/index.js"
-    },
-    "./utils": {
-      "types": "./src/utils/index.ts",
-      "import": "./dist/utils/index.js"
     }
   }
 }

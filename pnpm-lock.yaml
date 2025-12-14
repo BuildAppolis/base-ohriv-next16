@@ -22,34 +22,44 @@ importers:
     dependencies:
       '@motiadev/core':
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+        version: 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       '@motiadev/plugin-endpoint':
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(monaco-editor@0.55.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
+        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(monaco-editor@0.55.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
       '@motiadev/plugin-logs':
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-browser@0.17.6-beta.187)(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
+        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-browser@0.17.6-beta.187)(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
       '@motiadev/plugin-observability':
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
+        version: 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))
       motia:
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
+        version: 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
       zod:
         specifier: 4.1.12
         version: 4.1.12
     devDependencies:
       '@motiadev/workbench':
         specifier: 0.17.6-beta.187
-        version: 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))
+        version: 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))
       '@types/react':
         specifier: 19.1.1
         version: 19.1.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@25.0.1)(typescript@5.7.3)
+        version: 10.9.2(@types/node@25.0.2)(typescript@5.7.3)
       typescript:
         specifier: 5.7.3
+        version: 5.7.3
+
+  packages/database:
+    dependencies:
+      ravendb:
+        specifier: ^7.1.4
+        version: 7.1.4
+    devDependencies:
+      typescript:
+        specifier: ^5.5.3
         version: 5.7.3
 
   packages/frontend:
@@ -246,6 +256,9 @@ importers:
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.1.17
@@ -255,7 +268,7 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: latest
-        version: 25.0.1
+        version: 25.0.2
       '@types/react':
         specifier: ^19
         version: 19.2.7
@@ -279,7 +292,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       eslint-config-next:
         specifier: 16.0.7
-        version: 16.0.7(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+        version: 16.0.7(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.1.17
@@ -2566,8 +2579,8 @@ packages:
   '@types/node@20.19.25':
     resolution: {integrity: sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==}
 
-  '@types/node@25.0.1':
-    resolution: {integrity: sha512-czWPzKIAXucn9PtsttxmumiQ9N0ok9FrBwgRWrwmVLlp86BrMExzvXRLFYRJ+Ex3g6yqj+KuaxfX1JTgV2lpfg==}
+  '@types/node@25.0.2':
+    resolution: {integrity: sha512-gWEkeiyYE4vqjON/+Obqcoeffmk0NF15WSBwSs7zwVA2bAbTaE0SJ7P0WNGoJn8uE7fiaV5a7dKYIJriEqOrmA==}
 
   '@types/prismjs@1.26.5':
     resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
@@ -2600,6 +2613,9 @@ packages:
 
   '@types/uuid@9.0.8':
     resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@types/yauzl@2.10.3':
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
@@ -3481,6 +3497,9 @@ packages:
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
+
+  date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
 
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
@@ -5373,6 +5392,10 @@ packages:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
 
+  ravendb@7.1.4:
+    resolution: {integrity: sha512-229KvRFYFERWi1rgCPFl/NKcs5eXBcQ8gvM6lfrGgss3TfYQIlVA8wuxHbnWCZ/re++l6qCshrNweh1jCx+xXA==}
+    engines: {node: '>=20.0.0'}
+
   raw-body@2.5.3:
     resolution: {integrity: sha512-s4VSOf6yN0rvbRZGxs8Om5CWj6seneMwK3oDb4lWDH0UPhWcxwOWw5+qk24bxq87szX1ydrwylIOp2uG1ojUpA==}
     engines: {node: '>= 0.8'}
@@ -5690,6 +5713,9 @@ packages:
 
   safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
+
+  safe-memory-cache@2.0.0:
+    resolution: {integrity: sha512-49YT3x2WpAQ5gYhYpHaZdOLJwqgePkbRpPZXHHzLtRObVJXkgyoAg74jvJA6r3KCeQYw8x09o9b5bQK3LPC1BA==}
 
   safe-push-apply@1.0.0:
     resolution: {integrity: sha512-iKE9w/Z7xCzUMIZqdBsp6pEQvwuEebH4vdpjcDWnyzaI6yl6O9FHvVpmGelvEHNsoY6wGblkxR6Zty/h00WiSA==}
@@ -6143,6 +6169,10 @@ packages:
 
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+
+  undici@6.22.0:
+    resolution: {integrity: sha512-hU/10obOIu62MGYjdskASR3CUAiYaFTtC9Pa6vHyf//mAipSvSQg6od2CnJswq7fvzNS3zJhxoRkgNVaHurWKw==}
+    engines: {node: '>=18.17'}
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
@@ -7159,12 +7189,12 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@inquirer/external-editor@1.0.3(@types/node@25.0.1)':
+  '@inquirer/external-editor@1.0.3(@types/node@25.0.2)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.1
     optionalDependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.2
 
   '@ioredis/commands@1.4.0': {}
 
@@ -7222,32 +7252,32 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
-  '@motiadev/adapter-bullmq-events@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))':
+  '@motiadev/adapter-bullmq-events@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       bullmq: 5.66.0
       ioredis: 5.8.2
       uuid: 11.1.0
     transitivePeerDependencies:
       - supports-color
 
-  '@motiadev/adapter-redis-cron@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))':
+  '@motiadev/adapter-redis-cron@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       redis: 5.10.0
       uuid: 11.1.0
 
-  '@motiadev/adapter-redis-state@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))':
+  '@motiadev/adapter-redis-state@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       redis: 5.10.0
 
-  '@motiadev/adapter-redis-streams@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))':
+  '@motiadev/adapter-redis-streams@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       redis: 5.10.0
 
-  '@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)':
+  '@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)':
     dependencies:
       '@amplitude/analytics-node': 1.5.27
       '@standard-schema/spec': 1.0.0
@@ -7259,7 +7289,7 @@ snapshots:
       node-cron: 3.0.3
       picocolors: 1.1.1
       redis: 5.10.0
-      ts-node: 10.9.2(@types/node@25.0.1)(typescript@5.7.3)
+      ts-node: 10.9.2(@types/node@25.0.2)(typescript@5.7.3)
       tsconfig-paths: 4.2.0
       tsx: 4.21.0
       uuid: 11.1.0
@@ -7274,7 +7304,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.9.3)':
+  '@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.9.3)':
     dependencies:
       '@amplitude/analytics-node': 1.5.27
       '@standard-schema/spec': 1.0.0
@@ -7286,7 +7316,7 @@ snapshots:
       node-cron: 3.0.3
       picocolors: 1.1.1
       redis: 5.10.0
-      ts-node: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
+      ts-node: 10.9.2(@types/node@25.0.2)(typescript@5.9.3)
       tsconfig-paths: 4.2.0
       tsx: 4.21.0
       uuid: 11.1.0
@@ -7301,16 +7331,16 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@motiadev/plugin-endpoint@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(monaco-editor@0.55.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
+  '@motiadev/plugin-endpoint@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(monaco-editor@0.55.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
     dependencies:
       '@monaco-editor/react': 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       '@motiadev/stream-client-react': 0.17.6-beta.187(react@19.2.0)
       '@motiadev/ui': 0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
       clsx: 2.1.1
       json-schema: 0.4.0
       lucide-react: 0.555.0(react@19.2.0)
-      motia: 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
+      motia: 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
       react: 19.2.0
       react-syntax-highlighter: 16.1.0(react@19.2.0)
       react18-json-view: 0.2.9(react@19.2.0)
@@ -7323,15 +7353,15 @@ snapshots:
       - react-dom
       - use-sync-external-store
 
-  '@motiadev/plugin-logs@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-browser@0.17.6-beta.187)(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
+  '@motiadev/plugin-logs@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-browser@0.17.6-beta.187)(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       '@motiadev/stream-client-browser': 0.17.6-beta.187
       '@motiadev/stream-client-react': 0.17.6-beta.187(react@19.2.0)
       '@motiadev/ui': 0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
       '@tanstack/react-virtual': 3.13.13(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       lucide-react: 0.555.0(react@19.2.0)
-      motia: 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
+      motia: 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
       react: 19.2.0
       react18-json-view: 0.2.9(react@19.2.0)
       zustand: 5.0.9(@types/react@19.1.1)(immer@11.0.1)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
@@ -7341,16 +7371,16 @@ snapshots:
       - react-dom
       - use-sync-external-store
 
-  '@motiadev/plugin-observability@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
+  '@motiadev/plugin-observability@0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))(@motiadev/stream-client-react@0.17.6-beta.187(react@19.2.0))(@motiadev/ui@0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)))(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)))(react-dom@19.2.0(react@19.2.0))(use-sync-external-store@1.6.0(react@19.2.0))':
     dependencies:
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       '@motiadev/stream-client-react': 0.17.6-beta.187(react@19.2.0)
       '@motiadev/ui': 0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
       '@radix-ui/react-popover': 1.1.15(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/react-virtual': 3.13.13(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       date-fns: 4.1.0
       lucide-react: 0.555.0(react@19.2.0)
-      motia: 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
+      motia: 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0))
       react: 19.2.0
       react18-json-view: 0.2.9(react@19.2.0)
       zustand: 5.0.9(@types/react@19.1.1)(immer@11.0.1)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
@@ -7409,15 +7439,15 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@motiadev/workbench@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))':
+  '@motiadev/workbench@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))':
     dependencies:
       '@monaco-editor/react': 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.9.3)
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.9.3)
       '@motiadev/stream-client-react': 0.17.6-beta.187(react@19.2.0)
       '@motiadev/ui': 0.17.6-beta.187(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
       '@radix-ui/react-tooltip': 1.2.8(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tailwindcss/postcss': 4.1.17
-      '@vitejs/plugin-react': 5.1.2(vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@vitejs/plugin-react': 5.1.2(vite@7.2.7(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
       '@xyflow/react': 12.10.0(@types/react@19.1.1)(immer@11.0.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       autoprefixer: 10.4.22(postcss@8.5.6)
       babel-plugin-react-compiler: 1.0.0
@@ -7438,7 +7468,7 @@ snapshots:
       tw-animate-css: 1.4.0
       typescript: 5.9.3
       typescript-eslint: 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      vite: 7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+      vite: 7.2.7(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
       zod: 4.1.13
       zustand: 5.0.9(@types/react@19.1.1)(immer@11.0.1)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
     transitivePeerDependencies:
@@ -9109,7 +9139,7 @@ snapshots:
 
   '@types/jsdom@27.0.0':
     dependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.2
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -9131,7 +9161,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@25.0.1':
+  '@types/node@25.0.2':
     dependencies:
       undici-types: 7.16.0
 
@@ -9167,6 +9197,10 @@ snapshots:
 
   '@types/uuid@9.0.8': {}
 
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 20.19.25
+
   '@types/yauzl@2.10.3':
     dependencies:
       '@types/node': 20.19.25
@@ -9174,10 +9208,10 @@ snapshots:
 
   '@types/zen-observable@0.8.3': {}
 
-  '@typescript-eslint/eslint-plugin@8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.7.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 8.48.1
       '@typescript-eslint/type-utils': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/utils': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
@@ -9191,18 +9225,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.7.3)':
-    dependencies:
-      '@typescript-eslint/scope-manager': 8.48.1
-      '@typescript-eslint/types': 8.48.1
-      '@typescript-eslint/typescript-estree': 8.48.1(typescript@5.7.3)
-      '@typescript-eslint/visitor-keys': 8.48.1
-      debug: 4.4.3
-      eslint: 9.39.1(jiti@2.6.1)
-      typescript: 5.7.3
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.48.1
@@ -9212,15 +9234,6 @@ snapshots:
       debug: 4.4.3
       eslint: 9.39.1(jiti@2.6.1)
       typescript: 5.9.3
-    transitivePeerDependencies:
-      - supports-color
-
-  '@typescript-eslint/project-service@8.48.1(typescript@5.7.3)':
-    dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.48.1(typescript@5.7.3)
-      '@typescript-eslint/types': 8.48.1
-      debug: 4.4.3
-      typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -9237,10 +9250,6 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.48.1
       '@typescript-eslint/visitor-keys': 8.48.1
-
-  '@typescript-eslint/tsconfig-utils@8.48.1(typescript@5.7.3)':
-    dependencies:
-      typescript: 5.7.3
 
   '@typescript-eslint/tsconfig-utils@8.48.1(typescript@5.9.3)':
     dependencies:
@@ -9259,21 +9268,6 @@ snapshots:
       - supports-color
 
   '@typescript-eslint/types@8.48.1': {}
-
-  '@typescript-eslint/typescript-estree@8.48.1(typescript@5.7.3)':
-    dependencies:
-      '@typescript-eslint/project-service': 8.48.1(typescript@5.7.3)
-      '@typescript-eslint/tsconfig-utils': 8.48.1(typescript@5.7.3)
-      '@typescript-eslint/types': 8.48.1
-      '@typescript-eslint/visitor-keys': 8.48.1
-      debug: 4.4.3
-      minimatch: 9.0.5
-      semver: 7.7.3
-      tinyglobby: 0.2.15
-      ts-api-utils: 2.1.0(typescript@5.7.3)
-      typescript: 5.7.3
-    transitivePeerDependencies:
-      - supports-color
 
   '@typescript-eslint/typescript-estree@8.48.1(typescript@5.9.3)':
     dependencies:
@@ -9382,7 +9376,7 @@ snapshots:
 
   '@vercel/oidc@3.0.5': {}
 
-  '@vitejs/plugin-react@5.1.2(vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))':
+  '@vitejs/plugin-react@5.1.2(vite@7.2.7(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -9390,7 +9384,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.53
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+      vite: 7.2.7(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10207,6 +10201,8 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
+  date-fns@3.6.0: {}
+
   date-fns@4.1.0: {}
 
   dayjs@1.11.19: {}
@@ -10510,13 +10506,13 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-next@16.0.7(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
+  eslint-config-next@16.0.7(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@next/eslint-plugin-next': 16.0.7
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.1(jiti@2.6.1))
@@ -10538,7 +10534,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -10549,21 +10545,22 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+      '@typescript-eslint/parser': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -10574,7 +10571,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -10585,6 +10582,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -11243,9 +11242,9 @@ snapshots:
 
   inline-style-parser@0.2.7: {}
 
-  inquirer@8.2.7(@types/node@25.0.1):
+  inquirer@8.2.7(@types/node@25.0.2):
     dependencies:
-      '@inquirer/external-editor': 1.0.3(@types/node@25.0.1)
+      '@inquirer/external-editor': 1.0.3(@types/node@25.0.2)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -12198,16 +12197,16 @@ snapshots:
       dompurify: 3.2.7
       marked: 14.0.0
 
-  motia@0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)):
+  motia@0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(typescript@5.7.3)(use-sync-external-store@1.6.0(react@19.2.0)):
     dependencies:
       '@amplitude/analytics-node': 1.5.27
-      '@motiadev/adapter-bullmq-events': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))
-      '@motiadev/adapter-redis-cron': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))
-      '@motiadev/adapter-redis-state': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))
-      '@motiadev/adapter-redis-streams': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3))
-      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.1)(redis@5.10.0)(typescript@5.7.3)
+      '@motiadev/adapter-bullmq-events': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))
+      '@motiadev/adapter-redis-cron': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))
+      '@motiadev/adapter-redis-state': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))
+      '@motiadev/adapter-redis-streams': 0.17.6-beta.187(@motiadev/core@0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3))
+      '@motiadev/core': 0.17.6-beta.187(@types/node@25.0.2)(redis@5.10.0)(typescript@5.7.3)
       '@motiadev/stream-client-node': 0.17.6-beta.187
-      '@motiadev/workbench': 0.17.6-beta.187(@types/node@25.0.1)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))
+      '@motiadev/workbench': 0.17.6-beta.187(@types/node@25.0.2)(@types/react-dom@19.2.3(@types/react@19.1.1))(@types/react@19.1.1)(eslint@9.39.1(jiti@2.6.1))(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(monaco-editor@0.55.1)(redis@5.10.0)(tsx@4.21.0)(use-sync-external-store@1.6.0(react@19.2.0))
       antlr4ts: 0.5.0-alpha.4
       archiver: 7.0.1
       axios: 1.13.2
@@ -12218,7 +12217,7 @@ snapshots:
       esbuild: 0.25.12
       express: 4.22.1
       glob: 11.1.0
-      inquirer: 8.2.7(@types/node@25.0.1)
+      inquirer: 8.2.7(@types/node@25.0.2)
       jiti: 2.6.1
       node-cron: 3.0.3
       picocolors: 1.1.1
@@ -12226,7 +12225,7 @@ snapshots:
       redis: 5.10.0
       redis-memory-server: 0.14.0
       table: 6.9.0
-      ts-node: 10.9.2(@types/node@25.0.1)(typescript@5.7.3)
+      ts-node: 10.9.2(@types/node@25.0.2)(typescript@5.7.3)
       tsx: 4.21.0
       zod: 4.1.13
     transitivePeerDependencies:
@@ -12661,6 +12660,20 @@ snapshots:
       '@types/react-dom': 19.2.3(@types/react@19.2.7)
 
   range-parser@1.2.1: {}
+
+  ravendb@7.1.4:
+    dependencies:
+      '@types/node': 20.19.25
+      '@types/ws': 8.18.1
+      date-fns: 3.6.0
+      safe-memory-cache: 2.0.0
+      undici: 6.22.0
+      ws: 8.18.3
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu': 4.53.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   raw-body@2.5.3:
     dependencies:
@@ -13107,6 +13120,8 @@ snapshots:
   safe-buffer@5.1.2: {}
 
   safe-buffer@5.2.1: {}
+
+  safe-memory-cache@2.0.0: {}
 
   safe-push-apply@1.0.0:
     dependencies:
@@ -13585,24 +13600,20 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-api-utils@2.1.0(typescript@5.7.3):
-    dependencies:
-      typescript: 5.7.3
-
   ts-api-utils@2.1.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
 
   ts-dedent@2.2.0: {}
 
-  ts-node@10.9.2(@types/node@25.0.1)(typescript@5.7.3):
+  ts-node@10.9.2(@types/node@25.0.2)(typescript@5.7.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 25.0.1
+      '@types/node': 25.0.2
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -13613,14 +13624,14 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  ts-node@10.9.2(@types/node@25.0.1)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@25.0.2)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 25.0.1
+      '@types/node': 25.0.2
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -13701,7 +13712,7 @@ snapshots:
 
   typescript-eslint@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.7.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/parser': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/typescript-estree': 8.48.1(typescript@5.9.3)
       '@typescript-eslint/utils': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
@@ -13728,6 +13739,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici-types@7.16.0: {}
+
+  undici@6.22.0: {}
 
   unified@11.0.5:
     dependencies:
@@ -13901,7 +13914,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0):
+  vite@7.2.7(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -13910,7 +13923,7 @@ snapshots:
       rollup: 4.53.3
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.2
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.2

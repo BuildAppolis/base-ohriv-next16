@@ -12,7 +12,7 @@
     "dev:back": "pnpm --filter backend dev",
     "dev:backend": "pnpm --filter backend dev",
     "dev:all": "concurrently \"pnpm dev:front\" \"pnpm dev:back\"",
-    "build": "pnpm --filter shared build && pnpm --filter @ohriv/frontend build",
+    "build": "pnpm --filter shared build && pnpm --filter @ohriv/database build && pnpm --filter @ohriv/frontend build",
     "build:backend": "pnpm --filter backend build",
     "build:all": "pnpm build && pnpm build:backend",
     "start": "pnpm --filter @ohriv/frontend start",

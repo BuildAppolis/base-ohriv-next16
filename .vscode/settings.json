@@ -1,8 +1,8 @@
 {
   "npm.packageManager": "pnpm",
-  "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.workspaceSymbols.scope": "allOpenProjects",
@@ -35,15 +35,34 @@
   },
   "editor.formatOnSaveMode": "file",
   "css.customData": [".vscode/tailwind.json"],
-  "tailwindCSS.experimental.configFile": "./src/styles/globals.css",
+  "tailwindCSS.experimental.classRegex": [
+    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["tw\\`([^`]*)\\)", "([^`]*)"],
+    ["tw=\"([^\"]*)\"", "([^\"]*)"]
+  ],
   "tailwindCSS.includeLanguages": {
-    "plaintext": "html"
+    "typescript": "html",
+    "typescriptreact": "html",
+    "javascript": "html",
+    "javascriptreact": "html"
   },
   "tailwindCSS.files.exclude": [
     "**/.git/**",
     "**/node_modules/**",
     "**/.hg/**",
-    "**/.svn/**"
+    "**/.svn/**",
+    "**/dist/**",
+    "**/.next/**"
+  ],
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass"
+  ],
+  "tailwindCSS.experimental.workspaceFiletypes": [
+    "css"
   ],
   "typescript.preferences.exclude": [
     "**/types.d.ts",

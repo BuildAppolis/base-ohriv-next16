@@ -7,6 +7,13 @@ import { Badge } from '@/components/ui/badge'
 import { jobTypeWeightingPresets } from '@/types/latest/presets/weighting'
 import type { JobType, WeightingBand } from '@/types/latest/evaluation-guideline'
 import KSAV_SliderGroup, { SliderData } from '@/components/buildappolis/ksa-slider'
+import { Company, TestCompany } from '@ohriv/shared'
+
+// Test - should work without rebuilding shared package!
+const testCompany: Company = {} as any
+const testCompanyWithDev: TestCompany = {
+  developmentMode: true
+} as any
 
 const tailoredBuckets = [
   { label: 'Unable to perform job duties', helper: '1-2' },

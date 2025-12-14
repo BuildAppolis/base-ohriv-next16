@@ -22,7 +22,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ohriv/shared": ["../shared/src"],
+      "@ohriv/shared/*": ["../shared/src/*"]
     }
   },
   "include": [
