@@ -165,49 +165,61 @@
 
 ## 🔐 **3. Authentication & Access Control**
 
-### **User Authentication Flow:**
+### **Hybrid Authentication Architecture:**
 ```
-🔑 User Login Process
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  User Enters    │    │   Auth Database   │    │  Global Directory│
-│  Email/Password │───▶│  Verify Credentials│───▶│  Get User Profile │
-│                 │    │  + MFA Check      │    │  + Tenant Access │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+🔑 User Authentication Flow (Stack Auth + Global Directory)
+┌─────────────────┐    ┌──────────────────┐    ┌───────────────────┐
+│ Stack Auth      │    │   Backend API    │    │  Global Directory │
+│ (Frontend)      │───▶│  Validate JWT   │───▶│  Lookup User ID   │
+│ • Login/Signup  │    │  Extract userId  │    │  + Tenant Access  │
+│ • Session Mgmt  │    │  Forward Profile │    │  + Role Mapping   │
+│ • Passwords     │    │  Create Session  │    │  + Company Access │
+└─────────────────┘    └──────────────────┘    └───────────────────┘
           │                           │                           │
           ▼                           ▼                           ▼
-    🎫 Create Session           🏢 Return Tenants          👤 Return User Info
-    📱 Store in Database         💼 Role Permissions          🏥 Default Company
+    🔒 JWT Token               🎫 Backend Session        🏢 Tenant Context
+    (Stack Auth)              (Motia)                 (Access Control)
           │                           │                           │
           ▼                           ▼                           ▼
     ┌─────────────────────────────────────────────────────────────────┐
-    │                    🎯 Access Granted                           │
-    │  User can now access their tenant(s) and companies              │
+    │                    🎯 Authorized Access                        │
+    │          Frontend JWT + Backend Tenant/Role Session             │ 
     └─────────────────────────────────────────────────────────────────┘
 ```
 
-### **Cross-Tenant User Scenario:**
-```
-👤 Sarah Chen works for multiple tech companies as a contract engineer
+### **Authentication Responsibilities:**
+- **Stack Auth (Frontend)**: User authentication, password management, session cookies
+- **Global Directory (Backend)**: User identity mapping, tenant memberships, role assignments
+- **Per-Tenant DB**: Company-specific access, resource permissions, audit trails
 
-🔑 Login: sarah.chen@techcontractor.com
-│
-├── 🏢 Tenant 1: "Google LLC"
+### **Cross-Tenant User Flow:**
+```
+👤 Sarah logs in via Stack Auth → Receives JWT token
+
+🔑 Authentication Stack:
+├── Frontend: Stack Auth validates credentials, issues JWT
+├── API Call: Frontend sends JWT + profile to backend
+├── Backend: Validates JWT, extracts userId
+└── Directory Lookup: userId → tenant memberships
+
+🏢 Multi-Tenant Access:
+├── 🏢 Tenant 1: "Google LLC" (userId: google-sarah-123)
 │   ├── Role: "Contract Software Engineer"
 │   ├── Companies: ["Google - Mountain View", "Google Cloud - Seattle"]
-│   ├── Access: Can review technical candidates, conduct interviews
-│   └── Hours: 30 hrs/week
+│   ├── Access: Review technical candidates, conduct interviews
+│   └── Permissions: JWT + tenant-scoped session
 │
-├── 🏢 Tenant 2: "Meta Platforms"
+├── 🏢 Tenant 2: "Meta Platforms" (userId: meta-sarah-456)
 │   ├── Role: "Technical Interviewer"
 │   ├── Companies: ["Meta - Menlo Park", "WhatsApp - Mountain View"]
-│   ├── Access: Can evaluate system design interviews, assess coding skills
-│   └── Hours: 10 hrs/week
+│   ├── Access: System design interviews, coding assessments
+│   └── Permissions: JWT + tenant-scoped session
 │
-└── 🏢 Tenant 3: "Andela Talent Solutions"
+└── 🏢 Tenant 3: "Andela Talent Solutions" (userId: andela-sarah-789)
     ├── Role: "Technical Assessor"
     ├── Companies: ["Andela - Remote", "Client Screening Teams"]
-    ├── Access: Remote candidate technical assessments, skill evaluations
-    └── Hours: 20 hrs/week
+    ├── Access: Remote assessments, skill evaluations
+    └── Permissions: JWT + tenant-scoped session
 ```
 
 ### **Cross-Tenant Partner Scenario:**
@@ -345,18 +357,14 @@
 
 5. 🤖 ML Prediction Analysis (When Sufficient Data Available)
    ├── Platform Config: Google's custom ML algorithms enabled
-   ├── Predictive Models Used:
-   │   ├── Model ID: "ml-weighted-avg-001" - "Historical Performance Weighted Average"
-   │   ├── Model ID: "ml-log-reg-002" - "Logistic Regression Success Predictor"
-   │   └── Model ID: "ml-qwk-003" - "Quadratic Weighted Kappa Score Calculator"
    ├── Prediction Output for Sarah Chen:
-   │   ├── Weighted Average: 88.5/100
-   │   ├── Success Probability: 92%
-   │   ├── QWK Score: 0.87 (Strong agreement)
-   │   ├── Risk Factors: ["Limited cloud security experience"]
-   │   └── Strengths: ["Strong system design", "Clean coding practices"]
-   ├── Historical Comparison: "Similar to successful hires at 85th percentile"
-   └── Confidence Interval: 89-95% success probability
+   │   ├── Predicted Score: 7.2/10
+   │   ├── Success Probability: 78%
+   │   ├── Recommendation: CONSIDER
+   │   ├── Confidence: 85% (Based on 47 similar evaluations)
+   │   └── Early Warning: None (Performance above threshold)
+   ├── Historical Comparison: "Similar to successful hires at 75th percentile"
+   └── Note: Predictions assist evaluators without replacing judgment
 
 6. 📊 Final Evaluation Summary
    ├── Overall KSA Score: 8.3/10 (Weighted across all stages)
@@ -389,17 +397,21 @@
 │ └── ⚖️ Weighting: Dynamic weighting based on job level     │
 │                                                         │
 │ 🏢 Company Values Evaluation                               │
-│ ├── Innovation: Creative thinking, risk-taking            │
-│ ├── Excellence: Quality standards, continuous improvement │
-│ ├── Collaboration: Teamwork, communication, influence       │
-│ └── Growth: Learning, mentorship, adaptability             │
+│ ├── Default Values: Innovation, Excellence, Collaboration, Growth │
+│ ├── Custom Values: Tenant-defined company-specific values   │
+│ ├── Dynamic Loading: Values loaded from tenant configuration │
+│ └── Cultural Fit: Scoring based on company's unique values   │
 │                                                         │
 │ 📊 Evaluation Stages                                        │
-│ ├── Stage 1: Initial Screening (Basic questions)          │
-│ ├── Stage 2: Technical Assessment (Intermediate)           │
-│ ├── Stage 3: System Design (Advanced questions)            │
-│ ├── Stage 4: Leadership/Cultural Fit (Expert level)       │
-│ └── Custom Stages: Company-defined evaluation stages      │
+│ ├── System Stages (Fixed, cannot be deleted):                │
+│ │   ├── Stage 1: Recruiter Screen (Order: 1)               │
+│ │   ├── Stage 2: Hiring Manager Interview (Order: 2)       │
+│ │   └── Stage 3: Final Interview (Order: 3)                │
+│ ├── Custom Stages: Company-defined additional stages       │
+│ │   ├── Flexible ordering after system stages              │
+│ │   ├── Company/Location specific templates                │
+│ │   └── Configurable per tenant requirements                │
+│ └── Stage Templates: Pre-defined patterns for quick setup   │
 └─────────────────────────────────────────────────────────┘
           │
           ▼
@@ -475,90 +487,156 @@ Stage 2 → Knowledge:8, Skills:9, Ability:8, Values:8 → Advance ✅
 Stage 3 → Knowledge:9, Skills:8, Ability:9, Values:9 → Advance ✅
 Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 
-🤖 ML Predictions (After Stage 2+):
-├── Weighted Average: 88.5/100
-├── Success Probability: 92%
-├── QWK Score: 0.87 (Strong evaluator agreement)
-├── Risk Factors: Limited cloud security experience
-├── Strengths: Strong system design, clean coding
-└── Historical Match: Similar to top 15% of successful hires
+🤖 ML Predictions (After Stage 1+ - When sufficient data exists):
+├── Simplified Display (No algorithm exposure):
+│   ├── Predicted Score: 7.2/10
+│   ├── Success Probability: 78%
+│   ├── Recommendation: CONSIDER
+│   ├── Confidence: 85% (Based on 47 similar evaluations)
+│   └── Early Warning: None (Performance above threshold)
+├── Backend Processing (Not shown to evaluators):
+│   ├── Weighted Average: Combined KSA & Values scores
+│   ├── Logistic Regression: Success probability prediction
+│   └── QWK Score: Evaluator agreement quality (when applicable)
+└── Purpose: Assist evaluators without replacing judgment
+```
+
+### **Real-World Evaluation Scenario: Bad Candidate**
+```
+🎯 Google Hiring Senior Software Engineer
+
+📋 Job Configuration:
+├── Role: Senior Software Engineer
+├── Weighting Preset: "senior" (Knowledge: 22, Skills: 50, Ability: 28)
+├── Evaluation Stages: 4 stages
+├── KSA Guideline: Technical position (jobType: "technical")
+├── Company Values: ["Innovation", "Excellence", "Collaboration", "Growth"]
+└── ML Models: Google's custom algorithm set
+
+👥 Evaluation Team:
+├── Phone Screen: alex.recruiter@google.com
+├── Technical Interview: jane.smith.eng@google.com
+├── System Design: mike.johnson.staff@google.com
+├── Final Interview: director.eng@google.com
+└── Calibrators: hr.analytics@google.com (Quality control)
+
+📊 Candidate Journey (Mark Thompson):
+
+   **Stage 1: Phone Screen**
+   ├── Evaluator: alex.recruiter@google.com
+   ├── KSA Scoring:
+   │   ├── Knowledge: 3/10 (Could not explain basic OOP, confused REST vs GraphQL)
+   │   ├── Skills: 4/10 (Took 20+ minutes for simple "reverse string" problem)
+   │   └── Ability: 3/10 (Poor communication, blamed previous team)
+   ├── Company Values Score: 4/10 (Spoke negatively about past employers)
+   ├── Questions Asked: 2/5 screening questions (unable to answer 3)
+   └── Decision: "Borderline - proceed to technical with reservations"
+
+   **Stage 2: Technical Interview**
+   ├── Evaluator: jane.smith.eng@google.com (Senior Engineer)
+   ├── KSA Scoring:
+   │   ├── Knowledge: 3/10 (No understanding of Big O notation, confused basic data structures)
+   │   ├── Skills: 3/10 (Failed to implement binary search after 45 minutes, messy code)
+   │   └── Ability: 2/10 (Gave up early, said "this is impossible")
+   ├── Company Values Score: 3/10 (Poor collaboration, resistant to feedback)
+   ├── Questions Asked: 1/4 technical questions (only answered one partially)
+   ├── Coding Assessment: "Unable to complete basic implementation"
+   └── Decision: "Reject - Does not meet minimum requirements"
+
+🤖 ML Predictions (After Stage 1):
+├── Simplified Display:
+│   ├── Predicted Score: 3.5/10
+│   ├── Success Probability: 12%
+│   ├── Recommendation: DO NOT HIRE
+│   ├── Confidence: 73% (Based on 31 similar evaluations)
+│   └── Early Warning: ⚠️ Technical skills below minimum threshold
+├── Backend Processing:
+│   ├── Weighted Average: (3×0.22)+(4×0.50)+(3×0.28) = 3.38
+│   ├── Logistic Regression: 0.08 probability of success
+│   └── Risk Factors: Knowledge gap >2std, Limited practical experience
+└── Recommendation: Terminate process after Stage 2
+
+## Key Failure Indicators:
+
+### Stage 1 (Phone Screen - 30 minutes):
+- **Technical Knowledge**: Confused basic OOP concepts, couldn't explain REST vs GraphQL
+- **Problem Solving**: Took 20+ minutes for a simple "reverse string" problem
+- **Experience**: 2 years at startup, but couldn't discuss architecture decisions
+- **Red Flags**: Blamed team for failed projects, spoke negatively about previous employer
+
+### Stage 2 (Technical Interview - 60 minutes):
+- **Coding Challenge**: Failed to implement binary search after 45 minutes
+- **Data Structures**: Couldn't identify when to use hash map vs array
+- **Optimization**: No understanding of Big O notation
+- **Code Quality**: Messy solution, multiple syntax errors
+- **Communication**: Gave up early, said "this is impossible"
+
+## Detailed Evaluator Comments:
+
+### Alex (Recruiter):
+> "Candidate struggled with fundamental concepts. Even after hints, couldn't explain basic algorithms. Not suitable for senior role."
+
+### Jane (Technical Interviewer):
+> "Complete inability to write clean code. Failed to complete a medium-easy problem despite multiple prompts. No understanding of optimization or best practices."
+
+### ML Risk Analysis:
+- **Knowledge Gap**: 2.3 standard deviations below mean
+- **Skill Mismatch**: Junior-level performance for senior position
+- **Red Flag Count**: 8 (threshold: 5 triggers rejection)
+- **Hiring Cost Risk**: $127K estimated (training, potential replacement)
+- **Team Impact Risk**: High - would require significant mentorship
+
+## Final Decision:
+**REJECT** - Candidate does not meet minimum qualifications for Senior Software Engineer position. Recommend consideration for junior roles after 6-12 months of additional training and experience.
+```
 ```
 
 ### **ML Prediction System Architecture:**
 ```
-🧠 Machine Learning Pipeline
+🧠 Simplified ML Pipeline for Evaluation Support
 ┌─────────────────────────────────────────────────────────┐
-│                📊 DATA COLLECTION                       │
+│                📊 DATA INGESTION                         │
 ├─────────────────────────────────────────────────────────┤
-│ 🔢 Input Features                                        │
-│ ├── KSA Scores: Knowledge, Skills, Ability (1-10 scale)    │
-│ ├── Company Values: Value alignment scores (1-10)         │
-│ ├── Stage Performance: Progression through stages        │
-│ ├── Evaluator Metadata: Role, experience, calibration     │
-│ ├── Job Characteristics: Level, department, requirements    │
-│ ├── Candidate Profile: Experience, education, skills      │
-│ └── Historical Data: Past hiring outcomes, performance     │
-│                                                         │
-│ 📋 Feature Engineering                                   │
-│ ├── Normalization: Standardized score ranges            │
-│ ├── Weighting: Job-level specific weight application      │
-│ ├── Aggregation: Multi-stage score combination          │
-│ ├── Temporal: Time-based performance trends              │
-│ └── Categorical: One-hot encoding for qualitative data   │
+│ 🔍 Trigger: After Stage 1 completion (when data exists)   │
+│ ├── Minimum Data: 10+ historical evaluations             │
+│ ├── KSA Scores: Current stage Knowledge, Skills, Ability   │
+│ ├── Company Values: Cultural fit scores                  │
+│ ├── Job Context: Role level, department, requirements     │
+│ └── Historical Data: Past candidate outcomes             │
 └─────────────────────────────────────────────────────────┘
           │
           ▼
 ┌─────────────────────────────────────────────────────────┐
-│                🤖 MODEL TRAINING                         │
+│            🤖 PREDICTION PROCESSING                       │
 ├─────────────────────────────────────────────────────────┤
-│ 📊 Model Types                                           │
-│ ├── Weighted Average Model: Historical performance       │
-│ │   ├── Feature: Weighted KSA + Values scores             │
-│ │   ├── Output: Success probability (0-1)               │
-│ │   └── Training: Logistic regression on historical data│
+│ 📊 Algorithm Execution (Internal - Not Exposed)           │
+│ ├── Weighted Average: Baseline scoring from historical data│
+│ ├── Logistic Regression: Success probability (scikit-learn)│
+│ └── QWK Calculator: Inter-rater reliability (if applicable)│
 │                                                         │
-│ ├── Logistic Regression Model: Success prediction        │
-│ │   ├── Features: Multi-dimensional candidate profile   │
-│ │   ├── Output: Binary classification (hire/no-hire)     │
-│ │   └── Training: Maximum likelihood estimation          │
-│                                                         │
-│ └── QWK Model: Evaluator agreement quality                 │
-│     ├── Features: Inter-evaluator score differences     │
-│     ├── Output: Quadratic weighted kappa coefficient     │
-│     └── Training: Statistical optimization               │
-│                                                         │
-│ 🔧 Model Configuration                                   │
-│ ├── Platform Defaults: Base models for all tenants       │
-│ ├── Tenant Customization: Models trained on tenant data  │
-│ ├── Company Specific: Models for company culture fit     │
-│ └── Continuous Learning: Model updates with new data      │
+│ 🎯 Ensemble Combination                                  │
+│ ├── Dynamic Weighting: Based on data availability         │
+│ ├── Confidence Calculation: Statistical certainty         │
+│ └── Early Warning Detection: Performance thresholds       │
 └─────────────────────────────────────────────────────────┘
           │
           ▼
 ┌─────────────────────────────────────────────────────────┐
-│              📈 PREDICTION OUTPUT                          │
+│              📱 EVALUATOR INTERFACE                      │
 ├─────────────────────────────────────────────────────────┤
-│ 📊 Scorecard Components                                    │
-│ ├── Overall Score: Weighted average (0-100)             │
-│ ├── Success Probability: Likelihood of success (%)       │
-│ ├── Confidence Interval: Prediction reliability range     │
-│ ├── Risk Analysis: Potential failure indicators          │
-│ ├── Strengths: Key positive attributes                   │
-│ ├── Development Areas: Areas needing improvement          │
-│ └── Historical Comparison: Similar past candidates        │
+│ 🎯 Simple, Clear Display (No technical details)          │
+│ ├── Predicted Score: 0-10 scale                           │
+│ ├── Success Probability: Percentage with confidence       │
+│ ├── Recommendation: HIRE/CONSIDER/REJECT                  │
+│ ├── Data Basis: "Based on X similar evaluations"         │
+│ └── Early Warning: Alert if below threshold              │
 │                                                         │
-│ 🎯 Decision Support                                        │
-│ ├── Hire Recommendation: Hire/No-Hire/Maybe              │
-│ ├── Evaluator Feedback: Calibration suggestions         │
-│ ├── Stage Predictions: Likelihood of passing next stage  │
-│ └── Benchmark Comparison: vs. company average           │
-│                                                         │
-│ 📚 Model Metadata                                        │
-│ ├── Model ID: Unique identifier for prediction model     │
-│ ├── Model Name: Human-readable algorithm name           │
-│ ├── Version: Model version number                        │
-│ ├── Accuracy: Historical accuracy percentage              │
-│ └── Last Trained: Date of last model update             │
+│ ⚠️ Design Principles                                      │
+│ • Assist, don't replace human judgment                    │
+│ • Show confidence levels clearly                          │
+│ • No algorithm complexity exposed                        │
+│ • Early warnings for poor performers                     │
+│ • Historical context for decision support                 │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -605,6 +683,50 @@ Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 │ └── Evaluation Criteria: Scoring guidelines             │
 └─────────────────────────────────────────────────────────┘
 ```
+
+---
+
+#### 2. Prediction Display Design
+
+```
+┌─────────────────────────────────────────────────────┐
+│ 🧠 AI-Powered Insights          [Confidence: 85%]   │
+│ Predictive analytics to support your evaluation    │
+├─────────────────────────────────────────────────────┤
+│  Predicted Score    Success Probability    Rec.     │
+│      7.2/10               78%           CONSIDER    │
+├─────────────────────────────────────────────────────┤
+│ Algorithm Analysis:                                  │
+│ • Weighted Average: 7.5/10                          │
+│ • Logistic Regression: Likely Success (78%)        │
+│ • Reliability (QWK): 0.73 (Good Agreement)          │
+├─────────────────────────────────────────────────────┤
+│ ⚠️ Early Warnings:                                  │
+│ • Score is below historical average (6.8)           │
+├─────────────────────────────────────────────────────┤
+│ ℹ️ For Reference Only: Your judgment is primary     │
+└─────────────────────────────────────────────────────┘
+```
+
+#####  Workflow Integration
+
+#### Trigger Points:
+1. **Automatic**: After Stage 1 (screening) completion
+2. **Manual**: Evaluator can refresh predictions
+
+#### Integration Point:
+Modify the existing stage completion handler to trigger ML predictions for Stage 1.
+
+```typescript
+// In stage evaluation completion handler
+if (stageEvaluation.stage.type === 'screening') {
+  await triggerMLPrediction({
+    candidateId: stageEvaluation.candidateId,
+    jobId: stageEvaluation.jobId,
+    stageId: stageEvaluation.stageId,
+    currentScores: stageEvaluation.scoring
+  });
+}
 
 ---
 
@@ -1281,6 +1403,12 @@ Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 │ ├── 📋 Job Templates: Standardized job descriptions        │
 │ ├── 🎯 Evaluation Criteria: Custom evaluation rubrics       │
 │ ├── 📊 Interview Stages: Multi-stage interview processes   │
+│ │   ├── System Stages: 3 fixed stages (cannot delete)       │
+│ │   ├── Custom Stages: Additional company-specific stages   │
+│ │   └── Stage Templates: Reusable patterns per tenant       │
+│ ├── 🏢 Company Values: Cultural fit evaluation criteria     │
+│ │   ├── Default Values: Standard company values            │
+│ │   └── Custom Values: Tenant-defined cultural pillars     │
 │ ├── 💰 Compensation Structures: Pay grade definitions       │
 │ ├── 🤝 Referral Programs: Employee referral policies         │
 │ └── 📊 Diversity Goals: Diversity, equity, inclusion targets    │
@@ -1360,7 +1488,62 @@ Stage 4 → Knowledge:8, Skills:8, Ability:8, Values:8 → Hire ✅
 
 ---
 
-## 🏗️ **13. Strict Type Definitions**
+## 🏗️ **13. Tenant Configuration & Type Definitions**
+
+### **Tenant Configuration Structure**
+```typescript
+interface TenantConfiguration {
+  // Company Values Configuration
+  companyValues: {
+    defaultValues: CompanyValue[];  // Standard values
+    customValues: CompanyValue[];   // Tenant-specific values
+    requiredForEvaluation: boolean; // Must score cultural fit
+  };
+
+  // Evaluation Stages Configuration
+  evaluationStages: {
+    systemStages: SystemStage[];     // 3 fixed stages (from presets)
+    customStages: CustomStage[];     // Additional company stages
+    stageTemplates: StageTemplate[]; // Reusable patterns
+    companyOverrides: {
+      [companyId: string]: {
+        enabledStages: string[];
+        stageOrder: string[];
+        customStageConfig: CustomStageConfig[];
+      };
+    };
+  };
+
+  // KSA Configuration
+  ksaFramework: {
+    weightingPresets: {
+      [jobType: string]: {
+        knowledge: number;
+        skills: number;
+        ability: number;
+      };
+    };
+    defaultPreset: string;  // Which preset to use by default
+  };
+}
+
+interface CompanyValue {
+  id: string;
+  name: string;
+  description: string;
+  weight: number;  // Relative importance (1-10)
+  isDefault: boolean;  // System-provided or tenant-created
+}
+
+interface StageTemplate {
+  id: string;
+  name: string;
+  description: string;
+  stages: (SystemStage | CustomStage)[];
+  applicableJobTypes: string[];
+  isDefault: boolean;
+}
+```
 
 ### **Tenant Metadata**
 ```typescript
