@@ -3,7 +3,8 @@
     "console-ninja",
     "ohriv-better-auth",
     "shadcn-ui",
-    "upstash-context-7-mcp"
+    "upstash-context-7-mcp",
+    "stack-auth"
   ],
   "permissions": {
     "allow": ["Bash(pnpm :*)", "Bash(npm run :*)"]

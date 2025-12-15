@@ -1,29 +1,31 @@
-import { NextResponse, NextRequest } from 'next/server'
-import { getDemoSession } from '@/lib/session'
+import { NextResponse, NextRequest } from "next/server";
+import { stackServerApp } from "./lib/stack/server";
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl;
 
-  // Only protect /demos and its sub-routes
-  if (pathname.startsWith('/demos')) {
+  // Protect /dashboard routes using Stack Auth
+  if (pathname.startsWith("/dashboard")) {
     try {
-      const session = await getDemoSession()
+      const user = await stackServerApp.getUser();
 
-      // If no valid session, redirect to home page
-      if (!session || !session.demoAccess) {
-        const passwordUrl = new URL('/', request.url)
-        passwordUrl.searchParams.set('redirect', pathname)
-        return NextResponse.redirect(passwordUrl)
+      // If no authenticated user, redirect to sign-in page
+      if (!user) {
+        const signInUrl = new URL(stackServerApp.urls.signIn, request.url);
+        // Add redirect parameter to return to intended page after sign-in
+        signInUrl.searchParams.set("redirect_url", pathname);
+        return NextResponse.redirect(signInUrl);
       }
     } catch (error) {
-      // If session validation fails, redirect to home page
-      const passwordUrl = new URL('/', request.url)
-      passwordUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(passwordUrl)
+      // If authentication check fails, redirect to sign-in page
+      console.error("Auth middleware error:", error);
+      const signInUrl = new URL(stackServerApp.urls.signIn, request.url);
+      signInUrl.searchParams.set("redirect_url", pathname);
+      return NextResponse.redirect(signInUrl);
     }
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
@@ -36,6 +38,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-}
+};

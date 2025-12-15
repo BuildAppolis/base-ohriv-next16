@@ -2,7 +2,7 @@ import "./globals.css";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { createMetadata } from "@/lib/metadata";
-import { Providers } from "@/components/providers";
+import { ServerProviders } from "@/components/providers/index";
 
 
 export const metadata = createMetadata({
@@ -24,7 +24,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
       </head>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
-        <Providers>{children}</Providers>
+        <ServerProviders>{children}</ServerProviders>
       </body>
     </html>
   );
