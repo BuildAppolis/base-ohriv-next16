@@ -1,0 +1,32 @@
+# Railway configuration for Ohriv monorepo
+
+[build]
+builder = "nixpacks"
+
+# Backend service (Motia)
+[[services]]
+name = "ohriv-backend"
+source = "packages/backend"
+dockerfile = "packages/backend/Dockerfile"
+dockerContext = "packages/backend"
+
+[services.variables]
+NODE_ENV = "production"
+PORT = "3001"
+RAVENDB_URL = "https://ohriv-dev.buildappolis.ravendb.cloud"
+RAVENDB_DATABASE = "ohriv-prod"
+
+[services.env]
+RAVENDB_CERTIFICATE_BASE64 = ""
+RAVENDB_PRIVATE_KEY_BASE64 = ""
+
+# Frontend service (Next.js)
+[[services]]
+name = "ohriv-frontend"
+source = "packages/frontend"
+buildCommand = "cd packages/frontend && npm run build"
+startCommand = "cd packages/frontend && npm start"
+
+[services.variables]
+NODE_ENV = "production"
+NEXT_PUBLIC_API_URL = "https://ohriv-backend-production.railway.app"

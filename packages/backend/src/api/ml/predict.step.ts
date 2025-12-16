@@ -19,7 +19,7 @@ const PythonExecutionResultSchema = z.object({
   result: z.any().optional(),
   error: z.string().optional(),
   error_type: z.string().optional(),
-  traceback: z.string().optional(),
+  traceback: z.string().optional(),d
   stdout: z.string().optional(),
   stderr: z.string().optional(),
 });
