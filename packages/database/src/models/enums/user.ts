@@ -13,6 +13,37 @@ export enum UserStatus {
 }
 
 /**
+ * System-level roles (Platform-wide)
+ */
+export enum SystemRole {
+  PlatformOwner = "platform_owner",
+  SuperAdmin = "super_admin",
+  PartnerManager = "partner_manager",
+  StandardUser = "standard_user",
+}
+
+/**
+ * Tenant-level roles (Organization-wide)
+ */
+export enum TenantRole {
+  Owner = "owner",
+  Admin = "admin",
+  User = "user",
+  Viewer = "viewer",
+}
+
+/**
+ * Company-level roles (Location-specific)
+ */
+export enum CompanyRole {
+  Admin = "admin",
+  Manager = "manager",
+  Member = "member",
+  Evaluator = "evaluator",
+}
+
+/**
+ * @deprecated Use SystemRole, TenantRole, or CompanyRole instead
  * User roles within organization
  */
 export enum UserRole {
@@ -25,57 +56,168 @@ export enum UserRole {
 }
 
 /**
- * User permissions
+ * User permissions (resource:action:scope format)
  */
 export const permissions = [
-  // Tenant permissions
-  "tenant.manage",
-  "tenant.view",
-  "tenant.billing",
+  // System permissions (Platform-wide)
+  "system.*",
+  "system.configure",
+  "system.monitor",
+  "system.tenants.create",
+  "system.tenants.view",
+  "system.tenants.manage",
 
-  // Company permissions
+  // Tenant permissions (Organization-wide)
+  "tenant.*",
+  "tenant.create",
+  "tenant.view",
+  "tenant.edit",
+  "tenant.delete",
+  "tenant.manage",
+  "tenant.billing.view",
+  "tenant.billing.manage",
+  "tenant.users.invite",
+  "tenant.users.manage",
+  "tenant.companies.create",
+  "tenant.companies.manage",
+  "tenant.analytics.view",
+  "tenant.analytics.export",
+
+  // Company permissions (Location-specific)
+  "company.*",
+  "company.all.view",           // View all companies in tenant
   "company.create",
-  "company.edit",
-  "company.delete",
-  "company.view",
+  "company.view:all",           // View all companies
+  "company.view:assigned",      // View only assigned companies
+  "company.edit:all",
+  "company.edit:assigned",
+  "company.delete:all",
+  "company.delete:assigned",
+  "company.manage:all",
+  "company.manage:assigned",
+  "company.users.invite",
+  "company.users.assign",
+  "company.teams.manage",
 
   // Job permissions
-  "job.create",
-  "job.edit",
-  "job.delete",
-  "job.publish",
-  "job.view",
+  "job.*",
+  "job.create:all",
+  "job.create:assigned",
+  "job.view:all",
+  "job.view:assigned",
+  "job.view:own",
+  "job.edit:all",
+  "job.edit:assigned",
+  "job.edit:own",
+  "job.delete:all",
+  "job.delete:assigned",
+  "job.delete:own",
+  "job.publish:all",
+  "job.publish:assigned",
+  "job.publish:own",
+  "job.archive:all",
+  "job.archive:assigned",
 
   // Candidate permissions
-  "candidate.create",
-  "candidate.edit",
-  "candidate.delete",
-  "candidate.view",
-  "candidate.search",
+  "candidate.*",
+  "candidate.create:all",
+  "candidate.create:assigned",
+  "candidate.view:all",
+  "candidate.view:assigned",
+  "candidate.view:own",
+  "candidate.edit:all",
+  "candidate.edit:assigned",
+  "candidate.edit:own",
+  "candidate.delete:all",
+  "candidate.delete:assigned",
+  "candidate.delete:own",
+  "candidate.search:all",
+  "candidate.search:assigned",
+  "candidate.export:all",
+  "candidate.export:assigned",
+  "candidate.email:all",
+  "candidate.email:assigned",
 
   // Evaluation permissions
-  "evaluation.create",
-  "evaluation.edit",
-  "evaluation.delete",
-  "evaluation.view",
-  "evaluation.score",
+  "evaluation.*",
+  "evaluation.create:all",
+  "evaluation.create:assigned",
+  "evaluation.view:all",
+  "evaluation.view:assigned",
+  "evaluation.view:own",
+  "evaluation.edit:all",
+  "evaluation.edit:assigned",
+  "evaluation.edit:own",
+  "evaluation.delete:all",
+  "evaluation.delete:assigned",
+  "evaluation.delete:own",
+  "evaluation.score:all",
+  "evaluation.score:assigned",
+  "evaluation.score:own",
   "evaluation.advanced_scoring",
+  "evaluation.templates.manage",
+  "evaluation.assign",
+  "evaluation.calibrate",
 
   // Analytics permissions
-  "analytics.view",
+  "analytics.*",
+  "analytics.view:all",
+  "analytics.view:assigned",
+  "analytics.view:own",
   "analytics.advanced",
-  "analytics.export",
+  "analytics.export:all",
+  "analytics.export:assigned",
+  "analytics.custom",
+  "analytics.predictions",
 
-  // User management
+  // User management permissions
+  "user.*",
   "user.invite",
-  "user.edit",
-  "user.delete",
-  "user.manage_permissions",
+  "user.view:all",
+  "user.view:assigned",
+  "user.edit:all",
+  "user.edit:assigned",
+  "user.edit:own",
+  "user.delete:all",
+  "user.delete:assigned",
+  "user.permissions.view",
+  "user.permissions.manage",
+  "user.roles.assign",
+  "user.activity.view",
 
-  // System permissions
-  "system.configure",
-  "system.integrations",
-  "system.export_data",
+  // Integration permissions
+  "integration.*",
+  "integration.ats.configure",
+  "integration.ats.sync",
+  "integration.api.view",
+  "integration.api.create",
+  "integration.api.manage",
+  "integration.webhooks.manage",
+  "integration.exports.schedule",
+
+  // Report permissions
+  "report.*",
+  "report.view:all",
+  "report.view:assigned",
+  "report.create",
+  "report.schedule",
+  "report.export:all",
+  "report.export:assigned",
+
+  // Communication permissions
+  "communication.*",
+  "communication.email.send",
+  "communication.email.templates",
+  "communication.sms.send",
+  "communication.notifications.manage",
+
+  // Partner-specific permissions
+  "partner.*",
+  "partner.tenants.view",
+  "partner.clients.manage",
+  "partner.candidates.share",
+  "partner.jobs.post",
+  "partner.analytics.view",
 ] as const;
 
 export type Permission = (typeof permissions)[number];

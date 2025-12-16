@@ -5,3 +5,4 @@
 export * from './guidelines';
 export * from './stages';
 export * from './skills';
+export * from './pipeline-config';

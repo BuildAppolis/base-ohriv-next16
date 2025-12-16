@@ -8,6 +8,12 @@ import {
   PartnerDocument,
   TenantConfigDocument
 } from '../models';
+import {
+  TenantPlan,
+  TenantStatus,
+  PartnerBusinessType
+} from '../models/enums/system';
+import { TenantRole } from '../models/enums/user';
 
 /**
  * Tenant Management Service
@@ -41,7 +47,7 @@ export class TenantService {
    */
   async createTenant(tenantData: {
     name: string;
-    plan: 'free' | 'standard' | 'enterprise';
+    plan: TenantPlan;
     ownerUserId: string;
     ownerEmail: string;
     ownerName: string;
@@ -62,7 +68,7 @@ export class TenantService {
         tenantId,
         name: tenantData.name,
         plan: tenantData.plan,
-        status: 'active',
+        status: TenantStatus.Active,
         databaseName,
         ownerUserId: tenantData.ownerUserId,
         ownerEmail: tenantData.ownerEmail,
@@ -205,7 +211,7 @@ export class TenantService {
       email: string;
       name: string;
     },
-    role: 'owner' | 'admin' | 'recruiter' | 'interviewer' | 'viewer'
+    role: TenantRole
   ): Promise<UserMembership> {
     const membership: UserMembership = {
       userId: userData.userId,
@@ -279,7 +285,7 @@ export class TenantService {
   async createPartner(partnerData: {
     name: string;
     tenantId: string; // Partner's own tenant
-    businessType: 'reseller' | 'consultant' | 'implementation_partner';
+    businessType: PartnerBusinessType;
     contactInfo: any;
   }): Promise<PartnerDocument> {
     if (!this.managementClient) {
@@ -398,8 +404,8 @@ export class TenantService {
       version: 1,
       isActive: true,
       createdAt: new Date().toISOString(),
+      createdBy: 'system',
       updatedAt: new Date().toISOString(),
-      updatedBy: 'system',
       changeHistory: []
     };
 

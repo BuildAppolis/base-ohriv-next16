@@ -5,7 +5,10 @@
 import {
   CompanyScopedDocument,
   AuditableDocument,
-  SoftDelete
+  SoftDelete,
+  StackAuthIntegratedDocument,
+  StripeIntegratedDocument,
+  MultiTenantBillingDocument
 } from '../core/base';
 import {
   CompanySize,
@@ -19,7 +22,13 @@ import { Address, ContactInfo } from '../core/common';
 /**
  * Company Document - Represents a company/organization within a tenant
  */
-export interface CompanyDocument extends CompanyScopedDocument, AuditableDocument, SoftDelete {
+export interface CompanyDocument extends
+  CompanyScopedDocument,
+  AuditableDocument,
+  SoftDelete,
+  StackAuthIntegratedDocument,
+  StripeIntegratedDocument,
+  MultiTenantBillingDocument {
   collection: "companies";
 
   // Core company information

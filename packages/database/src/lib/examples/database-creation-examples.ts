@@ -5,8 +5,8 @@
  * Here are multiple approaches for creating tenant databases dynamically.
  */
 
-import { createDatabaseClient } from '../client';
-import { getDatabaseConfig } from '../config';
+import { createDatabaseClient } from "../../client";
+import { getDatabaseConfig } from "../../config";
 
 // Method 1: Direct Database Creation (Simplest)
 async function createDatabaseDirectly(tenantId: string) {
@@ -17,7 +17,7 @@ async function createDatabaseDirectly(tenantId: string) {
   const client = createDatabaseClient({
     ...getDatabaseConfig(),
     database: `tenant-${tenantId}`, // This database will be created automatically
-    enableOptimisticConcurrency: true
+    enableOptimisticConcurrency: true,
   });
 
   // 2. Initialize the client (this creates the database)
@@ -27,11 +27,11 @@ async function createDatabaseDirectly(tenantId: string) {
   const session = await client.openSession();
 
   const tenantConfig = {
-    collection: 'tenant-configs',
+    collection: "tenant-configs",
     id: `tenant-configs/${tenantId}`,
     tenantId,
     createdAt: new Date().toISOString(),
-    initialized: true
+    initialized: true,
   };
 
   await session.store(tenantConfig);
@@ -51,17 +51,17 @@ async function createDatabaseWithAPI(tenantId: string) {
   try {
     // Create database via HTTP API
     const response = await fetch(`${serverUrl}/admin/databases`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         DatabaseName: databaseName,
         Settings: {
           DataDirectory: `Databases/${databaseName}`,
           Encrypted: false, // Set to true for HIPAA compliance
-        }
-      })
+        },
+      }),
     });
 
     if (response.ok) {
@@ -73,9 +73,8 @@ async function createDatabaseWithAPI(tenantId: string) {
     // Now connect to it
     return await createDatabaseClient({
       ...config,
-      database: databaseName
+      database: databaseName,
     });
-
   } catch (error) {
     console.error(`❌ Failed to create database: ${(error as Error).message}`);
     throw error;
@@ -91,7 +90,7 @@ async function createMultipleDatabases(tenantIds: string[]) {
     try {
       const client = createDatabaseClient({
         ...getDatabaseConfig(),
-        database: `tenant-${tenantId}`
+        database: `tenant-${tenantId}`,
       });
 
       await client.initialize();
@@ -100,11 +99,11 @@ async function createMultipleDatabases(tenantIds: string[]) {
       const session = await client.openSession();
 
       await session.store({
-        collection: 'tenant-configs',
+        collection: "tenant-configs",
         id: `tenant-configs/${tenantId}`,
         tenantId,
         createdAt: new Date().toISOString(),
-        status: 'active'
+        status: "active",
       });
 
       await session.saveChanges();
@@ -120,13 +119,13 @@ async function createMultipleDatabases(tenantIds: string[]) {
   const results = await Promise.all(databasePromises);
 
   // Log results
-  const successful = results.filter(r => r.success).length;
-  const failed = results.filter(r => !r.success);
+  const successful = results.filter((r) => r.success).length;
+  const failed = results.filter((r) => !r.success);
 
   console.log(`✅ ${successful} databases created successfully`);
   if (failed.length > 0) {
     console.log(`❌ ${failed.length} databases failed to create`);
-    failed.forEach(f => console.log(`  - ${f.tenantId}: ${f.error}`));
+    failed.forEach((f) => console.log(`  - ${f.tenantId}: ${f.error}`));
   }
 
   return results;
@@ -137,7 +136,7 @@ async function checkDatabaseExists(databaseName: string): Promise<boolean> {
   try {
     const client = createDatabaseClient({
       ...getDatabaseConfig(),
-      database: databaseName
+      database: databaseName,
     });
 
     // Try to initialize - if it fails, database doesn't exist
@@ -158,7 +157,7 @@ async function checkDatabaseExists(databaseName: string): Promise<boolean> {
 async function createProductionTenant(tenantData: {
   tenantId: string;
   name: string;
-  plan: 'free' | 'standard' | 'enterprise';
+  plan: "free" | "standard" | "enterprise";
   encryptionEnabled?: boolean;
 }) {
   const { tenantId, name, plan, encryptionEnabled = false } = tenantData;
@@ -177,7 +176,7 @@ async function createProductionTenant(tenantData: {
     const client = createDatabaseClient({
       ...getDatabaseConfig(),
       database: databaseName,
-      enableOptimisticConcurrency: true
+      enableOptimisticConcurrency: true,
     });
 
     await client.initialize();
@@ -187,59 +186,58 @@ async function createProductionTenant(tenantData: {
 
     // Store tenant configuration
     await session.store({
-      collection: 'tenant-configs',
+      collection: "tenant-configs",
       id: `tenant-configs/${tenantId}`,
       tenantId,
-      configType: 'system',
+      configType: "system",
       config: {
         tenantName: name,
         plan,
         encryptionEnabled,
         hipaaCompliant: true,
         features: getFeaturesForPlan(plan),
-        limits: getLimitsForPlan(plan)
+        limits: getLimitsForPlan(plan),
       },
       version: 1,
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      updatedBy: 'system'
+      updatedBy: "system",
     });
 
     // Create initial indexes setup
     await session.store({
-      collection: 'system-indexes',
+      collection: "system-indexes",
       id: `system-indexes/${tenantId}`,
       tenantId,
       indexes: [
-        'companies/by-name',
-        'candidates/by-email',
-        'jobs/by-status',
-        'evaluations/by-candidate'
+        "companies/by-name",
+        "candidates/by-email",
+        "jobs/by-status",
+        "evaluations/by-candidate",
       ],
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
 
     await session.saveChanges();
     session.dispose();
 
     console.log(`✅ Tenant "${name}" database created: ${databaseName}`);
-    console.log(`🔒 Encryption: ${encryptionEnabled ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`🔒 Encryption: ${encryptionEnabled ? "ENABLED" : "DISABLED"}`);
     console.log(`📋 Plan: ${plan.toUpperCase()}`);
 
     return {
       success: true,
       databaseName,
       tenantId,
-      message: `Tenant ${name} created successfully`
+      message: `Tenant ${name} created successfully`,
     };
-
   } catch (error) {
     console.error(`❌ Failed to create tenant: ${(error as Error).message}`);
     return {
       success: false,
       tenantId,
-      message: (error as Error).message
+      message: (error as Error).message,
     };
   }
 }
@@ -250,32 +248,32 @@ function getFeaturesForPlan(plan: string) {
     evaluations: true,
     basicAnalytics: true,
     candidates: true,
-    jobs: true
+    jobs: true,
   };
 
   switch (plan) {
-    case 'free':
+    case "free":
       return {
         ...baseFeatures,
         advancedAnalytics: false,
         aiEvaluation: false,
-        apiAccess: false
+        apiAccess: false,
       };
-    case 'standard':
+    case "standard":
       return {
         ...baseFeatures,
         advancedAnalytics: true,
         aiEvaluation: true,
-        apiAccess: false
+        apiAccess: false,
       };
-    case 'enterprise':
+    case "enterprise":
       return {
         ...baseFeatures,
         advancedAnalytics: true,
         aiEvaluation: true,
         apiAccess: true,
         dedicatedSupport: true,
-        customIntegrations: true
+        customIntegrations: true,
       };
     default:
       return baseFeatures;
@@ -284,26 +282,26 @@ function getFeaturesForPlan(plan: string) {
 
 function getLimitsForPlan(plan: string) {
   switch (plan) {
-    case 'free':
+    case "free":
       return {
         companies: 1,
         users: 5,
         storageGB: 10,
-        evaluationsPerMonth: 100
+        evaluationsPerMonth: 100,
       };
-    case 'standard':
+    case "standard":
       return {
         companies: 5,
         users: 25,
         storageGB: 100,
-        evaluationsPerMonth: 1000
+        evaluationsPerMonth: 1000,
       };
-    case 'enterprise':
+    case "enterprise":
       return {
         companies: 50,
         users: 500,
         storageGB: 1000,
-        evaluationsPerMonth: 10000
+        evaluationsPerMonth: 10000,
       };
     default:
       return { companies: 1, users: 5, storageGB: 10 };
@@ -312,39 +310,48 @@ function getLimitsForPlan(plan: string) {
 
 // Usage examples
 export async function demonstrateDatabaseCreation() {
-  console.log('🎯 Demonstrating RavenDB Database Creation...\n');
+  console.log("🎯 Demonstrating RavenDB Database Creation...\n");
 
   try {
     // Example 1: Simple database creation
-    console.log('1. Simple Database Creation:');
-    const tenant1Client = await createDatabaseDirectly('healthcare-corp');
-    console.log('   ✅ Database created and initialized\n');
+    console.log("1. Simple Database Creation:");
+    const tenant1Client = await createDatabaseDirectly("healthcare-corp");
+    console.log("   ✅ Database created and initialized\n");
 
     // Example 2: Multiple databases
-    console.log('2. Batch Database Creation:');
-    const tenantIds = ['medical-center', 'clinic-abc', 'hospital-xyz'];
+    console.log("2. Batch Database Creation:");
+    const tenantIds = ["medical-center", "clinic-abc", "hospital-xyz"];
     const batchResults = await createMultipleDatabases(tenantIds);
-    console.log(`   ✅ ${batchResults.filter(r => r.success).length}/${batchResults.length} databases created\n`);
+    console.log(
+      `   ✅ ${batchResults.filter((r) => r.success).length}/${
+        batchResults.length
+      } databases created\n`
+    );
 
     // Example 3: Production tenant creation
-    console.log('3. Production Tenant Creation:');
+    console.log("3. Production Tenant Creation:");
     const tenantResult = await createProductionTenant({
-      tenantId: 'advanced-healthcare',
-      name: 'Advanced Healthcare Partners',
-      plan: 'enterprise',
-      encryptionEnabled: true
+      tenantId: "advanced-healthcare",
+      name: "Advanced Healthcare Partners",
+      plan: "enterprise",
+      encryptionEnabled: true,
     });
-    console.log(`   ${tenantResult.success ? '✅' : '❌'} ${tenantResult.message}\n`);
+    console.log(
+      `   ${tenantResult.success ? "✅" : "❌"} ${tenantResult.message}\n`
+    );
 
     // Example 4: Check existing databases
-    console.log('4. Database Existence Check:');
-    const dbExists = await checkDatabaseExists('tenant-healthcare-corp');
-    console.log(`   Database 'tenant-healthcare-corp' exists: ${dbExists ? 'Yes' : 'No'}\n`);
+    console.log("4. Database Existence Check:");
+    const dbExists = await checkDatabaseExists("tenant-healthcare-corp");
+    console.log(
+      `   Database 'tenant-healthcare-corp' exists: ${
+        dbExists ? "Yes" : "No"
+      }\n`
+    );
 
-    console.log('🎉 Database creation demonstration completed!');
-
+    console.log("🎉 Database creation demonstration completed!");
   } catch (error) {
-    console.error('❌ Demonstration failed:', error);
+    console.error("❌ Demonstration failed:", error);
   }
 }
 
@@ -354,7 +361,7 @@ export {
   createDatabaseWithAPI,
   createMultipleDatabases,
   checkDatabaseExists,
-  createProductionTenant
+  createProductionTenant,
 };
 
 // Run demonstration if this file is executed directly

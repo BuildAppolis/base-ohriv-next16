@@ -7,7 +7,9 @@ import {
   RavenDocument,
   TenantScopedDocument,
   AuditableDocument,
-  SoftDelete
+  SoftDelete,
+  StackAuthIntegratedDocument,
+  StripeIntegratedDocument
 } from '../core/base';
 import {
   TenantPlan,
@@ -23,7 +25,11 @@ import { UserRole } from '../enums/user';
  * Each tenant gets their own isolated database, but we also store tenant metadata
  * in a central management database for multi-tenant operations.
  */
-export interface TenantDocument extends RavenDocument, AuditableDocument {
+export interface TenantDocument extends
+  RavenDocument,
+  AuditableDocument,
+  StackAuthIntegratedDocument,
+  StripeIntegratedDocument {
   collection: "tenants";
 
   // Core tenant information
@@ -73,6 +79,18 @@ export interface TenantDocument extends RavenDocument, AuditableDocument {
       advancedAnalytics: boolean;
       customWorkflows: boolean;
       apiAccess: boolean;
+    };
+    // Stack Auth specific settings
+    stackAuth?: {
+      autoCreateTeams: boolean;
+      defaultRoles: string[];
+      allowUserRegistration: boolean;
+      requireInvitation: boolean;
+      teamSettings?: {
+        maxUsers?: number;
+        allowCrossCompanyAccess?: boolean;
+        defaultPermissions?: string[];
+      };
     };
   };
 

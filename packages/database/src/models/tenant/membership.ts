@@ -8,7 +8,7 @@ import {
   AuditableDocument,
   ActivityTracking
 } from '../core/base';
-import { UserStatus, UserRole, Theme, TimeFormat } from '../enums/user';
+import { UserStatus, TenantRole, Theme, TimeFormat } from '../enums/user';
 import { Address, ContactInfo } from '../core/common';
 
 /**
@@ -48,7 +48,7 @@ export interface UserDocument extends RavenDocument, AuditableDocument, Activity
 
   // Permissions and roles
   permissions: string[];    // Specific permissions (for fine-grained access)
-  defaultRole: UserRole;
+  defaultRole: TenantRole;
 
   // Preferences
   preferences: {
@@ -82,7 +82,7 @@ export interface UserDocument extends RavenDocument, AuditableDocument, Activity
 export interface UserMembership {
   tenantId: string;
   userId: string;
-  role: UserRole;
+  role: TenantRole;
   scopes: string[];          // Additional permissions/overrides
   invitedBy: string;         // Who invited this user
   invitedAt: string;         // When invitation was sent

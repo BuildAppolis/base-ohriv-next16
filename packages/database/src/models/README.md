@@ -88,44 +88,6 @@ import {
 } from '@/packages/database/src/models';
 ```
 
-### Legacy Imports
-
-```typescript
-// Old style (still works but deprecated)
-import { CompanyDocument } from '@/packages/database/src/models/recruitment-models';
-
-// Namespace import for legacy models
-import { LegacyRecruitmentModels } from '@/packages/database/src/models';
-const { CompanyDocument } = LegacyRecruitmentModels;
-```
-
-## 🔄 Migration Guide
-
-### Updating Existing Imports
-
-1. **Find all imports** from old model files:
-   ```bash
-   grep -r "from.*models.*-models" src/
-   ```
-
-2. **Update imports** to use new structure:
-   ```typescript
-   // Before
-   import { CompanyDocument } from '../models/recruitment-models';
-
-   // After
-   import { CompanyDocument } from '../models/recruitment';
-   ```
-
-3. **For multiple imports from same domain**:
-   ```typescript
-   // Before
-   import { CompanyDocument, JobDocument, CandidateDocument } from '../models/recruitment-models';
-
-   // After
-   import * as RecruitmentModels from '../models/recruitment';
-   const { CompanyDocument, JobDocument, CandidateDocument } = RecruitmentModels;
-   ```
 
 ## 📝 Type Usage Guidelines
 

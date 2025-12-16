@@ -42,7 +42,28 @@ export interface KSAGuidelineDocument extends TenantScopedDocument, AuditableDoc
   valuesFit: Record<string, ValuesCategory>;
 
   // Weighting Presets
-  weightingPresets?: Record<string, Record<string, WeightingPreset>>;
+  weightingPresets?: {
+    [jobType: string]: {
+      [jobLevel: string]: {
+        Knowledge: {
+          delta: number;
+          leftPoints: number;
+          rightPoints: number;
+        };
+        Skills: {
+          delta: number;
+          leftPoints: number;
+          rightPoints: number;
+        };
+        Ability: {
+          delta: number;
+          leftPoints: number;
+          rightPoints: number;
+        };
+        rationale: string;
+      };
+    };
+  };
 
   // Usage tracking
   usage: {

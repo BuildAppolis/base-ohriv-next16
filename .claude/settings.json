@@ -1,10 +1,12 @@
 {
   "enabledMcpjsonServers": [
     "console-ninja",
-    "ohriv-better-auth",
     "shadcn-ui",
-    "upstash-context-7-mcp",
-    "stack-auth"
+    "context7",
+    "stack-auth",
+    "codanna",
+    "Railway",
+    "motia"
   ],
   "permissions": {
     "allow": ["Bash(pnpm :*)", "Bash(npm run :*)"]
